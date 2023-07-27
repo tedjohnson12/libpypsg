@@ -1,0 +1,14 @@
+{
+    // "python.testing.pytestArgs": [
+    //     "-v",
+    //     "--cov=VSPEC/",
+    //     "--cov-report=html:coverage_html",
+    //     "--pdb",
+    //     "test/pytest"
+    // ],
+    // "python.testing.unittestEnabled": false,
+    // "python.testing.pytestEnabled": true,
+    // pytest --cov=VSPEC/ --cov-report=html:coverage_html test/pytest
+    "autoDocstring.docstringFormat": "numpy",
+    "autoDocstring.startOnNewLine": true
+}
