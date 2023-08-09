@@ -1,1 +1,0 @@
-from pypsg.cfg import *
