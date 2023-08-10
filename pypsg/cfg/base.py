@@ -233,6 +233,9 @@ class QuantityField(Field):
         super(QuantityField, QuantityField).value.__set__(self, value_to_set)
 
 class GravityField(Field):
+    """
+    A data field for planet gravity.
+    """
     _allowed_units:Tuple[u.Unit] = (u.Unit('m s-2'),u.Unit('g cm-3'), u.kg)
     _unit_codes:Tuple[str] = ('g', 'rho', 'kg')
     fmt = '.4f'
@@ -261,7 +264,7 @@ class GravityField(Field):
             msg = f'Value set is {value_to_set} ({value_to_set.unit.physical_type}). '
             msg += f'Must be of types {",".join([unit.to_string() for unit in self._allowed_units])}.'
             raise u.UnitConversionError(msg)
-        super(CharField, CharField).value.__set__(self, value_to_set)
+        super(GravityField, GravityField).value.__set__(self, value_to_set)
     def _get_values(self):
         unit_to_use = {unit.physical_type:unit for unit in self._allowed_units}[self._value.unit.physical_type]
         unit_code = {unit:code for unit,code in zip(self._allowed_units,self._unit_codes)}[unit_to_use]
