@@ -5,7 +5,7 @@ import pytest
 from astropy import units as u
 
 from pypsg.cfg.base import Field, Model, CharField, IntegerField
-from pypsg.cfg.base import FloatField, QuantityField
+from pypsg.cfg.base import FloatField, QuantityField, GravityField
 
 def test_field():
     field = Field(
@@ -13,7 +13,7 @@ def test_field():
     )
     assert field.is_null
     assert field.default is None
-    assert field.null is False
+    assert field.null is True
     
     field.value = 2
     assert not field.is_null
@@ -21,8 +21,7 @@ def test_field():
     assert field.value == b'2'
     assert field.content == b'<TEST>2'
     
-    with pytest.raises(ValueError):
-        field.value = None
+    
     ####
     field = Field(
         name='test',
@@ -31,6 +30,8 @@ def test_field():
     )
     assert field.default == 3
     assert field.null is False
+    with pytest.raises(ValueError):
+        field.value = None
 
 def test_CharField():
     char = CharField(max_length=4,name='char')
@@ -66,7 +67,7 @@ def test_FloatField():
     assert f.value == b'1.00e+06'
 
 def test_QuantityField():
-    q = QuantityField('quant',u.m)
+    q = QuantityField('quant',u.m,null=False)
     q.value = 1*u.m
     with pytest.raises(TypeError):
         q.value = 1
@@ -75,6 +76,35 @@ def test_QuantityField():
     with pytest.raises(u.UnitConversionError):
         q.value = 1*u.s
     assert q.value == b'1.00'
+
+def test_GravityField():
+    g = GravityField()
+    with pytest.raises(NotImplementedError):
+        _ = g.value
+    with pytest.raises(NotImplementedError):
+        _ = g.name
+    
+    g.value = 1*u.M_earth
+    assert g._value == 1*u.M_earth
+    g.value = 10*u.m / u.s**2
+    g.value = 5*u.g / u.cm**3
+    with pytest.raises(u.UnitConversionError):
+        g.value = 10*u.s
+    g.value = 1*u.M_earth
+    val_str, unit_code = g._get_values()
+    assert val_str == f'{(1*u.M_earth).to_value(u.kg):.4f}'
+    assert unit_code == 'kg'
+    g.value = 10*u.m / u.s**2
+    val_str, unit_code = g._get_values()
+    assert val_str == '10.0000'
+    assert unit_code == 'g'
+    g.value = 5*u.g / u.cm**3
+    val_str, unit_code = g._get_values()
+    assert val_str == '5.0000'
+    assert unit_code == 'rho'
+    assert g.content == b'<OBJECT-GRAVITY>5.0000\n<OBJECT-GRAVITY-UNIT>rho'
+    
+    
     
     
 def test_model():

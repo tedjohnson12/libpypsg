@@ -2,7 +2,7 @@
 This module contains the basic functionality for fields in PSG
 config objects.
 """
-from typing import Any
+from typing import Any,Tuple
 from copy import deepcopy
 from astropy import units as u
 
@@ -34,7 +34,7 @@ class Field:
         If false, the field cannot be empty.
     """
 
-    def __init__(self, name: str, default: Any = None, null: bool = False):
+    def __init__(self, name: str, default: Any = None, null: bool = True):
         self.default = default
         self.null = null
         self._name = name
@@ -141,7 +141,7 @@ class CharField(Field):
         If false, the field cannot be empty. Default is False.
     """
 
-    def __init__(self, name: str, default: str = None, null: bool = False, max_length: int = 255):
+    def __init__(self, name: str, default: str = None, null: bool = True, max_length: int = 255):
         super().__init__(name, default, null)
         self.max_length = max_length
 
@@ -172,7 +172,7 @@ class IntegerField(Field):
     def value(self, value_to_set):
         if value_to_set is not None and not isinstance(value_to_set, int):
             raise TypeError("Value must be an integer.")
-        super(CharField, CharField).value.__set__(self, value_to_set)
+        super(IntegerField, IntegerField).value.__set__(self, value_to_set)
 
 
 class FloatField(Field):
@@ -180,7 +180,7 @@ class FloatField(Field):
     A data field containing a float.
     """
 
-    def __init__(self, name: str, default: float = None, null: bool = False, fmt: str = '.2f'):
+    def __init__(self, name: str, default: float = None, null: bool = True, fmt: str = '.2f'):
         super().__init__(name, default, null)
         self.fmt = fmt
 
@@ -194,12 +194,12 @@ class FloatField(Field):
             value_to_set = float(value_to_set)
         if value_to_set is not None and not isinstance(value_to_set, float):
             raise TypeError("Value must be a float.")
-        super(CharField, CharField).value.__set__(self, value_to_set)
+        super(FloatField, FloatField).value.__set__(self, value_to_set)
 
 
 class QuantityField(Field):
     """
-    A data field representing a quantity
+    A data field representing a quantity.
     """
 
     def __init__(
@@ -207,7 +207,7 @@ class QuantityField(Field):
         name: str,
         unit: u.Unit,
         default: u.Quantity = None,
-        null: bool = False,
+        null: bool = True,
         fmt: str = '.2f'
     ):
         super().__init__(name, default, null)
@@ -224,11 +224,56 @@ class QuantityField(Field):
             pass
         elif not isinstance(value_to_set, u.Quantity):
             raise TypeError('Value must be a Quantity.')
+        elif not value_to_set.isscalar:
+            raise ValueError('QuantityField values must be a scalar, not an array.')
         elif value_to_set.unit.physical_type != self.unit.physical_type:
             msg = f'Value set is {value_to_set} ({value_to_set.unit.physical_type}). '
             msg += f'Must be of type {self.unit.physical_type}.'
             raise u.UnitConversionError(msg)
+        super(QuantityField, QuantityField).value.__set__(self, value_to_set)
+
+class GravityField(Field):
+    _allowed_units:Tuple[u.Unit] = (u.Unit('m s-2'),u.Unit('g cm-3'), u.kg)
+    _unit_codes:Tuple[str] = ('g', 'rho', 'kg')
+    fmt = '.4f'
+    def __init__(
+        self,
+        default: u.Quantity = None,
+        null: bool = True
+    ):
+        super().__init__('gravity', default, null)
+    
+    @property
+    def name(self):
+        raise NotImplementedError('This field produces two lines of PSG config file.')
+    @property
+    def _str_property(self):
+        raise NotImplementedError('This field produces two lines of PSG config file.')
+    @Field.value.setter
+    def value(self, value_to_set:u.Quantity):
+        if value_to_set is None:
+            pass
+        elif not isinstance(value_to_set, u.Quantity):
+            raise TypeError('Value must be a Quantity.')
+        elif not value_to_set.isscalar:
+            raise ValueError('QuantityField values must be a scalar, not an array.')
+        elif not any([value_to_set.unit.physical_type == unit.physical_type for unit in self._allowed_units]):
+            msg = f'Value set is {value_to_set} ({value_to_set.unit.physical_type}). '
+            msg += f'Must be of types {",".join([unit.to_string() for unit in self._allowed_units])}.'
+            raise u.UnitConversionError(msg)
         super(CharField, CharField).value.__set__(self, value_to_set)
+    def _get_values(self):
+        unit_to_use = {unit.physical_type:unit for unit in self._allowed_units}[self._value.unit.physical_type]
+        unit_code = {unit:code for unit,code in zip(self._allowed_units,self._unit_codes)}[unit_to_use]
+        value_str = f'{self._value.to_value(unit_to_use):{self.fmt}}'
+        return value_str, unit_code
+    @property
+    def content(self) -> bytes:
+        value_str, unit_code = self._get_values()
+        line1_str = f'<OBJECT-GRAVITY>{value_str}'
+        line2_str = f'<OBJECT-GRAVITY-UNIT>{unit_code}'
+        return bytes(f'{line1_str}\n{line2_str}',encoding=ENCODING)
+    
 
 
 class Model:
