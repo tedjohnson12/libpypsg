@@ -294,3 +294,10 @@ class Model:
             attr.value = __value
         else:
             super().__setattr__(__name, __value)
+    @property
+    def content(self):
+        lines = []
+        for _, field in self.__dict__.items():
+            if isinstance(field,Field):
+                lines.append(field.content)
+        return b'\n'.join(lines)

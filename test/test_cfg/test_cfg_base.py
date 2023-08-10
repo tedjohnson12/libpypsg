@@ -118,6 +118,8 @@ def test_model():
     assert person.name.content == b'<NAME>Ted'
     assert person.age.value == b'23'
     assert person.age.content == b'<AGE>23'
+    expected = b'<NAME>Ted\n<AGE>23'
+    assert person.content == expected
     
     person2 = TestModel(name='Cactus')
     assert person2.name.value == b'Cactus'
@@ -138,6 +140,9 @@ def test_model():
     person3 = OtherModel(name='Barbie',favorite_color='#e0218a')
     assert person3.name.value == b'Barbie'
     assert person3.favorite_color == '#e0218a'
+    
+    expected = b'<NAME>Barbie'
+    assert person3.content == expected
 
 
 if __name__ in '__main__':
