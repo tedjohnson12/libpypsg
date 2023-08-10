@@ -6,6 +6,7 @@ from astropy import units as u
 
 from pypsg.cfg.base import Field, Model, CharField, IntegerField
 from pypsg.cfg.base import FloatField, QuantityField, GravityField
+from pypsg.cfg.base import DateField, CharChoicesField
 
 def test_field():
     field = Field(
@@ -104,7 +105,17 @@ def test_GravityField():
     assert unit_code == 'rho'
     assert g.content == b'<OBJECT-GRAVITY>5.0000\n<OBJECT-GRAVITY-UNIT>rho'
     
-    
+def test_DateField():
+    d = DateField('date')
+    d.value = '2023-08-10 14:15'
+    assert d.value == b'2023/08/10 14:15'
+
+def test_CharChoicesField():
+    c = CharChoicesField('char_choice',options=['a','b'])
+    c.value = 'a'
+    assert c.value == b'a'
+    with pytest.raises(ValueError):
+        c.value = 'c'
     
     
 def test_model():

@@ -5,6 +5,8 @@ config objects.
 from typing import Any,Tuple
 from copy import deepcopy
 from astropy import units as u
+from astropy import time
+from dateutil.parser import parse as parse_date
 
 ENCODING = 'UTF-8'
 
@@ -159,6 +161,43 @@ class CharField(Field):
             raise ValueError("Value exceeds max length.")
         super(CharField, CharField).value.__set__(self, value_to_set)
 
+class CharChoicesField(CharField):
+    """
+    A character string datafield with limited options.
+    """
+    def __init__(self, name: str, options:Tuple, default: str = None, null: bool = True, max_length: int = 255):
+        super().__init__(name, default, null, max_length)
+        self._options = options
+    @Field.value.setter
+    def value(self, value_to_set):
+        if value_to_set is None:
+            pass
+        elif not any([value_to_set == option for option in self._options]):
+            msg = f'Value must be one of {",".join(self._options)}.'
+            raise ValueError(msg)
+        super(CharField, CharField).value.__set__(self, value_to_set)
+
+
+class DateField(Field):
+    """
+    A data field representing a date and time.
+    """
+    def __init__(self, name: str, default: Any = None, null: bool = True):
+        super().__init__(name, default, null)
+    @property
+    def _str_property(self):
+        self._value:time.Time
+        return self._value.strftime('%Y/%m/%d %H:%M')
+    @Field.value.setter
+    def value(self, value_to_set):
+        if value_to_set is None:
+            pass
+        else:
+            if isinstance(value_to_set,str):
+                value_to_set = parse_date(value_to_set)
+            value_to_set = time.Time(value_to_set)
+        super(DateField, DateField).value.__set__(self, value_to_set)
+    
 
 class IntegerField(Field):
     """
