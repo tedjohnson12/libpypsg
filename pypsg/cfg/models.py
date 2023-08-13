@@ -49,7 +49,7 @@ class Geometry(Model):
     offset = GeometryOffsetField()
     obs_altitude = CodedQuantityField(
         allowed_units=(u.AU,u.km,u.dimensionless_unscaled,u.pc),
-        unit_codes=('AU','km','diameter','parsec'),
+        unit_codes=('AU','km','diameter','pc'),
         fmt='.4f',
         names=('geometry-obs-altitude','geometry-altitude-unit')
     )
@@ -66,3 +66,7 @@ class Geometry(Model):
     # GEOMETRY-STAR-DISTANCE -- Computed by PSG
     # GEOMETRY-ROTATION -- Computed by PSG
     # GEOMETRY-BRDFSCALER -- Computed by PSG
+
+class Atmosphere(Model):
+    structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
+    
