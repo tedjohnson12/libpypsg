@@ -5,8 +5,9 @@ import pytest
 from astropy import units as u
 
 from pypsg.cfg.base import Field, Model, CharField, IntegerField
-from pypsg.cfg.base import FloatField, QuantityField, GravityField
-from pypsg.cfg.base import DateField, CharChoicesField
+from pypsg.cfg.base import FloatField, QuantityField
+from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
+from pypsg.cfg.base import CodedQuantityField, MultiQuantityField
 
 def test_field():
     field = Field(
@@ -78,8 +79,14 @@ def test_QuantityField():
         q.value = 1*u.s
     assert q.value == b'1.00'
 
-def test_GravityField():
-    g = GravityField()
+def test_CodedQuantityField():
+    g = CodedQuantityField(
+        allowed_units=(u.Unit('m s-2'),u.Unit('g cm-3'), u.kg),
+        unit_codes=('g', 'rho', 'kg'),
+        fmt=('.4f','.4f','.4e'),
+        names=('object-gravity','object-gravity-unit')
+    )
+    # g = GravityField()
     with pytest.raises(NotImplementedError):
         _ = g.value
     with pytest.raises(NotImplementedError):
@@ -93,7 +100,7 @@ def test_GravityField():
         g.value = 10*u.s
     g.value = 1*u.M_earth
     val_str, unit_code = g._get_values()
-    assert val_str == f'{(1*u.M_earth).to_value(u.kg):.4f}'
+    assert val_str == f'{(1*u.M_earth).to_value(u.kg):.4e}'
     assert unit_code == 'kg'
     g.value = 10*u.m / u.s**2
     val_str, unit_code = g._get_values()
@@ -104,6 +111,9 @@ def test_GravityField():
     assert val_str == '5.0000'
     assert unit_code == 'rho'
     assert g.content == b'<OBJECT-GRAVITY>5.0000\n<OBJECT-GRAVITY-UNIT>rho'
+    g.value = 1000*u.kg
+    val_str, unit_code = g._get_values()
+    assert val_str == '1.0000e+03'
     
 def test_DateField():
     d = DateField('date')
@@ -116,7 +126,26 @@ def test_CharChoicesField():
     assert c.value == b'a'
     with pytest.raises(ValueError):
         c.value = 'c'
-    
+
+def test_GeometryOffestField():
+    g = GeometryOffsetField()
+    g.value = (1*u.deg, 1*u.deg)
+    g.value = (1,1.4)
+    with pytest.raises(u.UnitConversionError):
+        g.value = (1*u.deg,1)
+    expected = b'<GEOMETRY-OFFSET-NS>1.0000\n'
+    expected += b'<GEOMETRY-OFFSET-EW>1.4000\n'
+    expected += b'<GEOMETRY-OFFSET-UNIT>diameter'
+    assert g.content == expected
+
+def test_MultiQuantityField():
+    m = MultiQuantityField('field',(u.s,u.km),fmt='.2f')
+    m.value = 1*u.min
+    assert m.value == b'60.00'
+    m.value = 100*u.m
+    assert m.value == b'0.10'
+    with pytest.raises(u.UnitTypeError):
+        m.value = 1*u.kg
     
 def test_model():
     class TestModel(Model):

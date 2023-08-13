@@ -95,7 +95,10 @@ class Field:
 
         :type: bytes
         """
-        return self.name + self.value
+        if self.is_null:
+            return b''
+        else:
+            return self.name + self.value
 
     @property
     def _str_property(self):
@@ -142,7 +145,7 @@ class CharField(Field):
     null : bool, optional
         If false, the field cannot be empty. Default is False.
     """
-
+    _value:str
     def __init__(self, name: str, default: str = None, null: bool = True, max_length: int = 255):
         super().__init__(name, default, null)
         self.max_length = max_length
@@ -165,6 +168,7 @@ class CharChoicesField(CharField):
     """
     A character string datafield with limited options.
     """
+    _value:str
     def __init__(self, name: str, options:Tuple, default: str = None, null: bool = True, max_length: int = 255):
         super().__init__(name, default, null, max_length)
         self._options = options
@@ -182,6 +186,7 @@ class DateField(Field):
     """
     A data field representing a date and time.
     """
+    _value:time.Time
     def __init__(self, name: str, default: Any = None, null: bool = True):
         super().__init__(name, default, null)
     @property
@@ -203,6 +208,7 @@ class IntegerField(Field):
     """
     A data field containing an integer value.
     """
+    _value:int
     @property
     def _str_property(self):
         return str(self._value)
@@ -218,7 +224,7 @@ class FloatField(Field):
     """
     A data field containing a float.
     """
-
+    _value:float
     def __init__(self, name: str, default: float = None, null: bool = True, fmt: str = '.2f'):
         super().__init__(name, default, null)
         self.fmt = fmt
@@ -240,7 +246,7 @@ class QuantityField(Field):
     """
     A data field representing a quantity.
     """
-
+    _value:u.Quantity
     def __init__(
         self,
         name: str,
@@ -271,26 +277,38 @@ class QuantityField(Field):
             raise u.UnitConversionError(msg)
         super(QuantityField, QuantityField).value.__set__(self, value_to_set)
 
-class GravityField(Field):
+class CodedQuantityField(Field):
     """
-    A data field for planet gravity.
+    A base class for fields where PSG requires a unit to be specified.
     """
-    _allowed_units:Tuple[u.Unit] = (u.Unit('m s-2'),u.Unit('g cm-3'), u.kg)
-    _unit_codes:Tuple[str] = ('g', 'rho', 'kg')
-    fmt = '.4f'
+    _value:u.Quantity
     def __init__(
-        self,
-        default: u.Quantity = None,
-        null: bool = True
+            self,
+            allowed_units:Tuple[u.Unit],
+            unit_codes:Tuple[u.Unit],
+            fmt:Tuple[str] or str,
+            names:Tuple[str],
+            default: Any = None,
+            null: bool = True
     ):
-        super().__init__('gravity', default, null)
-    
+        super().__init__(None,default,null)
+        self._allowed_units = allowed_units
+        self._unit_codes = unit_codes
+        self._fmt = fmt
+        self._names = names
     @property
     def name(self):
-        raise NotImplementedError('This field produces two lines of PSG config file.')
+        raise NotImplementedError('This field produces multiple lines of PSG config file.')
     @property
     def _str_property(self):
-        raise NotImplementedError('This field produces two lines of PSG config file.')
+        raise NotImplementedError('This field produces multiple lines of PSG config file.')
+    @property
+    def is_ambiguous(self):
+        physical_types = [unit.physical_type for unit in self._allowed_units]
+        if len(set(physical_types)) == len(physical_types):
+            return False
+        else:
+            return True
     @Field.value.setter
     def value(self, value_to_set:u.Quantity):
         if value_to_set is None:
@@ -303,19 +321,167 @@ class GravityField(Field):
             msg = f'Value set is {value_to_set} ({value_to_set.unit.physical_type}). '
             msg += f'Must be of types {",".join([unit.to_string() for unit in self._allowed_units])}.'
             raise u.UnitConversionError(msg)
-        super(GravityField, GravityField).value.__set__(self, value_to_set)
+        elif self.is_ambiguous:
+            if not any([value_to_set.unit == unit for unit in self._allowed_units]):
+                msg = f'Value for {self._name} is ambiguous. Please use one of these units: {",".join([unit.to_string() for unit in self._allowed_units])}'
+                raise u.UnitTypeError(msg)
+        super(CodedQuantityField, CodedQuantityField).value.__set__(self, value_to_set)
+    @property
+    def content(self):
+        raise NotImplementedError('`content` method must be implemented by a subclass.')
+    @property
+    def _unit(self):
+        if self.is_null:
+            return None
+        else:
+            if self.is_ambiguous:
+                if self._value.unit in self._allowed_units:
+                    return self._value.unit
+                else:
+                    raise u.UnitTypeError('`self._value.unit` not in allowed units.')
+            else:
+                try:
+                    unit = {unit.physical_type:unit for unit in self._allowed_units}[self._value.unit.physical_type]
+                    return unit
+                except KeyError:
+                    raise u.UnitTypeError(f'Cannot find allowed unit with physical type {self._value.unit.physical_type}.')
+    @property
+    def _unit_code(self):
+        unit_code = {unit:code for unit,code in zip(self._allowed_units,self._unit_codes)}[self._unit]
+        return unit_code
+    @property
+    def fmt(self):
+        if isinstance(self._fmt,str):
+            return self._fmt
+        else:
+            _fmt = {unit:f for unit,f in zip(self._allowed_units,self._fmt)}[self._unit]
+            return _fmt
     def _get_values(self):
-        unit_to_use = {unit.physical_type:unit for unit in self._allowed_units}[self._value.unit.physical_type]
-        unit_code = {unit:code for unit,code in zip(self._allowed_units,self._unit_codes)}[unit_to_use]
-        value_str = f'{self._value.to_value(unit_to_use):{self.fmt}}'
-        return value_str, unit_code
+        value_str = f'{self._value.to_value(self._unit):{self.fmt}}'
+        return value_str, self._unit_code
     @property
     def content(self) -> bytes:
-        value_str, unit_code = self._get_values()
-        line1_str = f'<OBJECT-GRAVITY>{value_str}'
-        line2_str = f'<OBJECT-GRAVITY-UNIT>{unit_code}'
-        return bytes(f'{line1_str}\n{line2_str}',encoding=ENCODING)
+        if self.is_null:
+            return b''
+        else:
+            name1, name2 = self._names
+            value_str, unit_code = self._get_values()
+            line1_str = f'<{name1.upper()}>{value_str}'
+            line2_str = f'<{name2.upper()}>{unit_code}'
+            return bytes(f'{line1_str}\n{line2_str}',encoding=ENCODING)
+
+class MultiQuantityField(Field):
+    """
+    A data field where the interpreted unit depends on other parameters.
+    """
+    _value:u.Quantity
+    def __init__(
+        self,
+        name: str,
+        units: Tuple[u.Unit],
+        default: u.Quantity = None,
+        null: bool = True,
+        fmt: str = '.2f'
+    ):
+        super().__init__(name, default, null)
+        self._units = units
+        self.fmt = fmt
+    @property
+    def unit(self):
+        if self.is_null:
+            return None
+        else:
+            for unit in self._units:
+                if self._value.unit.physical_type == unit.physical_type:
+                    return unit
+            raise u.UnitTypeError(f'Corresponding unit for {self._value} not found.')
+    @property
+    def _str_property(self):
+        return f'{self._value.to_value(self.unit):{self.fmt}}'
+
+    @Field.value.setter
+    def value(self, value_to_set):
+        if value_to_set is None:
+            pass
+        elif not isinstance(value_to_set, u.Quantity):
+            raise TypeError('Value must be a Quantity.')
+        elif not value_to_set.isscalar:
+            raise ValueError('QuantityField values must be a scalar, not an array.')
+        elif not any([value_to_set.unit.physical_type == unit.physical_type for unit in self._units]):
+            msg = f'Value set is {value_to_set} ({value_to_set.unit.physical_type}). '
+            msg += f'Must be of of one of {",".join([unit.to_string() for unit in self._units])}.'
+            raise u.UnitTypeError(msg)
+        super(MultiQuantityField, MultiQuantityField).value.__set__(self, value_to_set)
+
+
+
+class GeometryOffsetField(Field):
+    """
+    Data field for the geometry offset.
+    """
+    _allowed_units:Tuple[u.Unit] = (u.Unit('arcsec'),u.Unit('arcmin'), u.deg, u.km, u.dimensionless_unscaled)
+    _unit_codes:Tuple[str] = ('arcsec', 'arcmin', 'deg', 'km', 'diameter')
+    fmt = '.4f'
+    def __init__(
+        self,
+        default: u.Quantity = None,
+        null: bool = True
+    ):
+        super().__init__('gravity', default, null)
     
+    @property
+    def name(self):
+        raise NotImplementedError('This field produces three lines of PSG config file.')
+    @property
+    def _str_property(self):
+        raise NotImplementedError('This field produces three lines of PSG config file.')
+    def _validate(self,value:u.Quantity):
+        if value is None:
+            pass
+        elif not isinstance(value, u.Quantity):
+            if isinstance(value,(float,int)):
+                value = value*u.dimensionless_unscaled
+            else:
+                raise TypeError('Value must be a Quantity.')
+        elif not value.isscalar:
+            raise ValueError('QuantityField values must be a scalar, not an array.')
+        elif not any([value.unit.physical_type == unit.physical_type for unit in self._allowed_units]):
+            msg = f'Value set is {value} ({value.unit.physical_type}). '
+            msg += f'Must be of types {",".join([unit.to_string() for unit in self._allowed_units])}.'
+            raise u.UnitConversionError(msg)
+        return value
+    @Field.value.setter
+    def value(self, values:Tuple[u.Quantity]):
+        if values is None:
+            value_to_set = None
+        else:
+            value_ns,value_ew = values
+            value_ns = self._validate(value_ns)
+            value_ew = self._validate(value_ew)
+            if not value_ns.unit.physical_type == value_ew.unit.physical_type:
+                msg = f'EW offset cannot be {value_ew.unit} if NS offset is {value_ns.unit}.'
+                raise u.UnitConversionError(msg)
+            value_to_set = {'ns':value_ns,'ew':value_ew}
+        super(GeometryOffsetField, GeometryOffsetField).value.__set__(self, value_to_set)
+        
+    def _get_values(self):
+        unit_to_use = self._value['ns'].unit
+        unit_code = {unit:code for unit,code in zip(self._allowed_units,self._unit_codes)}[unit_to_use]
+        value_ns_str = f'{self._value["ns"].to_value(unit_to_use):{self.fmt}}'
+        value_ew_str = f'{self._value["ew"].to_value(unit_to_use):{self.fmt}}'
+        return value_ns_str, value_ew_str, unit_code
+    @property
+    def content(self) -> bytes:
+        if self.is_null:
+            return b''
+        else:
+            value_ns_str, value_ew_str, unit_code = self._get_values()
+            line1_str = f'<GEOMETRY-OFFSET-NS>{value_ns_str}'
+            line2_str = f'<GEOMETRY-OFFSET-EW>{value_ew_str}'
+            line3_str = f'<GEOMETRY-OFFSET-UNIT>{unit_code}'
+            return bytes(f'{line1_str}\n{line2_str}\n{line3_str}',encoding=ENCODING)
+
+
 
 
 class Model:
@@ -341,5 +507,6 @@ class Model:
         lines = []
         for _, field in self.__dict__.items():
             if isinstance(field,Field):
-                lines.append(field.content)
+                if not field.is_null:
+                    lines.append(field.content)
         return b'\n'.join(lines)
