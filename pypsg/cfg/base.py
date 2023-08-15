@@ -484,6 +484,22 @@ class GeometryOffsetField(Field):
             return bytes(f'{line1_str}\n{line2_str}\n{line3_str}',encoding=ENCODING)
 
 class Molecule:
+    """
+    Class to store data on individual molecules.
+
+    Parameters
+    ----------
+    name : str
+        The molecular identifier, e.g. `H2O` for water.
+    type : str
+        The profile database to use, e.g. `HIT[1]` for HITRAN water data.
+    abn : astropy.units.Quantity or float or int
+        The abundance of the molecule. Floats and ints will be cast to dimensionless.
+    
+    .. warning::
+        PSG also allows the `m-3`, `molec`, `s-1`, and `tau` unit types.
+        These should be implemented eventually.
+    """
     _allowed_units = (u.pct,u_psg.ppmv,u_psg.ppbv,u_psg.pptv,u.Unit('m-2'),u.dimensionless_unscaled)
     _unit_codes = ('%','ppmv','ppbv','pptv','m2','scl')
     _fmt = '.2e'
@@ -494,7 +510,7 @@ class Molecule:
             abn = abn*u.dimensionless_unscaled
         self._abn = abn
     def _validate(self):
-        assert self.abn.unit in self._allowed_units
+        assert self._abn.unit in self._allowed_units
     @property
     def abn(self):
         return self._abn.to_value(self._abn.unit)
@@ -504,6 +520,35 @@ class Molecule:
     @property
     def fmt(self):
         return self._fmt
+class Aerosol(Molecule):
+    """
+    Extension of the `Molecule` class for Aerosols.
+
+    .. warning::
+        PSG also allows a `wg` size unit type. This should be implemented in the future.
+    """
+    _allowed_size_units = (u.um,u.m,u.LogUnit(u.um),u.dimensionless_unscaled)
+    _size_unit_codes = ('um','m','lum','scl')
+    _fmt_size = '.2e'
+    def __init__(self, name: str, type: str, abn: u.Quantity,size: u.Quantity):
+        super().__init__(name, type, abn)
+        if isinstance(size,(int,float)):
+            size = size*u.dimensionless_unscaled
+        self._size = size
+        self._validate()
+    
+    def _validate(self):
+        assert self._size.unit in self._allowed_size_units
+        super()._validate()
+    @property
+    def size(self):
+        return self._size.to_value(self._size.unit)
+    @property
+    def size_unit_code(self):
+        return {unit:code for unit,code in zip(self._allowed_size_units,self._size_unit_codes)}[self._size.unit]
+    @property
+    def fmt_size(self):
+        return self._fmt_size
 
 class MoleculesField(Field):
     _value:Tuple[Molecule]
@@ -548,7 +593,56 @@ class MoleculesField(Field):
         s = f'{self.ngas}\n{self.gas}\n{self.type}\n{self.abun}\n{self.unit}'
         return bytes(s,encoding=ENCODING)
 
-
+class AerosolsField(Field):
+    _value:Tuple[Aerosol]
+    def __init__(self, default: Any = None, null: bool = True):
+        super().__init__(None, default, null)
+    @Field.value.setter
+    def value(self, aerosols:Tuple[Aerosol]):
+        if aerosols is None:
+            pass
+        else:
+            for aerosol in aerosols:
+                if not isinstance(aerosol,Aerosol):
+                    raise TypeError('AerosolsField values must be Aerosol objects.')
+            super(AerosolsField, AerosolsField).value.__set__(self, aerosols)
+    @property
+    def _str_property(self):
+        raise NotImplementedError('This method is not implemented.')
+    @property
+    def _naero(self):
+        return len(self._value)
+    @property
+    def naero(self):
+        return f'<ATMOSPHERE-NAERO>{self._naero}'
+    @property
+    def aeros(self):
+        names = [aero.name for aero in self._value]
+        return f'<ATMOSPHERE-AEROS>{",".join(names)}'
+    @property
+    def type(self):
+        types = [aero.type for aero in self._value]
+        return f'<ATMOSPHERE-ATYPE>{",".join(types)}'
+    @property
+    def abun(self):
+        abuns = [f'{aero.abn:{aero.fmt}}' for aero in self._value]
+        return f'<ATMOSPHERE-AABUN>{",".join(abuns)}'
+    @property
+    def unit(self):
+        units = [aero.unit_code for aero in self._value]
+        return f'<ATMOSPHERE-AUNIT>{",".join(units)}'
+    @property
+    def size(self):
+        sizes = [f'{aero.size:{aero.fmt}}' for aero in self._value]
+        return f'<ATMOSPHERE-ASIZE>{",".join(sizes)}'
+    @property
+    def size_unit(self):
+        units = [aero.size_unit_code for aero in self._value]
+        return f'<ATMOSPHERE-ASUNI>{",".join(units)}'
+    @property
+    def content(self):
+        s = f'{self.naero}\n{self.aeros}\n{self.type}\n{self.abun}\n{self.unit}\n{self.size}\n{self.size_unit}'
+        return bytes(s,encoding=ENCODING)
 
 
 

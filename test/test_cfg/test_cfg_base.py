@@ -4,11 +4,13 @@ Tests for the Field-Model base functionality
 import pytest
 from astropy import units as u
 
+from pypsg import units as u_psg
+
 from pypsg.cfg.base import Field, Model, CharField, IntegerField
 from pypsg.cfg.base import FloatField, QuantityField
 from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
 from pypsg.cfg.base import CodedQuantityField, MultiQuantityField
-from pypsg.cfg.base import Molecule, MoleculesField
+from pypsg.cfg.base import Molecule, MoleculesField, Aerosol, AerosolsField
 
 def test_field():
     field = Field(
@@ -156,6 +158,20 @@ def test_Molecule():
     assert mol.abn == pytest.approx(1.0,abs=1e-6)
     assert mol.unit_code == 'scl'
 
+def test_Aerosol():
+    aero = Aerosol('Water','watertype',1.0,1*u.um)
+    assert aero.abn == pytest.approx(1.00,abs=1e-6)
+    assert aero.unit_code == 'scl'
+    assert aero.size == pytest.approx(1.00,abs=1e-6)
+    assert aero.size_unit_code == 'um'
+    aero = Aerosol('Water','watertype',1*u.pct,4*u.LogUnit(u.um))
+    assert aero.abn == pytest.approx(1.0,abs=1e-6)
+    assert aero.unit_code == '%'
+    assert aero.size == pytest.approx(4.00,abs=1e-6)
+    assert aero.size_unit_code == 'lum'
+
+
+
 def test_MoleculeField():
     mol = Molecule('H2O','HIT[1]',1*u.pct)
     m = MoleculesField()
@@ -189,6 +205,30 @@ def test_MoleculeField():
     expected += b'<ATMOSPHERE-ABUN>1.00e+00,1.00e+00\n'
     expected += b'<ATMOSPHERE-UNIT>%,scl'
     assert m.content == expected
+
+def test_AerosolField():
+    aeros = (
+        Aerosol('Water','water_dat',1.0,1.0),
+        Aerosol('WaterIce','waterice_dat',10*u_psg.ppmv,3*u.LogUnit(u.um))
+    )
+    a = AerosolsField()
+    a.value = aeros
+    assert a._naero == 2
+    assert a.naero == '<ATMOSPHERE-NAERO>2'    
+    assert a.aeros == '<ATMOSPHERE-AEROS>Water,WaterIce'
+    assert a.type == '<ATMOSPHERE-ATYPE>water_dat,waterice_dat'
+    assert a.abun == '<ATMOSPHERE-AABUN>1.00e+00,1.00e+01'
+    assert a.unit == '<ATMOSPHERE-AUNIT>scl,ppmv'
+    assert a.size == '<ATMOSPHERE-ASIZE>1.00e+00,3.00e+00'
+    assert a.size_unit == '<ATMOSPHERE-ASUNI>scl,lum'
+    expected = b'<ATMOSPHERE-NAERO>2\n'
+    expected += b'<ATMOSPHERE-AEROS>Water,WaterIce\n'
+    expected += b'<ATMOSPHERE-ATYPE>water_dat,waterice_dat\n'
+    expected += b'<ATMOSPHERE-AABUN>1.00e+00,1.00e+01\n'
+    expected += b'<ATMOSPHERE-AUNIT>scl,ppmv\n'
+    expected += b'<ATMOSPHERE-ASIZE>1.00e+00,3.00e+00\n'
+    expected += b'<ATMOSPHERE-ASUNI>scl,lum'
+    assert a.content == expected
 
     
 def test_model():
