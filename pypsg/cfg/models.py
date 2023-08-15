@@ -6,7 +6,7 @@ from astropy import units as u
 from pypsg.cfg.base import Model
 from pypsg.cfg.base import Field, CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
-from pypsg.cfg.base import GeometryOffsetField, MultiQuantityField
+from pypsg.cfg.base import GeometryOffsetField, MultiQuantityField, MoleculesField, AerosolsField
 
 
 class Target(Model):
@@ -67,6 +67,23 @@ class Geometry(Model):
     # GEOMETRY-ROTATION -- Computed by PSG
     # GEOMETRY-BRDFSCALER -- Computed by PSG
 
-class Atmosphere(Model):
+class NoAtmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
-    
+    def __post_init__(self):
+        self.structure.value = 'None'
+
+class EquilibriumAtmosphere(Model):
+    structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
+    pressure = CodedQuantityField(
+        allowed_units=(u.Pa,u.bar,u.kbar,u.mbar,u.ubar,u.atm,u.torr,u.psi),
+        unit_codes=('Pa','bar','kbar','mbar','ubar','atm','torr','psi'), # what is `at`?
+        fmt = '.4e', names=('atmosphere-pressure','atmosphere-punit')
+    )
+    temperature = QuantityField('atmosphere-temperature',u.K)
+    weight = QuantityField('atmosphere-weight',u.Unit('g mol-1'))
+    continuum = CharField('atmosphere-continuum',max_length=300)
+    molecules = MoleculesField()
+    aerosols = AerosolsField()
+    nmax = IntegerField('atmosphere-nmax')
+    lmax = IntegerField('atmosphere-lmax')
+    description = CharField('atmosphere-description',max_length=200)
