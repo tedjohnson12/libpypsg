@@ -3,6 +3,7 @@ Tests for the Field-Model base functionality
 """
 import pytest
 from astropy import units as u
+import numpy as np
 
 from pypsg import units as u_psg
 
@@ -11,6 +12,7 @@ from pypsg.cfg.base import FloatField, QuantityField
 from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
 from pypsg.cfg.base import CodedQuantityField, MultiQuantityField
 from pypsg.cfg.base import Molecule, MoleculesField, Aerosol, AerosolsField
+from pypsg.cfg.base import Profile, ProfileField
 
 def test_field():
     field = Field(
@@ -230,6 +232,51 @@ def test_AerosolField():
     expected += b'<ATMOSPHERE-ASUNI>scl,lum'
     assert a.content == expected
 
+def test_profile():
+    p = Profile('H2O',np.array([1.,1.]))
+    assert np.all(p.dat == [1,1]*u.dimensionless_unscaled)
+    assert p.nlayers == 2
+    assert p.fget_layer(0) == 1.
+    assert not (p.is_temperature or p.is_pressure)
+
+    p = Profile('T',np.array([300.,200.]),unit=u.K)
+    assert p.is_temperature
+    assert not p.is_pressure
+    assert p.get_layer(1) == 200*u.K
+
+    p = Profile('Press',np.array([1.,0.1]),unit=u.bar)
+    assert not p.is_temperature
+    assert p.is_pressure
+    assert p.get_layer(0) == 1*u.bar
+
+def test_ProfileField():
+    press = Profile('Press',np.array([1.,0.1,0.01]),unit=u.bar)
+    temp = Profile('Temp',np.array([300,250,200]),unit=u.K)
+    h2o = Profile('H2O',np.array([1.,0.7,1.]))
+    co2 = Profile('CO2',np.array([0.0,0.3]))
+    p = ProfileField()
+    with pytest.raises(ValueError):
+        p.value = (press,temp,co2)
+    with pytest.raises(ValueError):
+        p.value = (press,h2o)
+    with pytest.raises(ValueError):
+        p.value = (temp,h2o)
+    p.value = (press,temp,h2o)
+    assert p.get_molecules(0) == [1.0]
+    assert p.get_temperature(0) == 300
+    assert p.get_temperature(2) == 200
+    assert p.get_pressure(0) == 1.
+    assert p.get_pressure(1) == 0.1
+    assert p.names == '<ATMOSPHERE-LAYERS-MOLECULES>H2O'
+    assert p.nlayers == 3
+    assert p.str_nlayers == '<ATMOSPHERE-LAYERS>3'
+    assert p.get_layer(0) == '<ATMOSPHERE-LAYER-1>1.000000e+00,3.000000e+02,1.000000e+00'
+    expected = b'<ATMOSPHERE-LAYERS-MOLECULES>H2O\n'
+    expected += b'<ATMOSPHERE-LAYERS>3\n'
+    expected += b'<ATMOSPHERE-LAYER-1>1.000000e+00,3.000000e+02,1.000000e+00\n'
+    expected += b'<ATMOSPHERE-LAYER-2>1.000000e-01,2.500000e+02,7.000000e-01\n'
+    expected += b'<ATMOSPHERE-LAYER-3>1.000000e-02,2.000000e+02,1.000000e+00'
+    assert p.content == expected
     
 def test_model():
     class TestModel(Model):

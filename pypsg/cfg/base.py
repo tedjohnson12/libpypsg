@@ -7,6 +7,7 @@ from copy import deepcopy
 from astropy import units as u
 from astropy import time
 from dateutil.parser import parse as parse_date
+import numpy as np
 
 from pypsg import units as u_psg
 
@@ -643,6 +644,89 @@ class AerosolsField(Field):
     def content(self):
         s = f'{self.naero}\n{self.aeros}\n{self.type}\n{self.abun}\n{self.unit}\n{self.size}\n{self.size_unit}'
         return bytes(s,encoding=ENCODING)
+
+class Profile:
+    """
+    A data container for an atmospheric profile.
+    """
+    def __init__(self,name:str,dat:np.ndarray,unit:u.Unit = u.dimensionless_unscaled):
+        self.name = name
+        self._dat = dat
+        self.unit = unit
+        self._validate()
+    def _validate(self):
+        if not self._dat.ndim == 1:
+            raise ValueError('dat must have a shape of 1.')
+    @property
+    def dat(self):
+        return self._dat*self.unit
+    @property
+    def nlayers(self):
+        return self._dat.shape[0]
+    def fget_layer(self,i:int):
+        return self._dat[i]
+    def get_layer(self,i:int):
+        return self.fget_layer(i)*self.unit
+    @property
+    def is_temperature(self):
+        return self.unit.physical_type == u.K.physical_type
+    @property
+    def is_pressure(self):
+        return self.unit.physical_type == u.bar.physical_type
+
+class ProfileField(Field):
+    _value:Tuple[Profile]
+    _fmt = '.6e'
+    def __init__(self, default: Any = None, null: bool = True):
+        super().__init__(None, default, null)
+    
+    @Field.value.setter
+    def value(self, profiles:Tuple[Profile]):
+        if profiles is None:
+            pass
+        else:
+            for profile in profiles:
+                if not isinstance(profile,Profile):
+                    raise TypeError('ProfileField values must be Profile objects.')
+            nlayers = {profile.nlayers for profile in profiles}
+            if not len(nlayers) == 1:
+                raise ValueError('Profiles must all have the same shape.')
+            is_temp = [profile.is_temperature for profile in profiles]
+            if not np.sum(is_temp) == 1:
+                raise ValueError(f'ProfileField recieved {np.sum(is_temp)} temperature profiles!')
+            is_press = [profile.is_pressure for profile in profiles]
+            if not np.sum(is_press) == 1:
+                raise ValueError(f'ProfileField recieved {np.sum(is_press)} pressure profiles!')
+            super(ProfileField, ProfileField).value.__set__(self, profiles)
+    
+    def get_molecules(self,i:int):
+        return [profile.fget_layer(i) for profile in self._value if not (profile.is_pressure or profile.is_temperature)]
+    def get_temperature(self,i:int):
+        return [profile.fget_layer(i) for profile in self._value if profile.is_temperature][0]
+    def get_pressure(self,i:int):
+        return [profile.fget_layer(i) for profile in self._value if profile.is_pressure][0]
+    @property
+    def names(self):
+        _names = [profile.name for profile in self._value if not (profile.is_pressure or profile.is_temperature)]
+        return f'<ATMOSPHERE-LAYERS-MOLECULES>{",".join(_names)}'
+    @property
+    def nlayers(self):
+        return self._value[0].nlayers
+    @property
+    def fmt(self):
+        return self._fmt
+    @property
+    def str_nlayers(self):
+        return f'<ATMOSPHERE-LAYERS>{self.nlayers}'
+    def get_layer(self,i):
+        values = [self.get_pressure(i)] + [self.get_temperature(i)] + self.get_molecules(i)
+        return f'<ATMOSPHERE-LAYER-{i+1}>{",".join([f"{value:{self.fmt}}" for value in values])}'
+    @property
+    def content(self):
+        lines = [self.names] + [self.str_nlayers] + [self.get_layer(i) for i in range(self.nlayers)]
+        return bytes('\n'.join(lines), encoding=ENCODING)
+
+    
 
 
 
