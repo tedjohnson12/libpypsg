@@ -7,7 +7,7 @@ from pypsg.cfg.base import Model
 from pypsg.cfg.base import Field, CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
 from pypsg.cfg.base import GeometryOffsetField, MultiQuantityField, MoleculesField, AerosolsField
-from pypsg.cfg.base import ProfileField
+from pypsg.cfg.base import ProfileField, BooleanField
 
 
 class Target(Model):
@@ -89,3 +89,22 @@ class EquilibriumAtmosphere(Model):
     lmax = IntegerField('atmosphere-lmax')
     description = CharField('atmosphere-description',max_length=200)
     profile = ProfileField()
+    def __post_init__(self):
+        self.structure.value = 'Equilibrium'
+
+class ComaAtmosphere(Model):
+    structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
+    gas_production = QuantityField('atmosphere-pressure',u.Unit('s-1'))
+    at_1au = BooleanField('atmosphere-punit',true='gasau',false='gas')
+    expansion_velocity = QuantityField('atmosphere-weight',u.Unit('m s-1'))
+    continuum = CharField('atmosphere-continuum',max_length=300)
+    molecules = MoleculesField()
+    aerosols = AerosolsField()
+    nmax = IntegerField('atmosphere-nmax')
+    lmax = IntegerField('atmosphere-lmax')
+    tau = QuantityField('atmosphere-tau',u.s)
+    description = CharField('atmosphere-description',max_length=200)
+    profile = ProfileField()
+    def __post_init__(self):
+        self.structure.value = 'Coma'
+
