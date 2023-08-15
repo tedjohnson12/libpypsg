@@ -7,6 +7,7 @@ from pypsg.cfg.base import Model
 from pypsg.cfg.base import Field, CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
 from pypsg.cfg.base import GeometryOffsetField, MultiQuantityField, MoleculesField, AerosolsField
+from pypsg.cfg.base import ProfileField
 
 
 class Target(Model):
@@ -87,3 +88,4 @@ class EquilibriumAtmosphere(Model):
     nmax = IntegerField('atmosphere-nmax')
     lmax = IntegerField('atmosphere-lmax')
     description = CharField('atmosphere-description',max_length=200)
+    profile = ProfileField()
