@@ -8,6 +8,7 @@ from pypsg.cfg.base import Field, Model, CharField, IntegerField
 from pypsg.cfg.base import FloatField, QuantityField
 from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
 from pypsg.cfg.base import CodedQuantityField, MultiQuantityField
+from pypsg.cfg.base import Molecule, MoleculesField
 
 def test_field():
     field = Field(
@@ -146,6 +147,49 @@ def test_MultiQuantityField():
     assert m.value == b'0.10'
     with pytest.raises(u.UnitTypeError):
         m.value = 1*u.kg
+
+def test_Molecule():
+    mol = Molecule('H2O','HIT[1]',1*u.pct)
+    assert mol.abn == pytest.approx(1.0,abs=1e-6)
+    assert mol.unit_code == '%'
+    mol = Molecule('H2O', 'HIT[1]',1)
+    assert mol.abn == pytest.approx(1.0,abs=1e-6)
+    assert mol.unit_code == 'scl'
+
+def test_MoleculeField():
+    mol = Molecule('H2O','HIT[1]',1*u.pct)
+    m = MoleculesField()
+    m.value = (mol,)
+    with pytest.raises(NotImplementedError):
+        m._str_property
+    assert m._ngas == 1
+    assert m.ngas == '<ATMOSPHERE-NGAS>1'    
+    assert m.gas == '<ATMOSPHERE-GAS>H2O'
+    assert m.type == '<ATMOSPHERE-TYPE>HIT[1]'
+    assert m.abun == '<ATMOSPHERE-ABUN>1.00e+00'
+    assert m.unit == '<ATMOSPHERE-UNIT>%'
+    expected = b'<ATMOSPHERE-NGAS>1\n'
+    expected += b'<ATMOSPHERE-GAS>H2O\n'
+    expected += b'<ATMOSPHERE-TYPE>HIT[1]\n'
+    expected += b'<ATMOSPHERE-ABUN>1.00e+00\n'
+    expected += b'<ATMOSPHERE-UNIT>%'
+    assert m.content == expected
+
+    mol2 = Molecule('CO2','HIT[2]',1)
+    m.value = (mol,mol2)
+    assert m._ngas == 2
+    assert m.ngas == '<ATMOSPHERE-NGAS>2'    
+    assert m.gas == '<ATMOSPHERE-GAS>H2O,CO2'
+    assert m.type == '<ATMOSPHERE-TYPE>HIT[1],HIT[2]'
+    assert m.abun == '<ATMOSPHERE-ABUN>1.00e+00,1.00e+00'
+    assert m.unit == '<ATMOSPHERE-UNIT>%,scl'
+    expected = b'<ATMOSPHERE-NGAS>2\n'
+    expected += b'<ATMOSPHERE-GAS>H2O,CO2\n'
+    expected += b'<ATMOSPHERE-TYPE>HIT[1],HIT[2]\n'
+    expected += b'<ATMOSPHERE-ABUN>1.00e+00,1.00e+00\n'
+    expected += b'<ATMOSPHERE-UNIT>%,scl'
+    assert m.content == expected
+
     
 def test_model():
     class TestModel(Model):

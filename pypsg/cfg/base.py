@@ -8,6 +8,8 @@ from astropy import units as u
 from astropy import time
 from dateutil.parser import parse as parse_date
 
+from pypsg import units as u_psg
+
 ENCODING = 'UTF-8'
 
 
@@ -480,6 +482,76 @@ class GeometryOffsetField(Field):
             line2_str = f'<GEOMETRY-OFFSET-EW>{value_ew_str}'
             line3_str = f'<GEOMETRY-OFFSET-UNIT>{unit_code}'
             return bytes(f'{line1_str}\n{line2_str}\n{line3_str}',encoding=ENCODING)
+
+class Molecule:
+    _allowed_units = (u.pct,u_psg.ppmv,u_psg.ppbv,u_psg.pptv,u.Unit('m-2'),u.dimensionless_unscaled)
+    _unit_codes = ('%','ppmv','ppbv','pptv','m2','scl')
+    _fmt = '.2e'
+    def __init__(self,name:str,type:str,abn:u.Quantity):
+        self.name = name
+        self.type = type
+        if isinstance(abn,(int,float)):
+            abn = abn*u.dimensionless_unscaled
+        self._abn = abn
+    def _validate(self):
+        assert self.abn.unit in self._allowed_units
+    @property
+    def abn(self):
+        return self._abn.to_value(self._abn.unit)
+    @property
+    def unit_code(self):
+        return {unit:code for unit,code in zip(self._allowed_units,self._unit_codes)}[self._abn.unit]
+    @property
+    def fmt(self):
+        return self._fmt
+
+class MoleculesField(Field):
+    _value:Tuple[Molecule]
+    def __init__(self, default: Any = None, null: bool = True):
+        super().__init__(None, default, null)
+    @Field.value.setter
+    def value(self, molecules:Tuple[Molecule]):
+        if molecules is None:
+            pass
+        else:
+            for molecule in molecules:
+                if not isinstance(molecule,Molecule):
+                    raise TypeError('MoleculeField values must be Molecule objects.')
+            super(MoleculesField, MoleculesField).value.__set__(self, molecules)
+    @property
+    def _str_property(self):
+        raise NotImplementedError('This method is not implemented.')
+    @property
+    def _ngas(self):
+        return len(self._value)
+    @property
+    def ngas(self):
+        return f'<ATMOSPHERE-NGAS>{self._ngas}'
+    @property
+    def gas(self):
+        names = [mol.name for mol in self._value]
+        return f'<ATMOSPHERE-GAS>{",".join(names)}'
+    @property
+    def type(self):
+        types = [mol.type for mol in self._value]
+        return f'<ATMOSPHERE-TYPE>{",".join(types)}'
+    @property
+    def abun(self):
+        abuns = [f'{mol.abn:{mol.fmt}}' for mol in self._value]
+        return f'<ATMOSPHERE-ABUN>{",".join(abuns)}'
+    @property
+    def unit(self):
+        units = [mol.unit_code for mol in self._value]
+        return f'<ATMOSPHERE-UNIT>{",".join(units)}'
+    @property
+    def content(self):
+        s = f'{self.ngas}\n{self.gas}\n{self.type}\n{self.abun}\n{self.unit}'
+        return bytes(s,encoding=ENCODING)
+
+
+
+
+
 
 
 
