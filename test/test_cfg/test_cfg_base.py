@@ -12,7 +12,7 @@ from pypsg.cfg.base import FloatField, QuantityField
 from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
 from pypsg.cfg.base import CodedQuantityField, MultiQuantityField
 from pypsg.cfg.base import Molecule, MoleculesField, Aerosol, AerosolsField
-from pypsg.cfg.base import Profile, ProfileField
+from pypsg.cfg.base import Profile, ProfileField, BooleanField
 
 def test_field():
     field = Field(
@@ -277,6 +277,17 @@ def test_ProfileField():
     expected += b'<ATMOSPHERE-LAYER-2>1.000000e-01,2.500000e+02,7.000000e-01\n'
     expected += b'<ATMOSPHERE-LAYER-3>1.000000e-02,2.000000e+02,1.000000e+00'
     assert p.content == expected
+
+def test_BooleanField():
+    b = BooleanField('boolean')
+    with pytest.raises(TypeError):
+        b.value = 1
+    b.value = True
+    assert b.content == b'<BOOLEAN>Y'
+    b = BooleanField('boolean',true='yes',false='no')
+    b.value = False
+    assert b.content == b'<BOOLEAN>no'
+
     
 def test_model():
     class TestModel(Model):

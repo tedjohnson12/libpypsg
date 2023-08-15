@@ -726,6 +726,24 @@ class ProfileField(Field):
         lines = [self.names] + [self.str_nlayers] + [self.get_layer(i) for i in range(self.nlayers)]
         return bytes('\n'.join(lines), encoding=ENCODING)
 
+class BooleanField(Field):
+    _value:bool
+    def __init__(self, name: str, default: Any = None, null: bool = True, true:str = 'Y', false:str = 'N'):
+        super().__init__(name, default, null)
+        self._true = true
+        self._false = false
+
+    @property
+    def _str_property(self):
+        return self._true if self._value else self._false
+
+    @Field.value.setter
+    def value(self, value_to_set):
+        if value_to_set is not None and not isinstance(value_to_set, bool):
+            raise TypeError("Value must be boolean.")
+        super(BooleanField, BooleanField).value.__set__(self, value_to_set)
+
+
     
 
 
