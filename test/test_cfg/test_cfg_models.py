@@ -4,6 +4,7 @@ import pytest
 from astropy import units as u
 
 from pypsg.cfg.models import Target, Geometry
+from pypsg.cfg.models import NoAtmosphere, EquilibriumAtmosphere, ComaAtmosphere
 
 def test_Target():
     target = Target(object='Exoplanet')
@@ -21,3 +22,15 @@ def test_Geometry():
     assert geo.geometry.value == b'Observatory'
     expected = b'<GEOMETRY>Observatory\n'
     expected += b'<GEOMETRY-OBS-ALTITUDE>1.3000'
+
+def test_NoAtmosphere():
+    atm = NoAtmosphere()
+    assert atm.structure._value == 'None'
+
+def test_EquilibriumAtmosphere():
+    atm = EquilibriumAtmosphere()
+    assert atm.structure._value == 'Equilibrium'
+
+def test_ComaAtmosphere():
+    atm = ComaAtmosphere()
+    assert atm.structure._value == 'Coma'

@@ -1,7 +1,15 @@
 """
 A module to store PSG config models.
 """
+from dataclasses import dataclass
+
 from astropy import units as u
+from astropy.units import cds
+from astropy.units import imperial
+
+
+
+from pypsg import units as u_psg
 
 from pypsg.cfg.base import Model
 from pypsg.cfg.base import Field, CharField, IntegerField, DateField
@@ -67,16 +75,16 @@ class Geometry(Model):
     # GEOMETRY-STAR-DISTANCE -- Computed by PSG
     # GEOMETRY-ROTATION -- Computed by PSG
     # GEOMETRY-BRDFSCALER -- Computed by PSG
-
+@dataclass
 class NoAtmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
     def __post_init__(self):
         self.structure.value = 'None'
-
+@dataclass
 class EquilibriumAtmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
     pressure = CodedQuantityField(
-        allowed_units=(u.Pa,u.bar,u.kbar,u.mbar,u.ubar,u.atm,u.torr,u.psi),
+        allowed_units=(u.Pa,u.bar,u_psg.kbar,u_psg.mbar,u_psg.ubar,cds.atm,u.torr,imperial.psi),
         unit_codes=('Pa','bar','kbar','mbar','ubar','atm','torr','psi'), # what is `at`?
         fmt = '.4e', names=('atmosphere-pressure','atmosphere-punit')
     )
@@ -91,7 +99,7 @@ class EquilibriumAtmosphere(Model):
     profile = ProfileField()
     def __post_init__(self):
         self.structure.value = 'Equilibrium'
-
+@dataclass
 class ComaAtmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
     gas_production = QuantityField('atmosphere-pressure',u.Unit('s-1'))
