@@ -12,9 +12,9 @@ from astropy.units import imperial
 from pypsg import units as u_psg
 
 from pypsg.cfg.base import Model
-from pypsg.cfg.base import Field, CharField, IntegerField, DateField
+from pypsg.cfg.base import CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
-from pypsg.cfg.base import GeometryOffsetField, MultiQuantityField, MoleculesField, AerosolsField
+from pypsg.cfg.base import GeometryOffsetField, GeometryUserParamField, MoleculesField, AerosolsField
 from pypsg.cfg.base import ProfileField, BooleanField
 
 
@@ -63,7 +63,7 @@ class Geometry(Model):
         names=('geometry-obs-altitude','geometry-altitude-unit')
     )
     azimuth = QuantityField('geometry-azimuth',u.deg)
-    user_parameter = MultiQuantityField('geometry-user-parameter',(u.deg,u.km))
+    user_parameter = GeometryUserParamField()
     stellar_type = CharChoicesField('geometry-stellar-type',('O','B','A','F','G','K','M',''),max_length=1)
     stellar_temperature = QuantityField('geometry-stellar-temperature',u.K)
     stellar_magnitude = FloatField('geometry-stellar-magnitude')
@@ -75,6 +75,72 @@ class Geometry(Model):
     # GEOMETRY-STAR-DISTANCE -- Computed by PSG
     # GEOMETRY-ROTATION -- Computed by PSG
     # GEOMETRY-BRDFSCALER -- Computed by PSG
+
+    @classmethod
+    def _from_cfg(cls,cfg:dict):
+        """
+        Create a class instance from a config dict.
+
+        Parameters
+        ----------
+        cfg : dict
+            A dictionary read from a PSG config file.
+
+        Returns
+        -------
+        Geometry
+            An instance of the Geometry class
+        """
+        def wrap(s:str):
+            if not s == '':
+                s = '-' + s
+            return f'<GEOMETRY{s.upper()}>'
+        def u_or_none(name:str,_type:type):
+            try:
+                return _type(cfg[wrap(name)])
+            except KeyError:
+                return None
+        kwargs = {}
+        kwargs['geometry'] = u_or_none('',str)
+        kwargs['ref'] = u_or_none('ref',str)
+        
+        offset_ns = u_or_none(wrap('offset-ns'),float)
+        offset_ew = u_or_none(wrap('offset-ew'),float)
+        offset_unit = u_or_none(wrap('offset-unit'),u.Unit)
+        if None in [offset_ew,offset_ew,offset_unit]:
+            kwargs['offset'] = None
+        else:
+            kwargs['offset'] = (offset_ns*offset_unit,offset_ew*offset_unit)
+        
+        obs_altitude = u_or_none(wrap('obs-altitude'),float)
+        obs_altitude_unit = u_or_none(wrap('obs-altitude-unit'),u.Unit)
+        if None in [obs_altitude,obs_altitude_unit]:
+            kwargs['obs_altitude'] = None
+        else:
+            kwargs['obs_altitude'] = obs_altitude*obs_altitude_unit
+        
+        kwargs['azimuth'] = u_or_none(wrap('azimuth'),float)
+        
+        
+
+    @classmethod
+    def from_cfg(cls,cfg:dict):
+        """
+        Create a class instance from a config dict.
+
+        Parameters
+        ----------
+        cfg : dict
+            A dictionary read from a PSG config file.
+
+        Returns
+        -------
+        Geometry
+            An instance of the Geometry class
+        """
+        return cls._from_cfg(cfg)
+    
+    
 @dataclass
 class NoAtmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
@@ -84,6 +150,7 @@ class NoAtmosphere(Model):
 class EquilibriumAtmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
     pressure = CodedQuantityField(
+        # pylint: disable-next=no-member
         allowed_units=(u.Pa,u.bar,u_psg.kbar,u_psg.mbar,u_psg.ubar,cds.atm,u.torr,imperial.psi),
         unit_codes=('Pa','bar','kbar','mbar','ubar','atm','torr','psi'), # what is `at`?
         fmt = '.4e', names=('atmosphere-pressure','atmosphere-punit')
@@ -115,4 +182,3 @@ class ComaAtmosphere(Model):
     profile = ProfileField()
     def __post_init__(self):
         self.structure.value = 'Coma'
-

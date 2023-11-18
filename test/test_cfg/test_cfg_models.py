@@ -2,9 +2,13 @@
 
 import pytest
 from astropy import units as u
+from pathlib import Path
+
+from pypsg.cfg.config import Config
 
 from pypsg.cfg.models import Target, Geometry
 from pypsg.cfg.models import NoAtmosphere, EquilibriumAtmosphere, ComaAtmosphere
+
 
 def test_Target():
     target = Target(object='Exoplanet')
@@ -13,6 +17,15 @@ def test_Target():
         _ = Target(object='Black Hole')
     expected = b'<OBJECT>Exoplanet'
     assert target.content == expected
+    
+    path = Path(__file__).parent / 'data' / 'object_gj1214b.cfg'
+    cfg = Config.from_file(path)
+    target = Target.from_cfg(cfg.dict)
+    assert target.object.value == b'Exoplanet'
+    assert target.name.value == b'GJ 1214b'
+    assert target.date.value == b'2020/04/08 01:32'
+    assert target.diameter._value == 35031.1 * u.km
+    
 
 def test_Geometry():
     geo = Geometry(
@@ -34,3 +47,6 @@ def test_EquilibriumAtmosphere():
 def test_ComaAtmosphere():
     atm = ComaAtmosphere()
     assert atm.structure._value == 'Coma'
+
+if __name__ in '__main__':
+    pytest.main([__file__])

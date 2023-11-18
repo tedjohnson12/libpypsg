@@ -117,6 +117,27 @@ class Field:
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self._name!r}, value={self._value!r})"
+    def _read(self,d:dict):
+        """
+        Abstract _read method
+        """
+        raise NotImplementedError('Attempted to call abstract _read method from the base class.')
+    def read(self,d:dict):
+        """
+        Read a dictionary and return the information necessary to
+        construct a class instance. Does not construct that isntance.
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        Any
+            The information necessary to construct a class instance.
+        """
+        return self._read(d)
 
 
 class CharField(Field):
@@ -166,6 +187,12 @@ class CharField(Field):
         elif len(value_to_set) > self.max_length:
             raise ValueError("Value exceeds max length.")
         super(CharField, CharField).value.__set__(self, value_to_set)
+    def _read(self,d:dict):
+        key = self._name.upper()
+        try:
+            return str(d[key])
+        except KeyError:
+            return None
 
 class CharChoicesField(CharField):
     """
@@ -176,7 +203,7 @@ class CharChoicesField(CharField):
         super().__init__(name, default, null, max_length)
         self._options = options
     @Field.value.setter
-    def value(self, value_to_set):
+    def value(self, value_to_set:str):
         if value_to_set is None:
             pass
         elif not any([value_to_set == option for option in self._options]):
@@ -197,7 +224,7 @@ class DateField(Field):
         self._value:time.Time
         return self._value.strftime('%Y/%m/%d %H:%M')
     @Field.value.setter
-    def value(self, value_to_set):
+    def value(self, value_to_set:str):
         if value_to_set is None:
             pass
         else:
@@ -205,6 +232,12 @@ class DateField(Field):
                 value_to_set = parse_date(value_to_set)
             value_to_set = time.Time(value_to_set)
         super(DateField, DateField).value.__set__(self, value_to_set)
+    def _read(self,d:dict):
+        key = self._name.upper()
+        try:
+            return str(d[key])
+        except KeyError:
+            return None
     
 
 class IntegerField(Field):
@@ -221,6 +254,12 @@ class IntegerField(Field):
         if value_to_set is not None and not isinstance(value_to_set, int):
             raise TypeError("Value must be an integer.")
         super(IntegerField, IntegerField).value.__set__(self, value_to_set)
+    def _read(self,d:dict):
+        key = self._name.upper()
+        try:
+            return int(d[key])
+        except KeyError:
+            return None
 
 
 class FloatField(Field):
@@ -243,6 +282,12 @@ class FloatField(Field):
         if value_to_set is not None and not isinstance(value_to_set, float):
             raise TypeError("Value must be a float.")
         super(FloatField, FloatField).value.__set__(self, value_to_set)
+    def _read(self,d:dict):
+        key = self._name.upper()
+        try:
+            return float(d[key])
+        except KeyError:
+            return None
 
 
 class QuantityField(Field):
@@ -279,6 +324,12 @@ class QuantityField(Field):
             msg += f'Must be of type {self.unit.physical_type}.'
             raise u.UnitConversionError(msg)
         super(QuantityField, QuantityField).value.__set__(self, value_to_set)
+    def _read(self,d:dict):
+        key = self._name.upper()
+        try:
+            return u.Quantity(float(d[key]),self.unit)
+        except KeyError:
+            return None
 
 class CodedQuantityField(Field):
     """
@@ -329,9 +380,9 @@ class CodedQuantityField(Field):
                 msg = f'Value for {self._name} is ambiguous. Please use one of these units: {",".join([unit.to_string() for unit in self._allowed_units])}'
                 raise u.UnitTypeError(msg)
         super(CodedQuantityField, CodedQuantityField).value.__set__(self, value_to_set)
-    @property
-    def content(self):
-        raise NotImplementedError('`content` method must be implemented by a subclass.')
+    # @property
+    # def content(self):
+    #     raise NotImplementedError('`content` method must be implemented by a subclass.')
     @property
     def _unit(self):
         if self.is_null:
@@ -372,6 +423,35 @@ class CodedQuantityField(Field):
             line1_str = f'<{name1.upper()}>{value_str}'
             line2_str = f'<{name2.upper()}>{unit_code}'
             return bytes(f'{line1_str}\n{line2_str}',encoding=ENCODING)
+    def parse_unit(self,code:str)->u.Unit:
+        """
+        Parse a unit code to get it's associated unit.
+
+        Parameters
+        ----------
+        code : str
+            The unit code given.
+
+        Returns
+        -------
+        astropy.units.Unit
+            The associated unit.
+        """
+        codes = self._unit_codes
+        units = self._allowed_units
+        d = {c:unit for c, unit in zip(codes,units)}
+        return d[code]
+    def _read(self,d:dict):
+        value_key, unit_key = self._names
+        value_key = value_key.upper()
+        unit_key = unit_key.upper()
+        try:
+            value = float(d[value_key])
+            code = str(d[unit_key])
+            unit = self.parse_unit(code)
+            return u.Quantity(value,unit)
+        except KeyError:
+            return None
 
 class MultiQuantityField(Field):
     """
@@ -415,6 +495,33 @@ class MultiQuantityField(Field):
             msg += f'Must be of of one of {",".join([unit.to_string() for unit in self._units])}.'
             raise u.UnitTypeError(msg)
         super(MultiQuantityField, MultiQuantityField).value.__set__(self, value_to_set)
+    def _read(self,d:dict):
+        raise NotImplementedError
+
+class GeometryUserParamField(MultiQuantityField):
+    """
+    Data field for the geometry user parameters.
+    """
+    def __init__(
+        self,
+        default: u.Quantity = None,
+        null: bool = True
+    ):
+        name = 'geometry-user-parameter'
+        units = (u.deg, u.km)
+        super().__init__(name, units, default, null)
+    def _read(self,d:dict):
+        key = self._name.upper()
+        try:
+            switch = str(d['GEOMETRY'])
+            if switch == 'NADIR':
+                unit = u.deg
+            else:
+                unit = u.km
+            return u.Quantity(float(d[key]),unit)
+        except KeyError:
+            return None
+    
 
 
 
@@ -430,7 +537,7 @@ class GeometryOffsetField(Field):
         default: u.Quantity = None,
         null: bool = True
     ):
-        super().__init__('gravity', default, null)
+        super().__init__('geometry-offset', default, null)
     
     @property
     def name(self):
@@ -483,6 +590,15 @@ class GeometryOffsetField(Field):
             line2_str = f'<GEOMETRY-OFFSET-EW>{value_ew_str}'
             line3_str = f'<GEOMETRY-OFFSET-UNIT>{unit_code}'
             return bytes(f'{line1_str}\n{line2_str}\n{line3_str}',encoding=ENCODING)
+    def _read(self,d:dict):
+        try:
+            ns_value = float(d['GEOMETRY-OFFSET-NS'])
+            ew_value = float(d['GEOMETRY-OFFSET-EW'])
+            unit = u.Unit(d['GEOMETRY-OFFSET-UNIT'])
+            return (u.Quantity(ns_value,unit),u.Quantity(ew_value,unit))
+        except KeyError:
+            return None
+            
 
 class Molecule:
     """
@@ -763,6 +879,20 @@ class Model:
                 newfield = deepcopy(field)
                 newfield.value = field_value
                 self.__setattr__(field_name, newfield)
+    
+    @classmethod
+    def from_cfg(cls,cfg:dict):
+        """
+        Construct a Model instance from a config dict.
+        """
+        initialized = cls() # we must first initialize an instance
+                            # so that we have access to the fields
+        kwargs = {}
+        for field_name, field in initialized.__class__.__dict__.items():
+            if isinstance(field, Field):
+                kwargs[field_name] = field.read(cfg)
+        return cls(**kwargs)
+                
 
     def __setattr__(self, __name: str, __value: Any) -> None:
         attr = self.__dict__.get(__name, None)
@@ -778,3 +908,19 @@ class Model:
                 if not field.is_null:
                     lines.append(field.content)
         return b'\n'.join(lines)
+    @property
+    def keys(self)->dict:
+        """
+        Get the keys of a Model, formated
+        for PSG as {'attr_name':'PSG_name'}.
+
+        :type:dict
+        """
+        keys = {}
+        for key, value in self.__dict__.items():
+            if isinstance(value,Field):
+                value:Field
+                keys[key] = value.name
+        return keys
+        
+        
