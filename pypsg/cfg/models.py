@@ -16,6 +16,7 @@ from pypsg.cfg.base import CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
 from pypsg.cfg.base import GeometryOffsetField, GeometryUserParamField, MoleculesField, AerosolsField
 from pypsg.cfg.base import ProfileField, BooleanField
+from pypsg.cfg.utils import radiance_units
 
 
 class Target(Model):
@@ -182,3 +183,141 @@ class ComaAtmosphere(Model):
     profile = ProfileField()
     def __post_init__(self):
         self.structure.value = 'Coma'
+    
+
+class Generator(Model):
+    resolution_kernel = BooleanField('generator-resolutionkernel')
+    gas_model = BooleanField('generator-gasmodel')
+    continuum_model = BooleanField('generator-cont-model')
+    continuum_stellar = BooleanField('generator-cont-stellar')
+    apply_telluric_noise = BooleanField('generator-trans-show')
+    apply_telluir_obs = BooleanField('generator-trans-apply')
+    telluric_params = CharField('generator-trans',max_length=20)
+    rad_units = CharChoicesField(
+        'generator-radunits',
+        options=(key for key in radiance_units.keys())
+    )
+    log_rad = BooleanField('generator-lograd')
+    gcm_binning = IntegerField('generator-gcm-binning')
+    
+    
+    
+class Telescope(Model):
+    """
+    Base class for telescopes.
+    """
+    telescope = CharChoicesField(
+        'generator-telescope',
+        options = ('SINGLE','ARRAY','CORONA','AOTF','LIDAR')
+    )
+    apperture = QuantityField('generator-diamtele',u.Unit('m'))
+    zodi = FloatField('generator-telescope2')
+    fov = CodedQuantityField(
+        allowed_units=(u.arcsec, u.arcmin, u.deg, u.km, u.dimensionless_unscaled,u.dimensionless_unscaled),
+        unit_codes=('arcsec','arcmin','deg','km','diameter','diffrac'),
+        fmt = '.4e',
+        names=('generator-beam','generator-beamunit')
+    )
+    range1 = CodedQuantityField(
+        allowed_units=(u.um,u.nm, u.mm, u.AA, u.Unit('cm-1'),
+                       u.MHz, u.GHz, u.kHz),
+        unit_codes=('um','nm','mm','An','cm','MHz','GHz','kHz'),
+        fmt = '.4e', names=('generator-range1','generator-rangeunit')
+    )
+    range2 = CodedQuantityField(
+        allowed_units=(u.um,u.nm, u.mm, u.AA, u.Unit('cm-1'),
+                       u.MHz, u.GHz, u.kHz),
+        unit_codes=('um','nm','mm','An','cm','MHz','GHz','kHz'),
+        fmt = '.4e', names=('generator-range2','generator-rangeunit')
+    )
+    resolution = CodedQuantityField(
+        allowed_units=(u.dimensionless_unscaled,u.um,u.nm,u.mm,u.AA,
+                       u.Unit('cm-1'),u.MHz,u.GHz,u.kHz),
+        unit_codes=('RP','um','nm','mm','An','cm','MHz','GHz','kHz'),
+        fmt = '.4e', names=('generator-resolution','generator-resolutionunit')
+    )
+
+class Noise(Model):
+    """
+    Base class for noise models.
+    """
+    noise_type = CharChoicesField(
+        'generator-noise',
+        options=('NO','TRX','RMS','BKG','NEP','D*','CCD')
+    )
+    exp_time = QuantityField('generator-noisetime',u.s)
+    n_frames = IntegerField('generator-noiseframes')
+    n_pixels = IntegerField('generator-noisepixels')
+
+
+@dataclass
+class SingleTelescope(Telescope):
+    def __post_init__(self):
+        self.telescope.value = 'SINGLE'
+
+@dataclass
+class Interferometer(Telescope):
+    n_telescopes = IntegerField('generator-telescope1')
+    def __post_init__(self):
+        self.telescope.value = 'ARRAY'
+
+@dataclass
+class Coronagraph(Telescope):
+    contrast = FloatField('generator-telescope1')
+    iwa = FloatField('generator-telescope3')
+    def __post_init__(self):
+        self.telescope.value = 'CORONA'
+
+@dataclass
+class AOTF(Telescope):
+    def __post_init__(self):
+        self.telescope.value = 'AOTF'
+    
+@dataclass
+class Noiseless(Noise):
+    thoughput = FloatField('generator-noiseoeff')
+    emissivity = FloatField('generator-noieoemis')
+    temperature = QuantityField('generator-noisetemp',u.K)
+    desc = CharField('generator-instrument',max_length=500)
+    pixel_depth = QuantityField('generator-noisewell',u.electron)
+    def __post_init__(self):
+        self.noise_type.value = 'NO'
+
+@dataclass
+class RecieverTemperatureNoise(Noise):
+    temperature = FloatField('generator-noise1')
+    g_factor = FloatField('generator-noise2')
+    def __post_init__(self):
+        self.noise_type.value = 'TRX'
+
+@dataclass
+class ConstantNoise(Noise):
+    sigma = FloatField('generator-noise1')
+    def __post_init__(self):
+        self.noise_type.value = 'RMS'
+
+@dataclass
+class ConstantNoiseWithBackground(Noise):
+    sigma = FloatField('generator-noise1')
+    def __post_init__(self):
+        self.noise_type.value = 'BKG'
+
+@dataclass
+class PowerEquivalentNoise(Noise):
+    sensitivity = QuantityField('generator-noise1',u.W/u.Hz**(1/2))
+    def __post_init__(self):
+        self.noise_type.value = 'NEP'
+
+@dataclass
+class Detectability(Noise):
+    sensitivity = QuantityField('generator-noise1',u.cm*u.Hz**(1/2)/u.W)
+    pixel_size = QuantityField('generator-noise2',u.um)
+    def __post_init__(self):
+        self.noise_type.value = 'D*'
+
+@dataclass
+class CCD(Noise):
+    read_noise = QuantityField('generator-noise1',u.electron)
+    dark_current = QuantityField('generator-noise2',u.electron/u.s)
+    def __post_init__(self):
+        self.noise_type.value = 'CCD'

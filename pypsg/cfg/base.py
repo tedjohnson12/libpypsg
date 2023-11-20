@@ -3,6 +3,7 @@ This module contains the basic functionality for fields in PSG
 config objects.
 """
 from typing import Any,Tuple
+import warnings
 from copy import deepcopy
 from astropy import units as u
 from astropy import time
@@ -13,6 +14,8 @@ from pypsg import units as u_psg
 
 ENCODING = 'UTF-8'
 
+class NullFieldComparisonError(Exception):
+    pass
 
 class Field:
     """
@@ -53,6 +56,18 @@ class Field:
         :type: bool
         """
         return self._value is None
+    def __eq__(self, other:'Field'):
+        if not isinstance(other, Field):
+            raise TypeError("Can only compare fields with other fields.")
+        if not self.name == other.name:
+            raise ValueError("Can only compare fields with the same name.")
+        if self.is_null and other.is_null:
+            return True
+        if self.is_null:
+            raise NullFieldComparisonError('Comparing null field to non-null field.')
+        if other.is_null:
+            raise NullFieldComparisonError('Comparing non-null field to null field.')
+        return self.value == other.value
 
     @property
     def name(self) -> bytes:
@@ -260,6 +275,7 @@ class IntegerField(Field):
             return int(d[key])
         except KeyError:
             return None
+
 
 
 class FloatField(Field):
@@ -594,7 +610,8 @@ class GeometryOffsetField(Field):
         try:
             ns_value = float(d['GEOMETRY-OFFSET-NS'])
             ew_value = float(d['GEOMETRY-OFFSET-EW'])
-            unit = u.Unit(d['GEOMETRY-OFFSET-UNIT'])
+            unit_code = str(d['GEOMETRY-OFFSET-UNIT'])
+            unit = {code:unit for code,unit in zip(self._unit_codes,self._allowed_units)}[unit_code]
             return (u.Quantity(ns_value,unit),u.Quantity(ew_value,unit))
         except KeyError:
             return None
@@ -922,5 +939,65 @@ class Model:
                 value:Field
                 keys[key] = value.name
         return keys
+    @property
+    def fields(self)->dict:
+        """
+        Get the fields of a Model.
+
+        :type:list
+        """
+        return {name:field for name,field in self.__dict__.items() if isinstance(field,Field)}
+    
+    def __eq__(self, other):
+        if not isinstance(other, Model):
+            raise TypeError("Can only compare models with other models.")
+        return self.content == other.content
+    def compare_to(self,other,strict=False,warn=True):
+        """
+        Compare a model to another. The other model is optionally
+        allowed to contain extra fields that are not in the current model.
+        This is because PSG sometimes adds fields internally that are
+        not set by the user.
         
+        Parameters
+        ----------
+        other : Model
+            The model to compare to
+        strict : bool
+            If True, raise an error if the other model contains extra fields.
+        warn : bool
+            If True, warn if the other model contains extra fields.
         
+        Returns
+        -------
+        bool
+            True if the models are equal.
+        """
+        if not isinstance(other, Model):
+            raise TypeError("Can only compare models with other models.")
+        
+        other_fields = other.fields
+        self_fields = self.fields
+        if not all(key1==key2 for key1,key2 in zip(self_fields.keys(),other_fields.keys())):
+            raise ValueError("Can only compare models with the same fields.")
+        # make sure the other model has all the fields.
+        keys = self_fields.keys()
+        should_warn = False
+        for key in keys:
+            sf:Field = self_fields[key]
+            of:Field = other_fields[key]
+            try:
+                if not sf == of:
+                    return False
+            except NullFieldComparisonError: # one is null
+                if sf.is_null: # self is null
+                    return False
+                else: # other is null
+                    if strict:
+                        return False
+                    if warn:
+                        should_warn = True
+        if should_warn:
+            warnings.warn(f"Model {other.__class__.__name__} has extra field {key}.",RuntimeWarning)
+        return True
+            

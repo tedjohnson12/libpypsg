@@ -9,7 +9,7 @@ from pypsg import units as u_psg
 
 from pypsg.cfg.base import Field, Model, CharField, IntegerField
 from pypsg.cfg.base import FloatField, QuantityField
-from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
+from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField, GeometryUserParamField
 from pypsg.cfg.base import CodedQuantityField, MultiQuantityField
 from pypsg.cfg.base import Molecule, MoleculesField, Aerosol, AerosolsField
 from pypsg.cfg.base import Profile, ProfileField, BooleanField
@@ -49,6 +49,8 @@ def test_CharField():
         char.value = 0
     char = CharField(max_length=4,name='char',null=True)
     char.value = None
+    d = {'CHAR':'value'}
+    assert char.read(d) == 'value'
 
 def test_IntegerField():
     i = IntegerField('int')
@@ -59,6 +61,8 @@ def test_IntegerField():
         i.value = 0.
     i = IntegerField('int',null=True)
     i.value = None
+    d = {'INT':0}
+    assert i.read(d) == 0
 
 def test_FloatField():
     f = FloatField('float')
@@ -72,6 +76,8 @@ def test_FloatField():
     f = FloatField('float',fmt='.2e')
     f.value = 1e6
     assert f.value == b'1.00e+06'
+    d = {'FLOAT':0.0}
+    assert f.read(d) == 0.0
 
 def test_QuantityField():
     q = QuantityField('quant',u.m,null=False)
@@ -83,6 +89,8 @@ def test_QuantityField():
     with pytest.raises(u.UnitConversionError):
         q.value = 1*u.s
     assert q.value == b'1.00'
+    d = {'QUANT':1}
+    assert q.read(d) == 1*u.m
 
 def test_CodedQuantityField():
     g = CodedQuantityField(
@@ -120,10 +128,15 @@ def test_CodedQuantityField():
     val_str, unit_code = g._get_values()
     assert val_str == '1.0000e+03'
     
+    d = {'OBJECT-GRAVITY':5,'OBJECT-GRAVITY-UNIT':'rho'}
+    assert g.read(d) == 5*u.g / u.cm**3
+    
 def test_DateField():
     d = DateField('date')
     d.value = '2023-08-10 14:15'
     assert d.value == b'2023/08/10 14:15'
+    cfg = {'DATE':'2023-08-10 14:15'}
+    assert d.read(cfg) == '2023-08-10 14:15'
 
 def test_CharChoicesField():
     c = CharChoicesField('char_choice',options=['a','b'])
@@ -131,6 +144,8 @@ def test_CharChoicesField():
     assert c.value == b'a'
     with pytest.raises(ValueError):
         c.value = 'c'
+    d = {'CHAR_CHOICE':'b'}
+    assert c.read(d) == 'b'
 
 def test_GeometryOffestField():
     g = GeometryOffsetField()
@@ -142,6 +157,8 @@ def test_GeometryOffestField():
     expected += b'<GEOMETRY-OFFSET-EW>1.4000\n'
     expected += b'<GEOMETRY-OFFSET-UNIT>diameter'
     assert g.content == expected
+    d = {'GEOMETRY-OFFSET-NS':1,'GEOMETRY-OFFSET-EW':1.4,'GEOMETRY-OFFSET-UNIT':'diameter'}
+    assert g.read(d) == (1,1.4)
 
 def test_MultiQuantityField():
     m = MultiQuantityField('field',(u.s,u.km),fmt='.2f')
@@ -151,6 +168,18 @@ def test_MultiQuantityField():
     assert m.value == b'0.10'
     with pytest.raises(u.UnitTypeError):
         m.value = 1*u.kg
+    d = {'FIELD':1}
+    with pytest.raises(NotImplementedError):
+        _ = m.read(d)
+
+def test_GeometryUserParamField():
+    g = GeometryUserParamField()
+    g.value = 1*u.deg
+    assert g.value == b'1.00'
+    d = {'GEOMETRY-USER-PARAMETER':1}
+    assert g.read(d) == None
+    d = {'GEOMETRY-USER-PARAMETER':1,'GEOMETRY':'NADIR'}
+    assert g.read(d) == 1*u.deg
 
 def test_Molecule():
     mol = Molecule('H2O','HIT[1]',1*u.pct)
