@@ -28,3 +28,7 @@ radiance_units = {
     'rif': u.dimensionless_unscaled,
     'V': u.mag
 }
+
+diameter = u.def_unit('diameter')
+diffraction = u.def_unit('diffraction')
+resolving_power = u.def_unit('resolving_power')

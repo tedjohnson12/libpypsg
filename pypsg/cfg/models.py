@@ -16,7 +16,7 @@ from pypsg.cfg.base import CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
 from pypsg.cfg.base import GeometryOffsetField, GeometryUserParamField, MoleculesField, AerosolsField
 from pypsg.cfg.base import ProfileField, BooleanField
-from pypsg.cfg.utils import radiance_units
+from pypsg.cfg.utils import radiance_units, diameter, diffraction, resolving_power
 
 
 class Target(Model):
@@ -58,7 +58,7 @@ class Geometry(Model):
     ref = CharField('geometry-ref',max_length=50)
     offset = GeometryOffsetField()
     obs_altitude = CodedQuantityField(
-        allowed_units=(u.AU,u.km,u.dimensionless_unscaled,u.pc),
+        allowed_units=(u.AU,u.km,diameter,u.pc),
         unit_codes=('AU','km','diameter','pc'),
         fmt='.4f',
         names=('geometry-obs-altitude','geometry-altitude-unit')
@@ -213,7 +213,7 @@ class Telescope(Model):
     apperture = QuantityField('generator-diamtele',u.Unit('m'))
     zodi = FloatField('generator-telescope2')
     fov = CodedQuantityField(
-        allowed_units=(u.arcsec, u.arcmin, u.deg, u.km, u.dimensionless_unscaled,u.dimensionless_unscaled),
+        allowed_units=(u.arcsec, u.arcmin, u.deg, u.km, diameter, diffraction),
         unit_codes=('arcsec','arcmin','deg','km','diameter','diffrac'),
         fmt = '.4e',
         names=('generator-beam','generator-beamunit')
@@ -231,7 +231,7 @@ class Telescope(Model):
         fmt = '.4e', names=('generator-range2','generator-rangeunit')
     )
     resolution = CodedQuantityField(
-        allowed_units=(u.dimensionless_unscaled,u.um,u.nm,u.mm,u.AA,
+        allowed_units=(resolving_power,u.um,u.nm,u.mm,u.AA,
                        u.Unit('cm-1'),u.MHz,u.GHz,u.kHz),
         unit_codes=('RP','um','nm','mm','An','cm','MHz','GHz','kHz'),
         fmt = '.4e', names=('generator-resolution','generator-resolutionunit')
