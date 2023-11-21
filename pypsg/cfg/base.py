@@ -953,10 +953,19 @@ class BooleanField(Field):
         return self._true if self._value else self._false
 
     @Field.value.setter
-    def value(self, value_to_set):
+    def value(self, value_to_set:bool):
         if value_to_set is not None and not isinstance(value_to_set, bool):
             raise TypeError("Value must be boolean.")
         super(BooleanField, BooleanField).value.__set__(self, value_to_set)
+    def _read(self, d: dict):
+        key = self._name.upper()
+        value = str(d[key])
+        if value == self._true:
+            return True
+        elif value == self._false:
+            return False
+        else:
+            raise ValueError(f'Value must be one of {self._true} or {self._false}.')
 
 
     
