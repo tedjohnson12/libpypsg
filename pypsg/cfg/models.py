@@ -77,79 +77,28 @@ class Geometry(Model):
     # GEOMETRY-ROTATION -- Computed by PSG
     # GEOMETRY-BRDFSCALER -- Computed by PSG
 
-    @classmethod
-    def _from_cfg(cls,cfg:dict):
-        """
-        Create a class instance from a config dict.
-
-        Parameters
-        ----------
-        cfg : dict
-            A dictionary read from a PSG config file.
-
-        Returns
-        -------
-        Geometry
-            An instance of the Geometry class
-        """
-        def wrap(s:str):
-            if not s == '':
-                s = '-' + s
-            return f'<GEOMETRY{s.upper()}>'
-        def u_or_none(name:str,_type:type):
-            try:
-                return _type(cfg[wrap(name)])
-            except KeyError:
-                return None
-        kwargs = {}
-        kwargs['geometry'] = u_or_none('',str)
-        kwargs['ref'] = u_or_none('ref',str)
-        
-        offset_ns = u_or_none(wrap('offset-ns'),float)
-        offset_ew = u_or_none(wrap('offset-ew'),float)
-        offset_unit = u_or_none(wrap('offset-unit'),u.Unit)
-        if None in [offset_ew,offset_ew,offset_unit]:
-            kwargs['offset'] = None
-        else:
-            kwargs['offset'] = (offset_ns*offset_unit,offset_ew*offset_unit)
-        
-        obs_altitude = u_or_none(wrap('obs-altitude'),float)
-        obs_altitude_unit = u_or_none(wrap('obs-altitude-unit'),u.Unit)
-        if None in [obs_altitude,obs_altitude_unit]:
-            kwargs['obs_altitude'] = None
-        else:
-            kwargs['obs_altitude'] = obs_altitude*obs_altitude_unit
-        
-        kwargs['azimuth'] = u_or_none(wrap('azimuth'),float)
-        
-        
-
-    @classmethod
-    def from_cfg(cls,cfg:dict):
-        """
-        Create a class instance from a config dict.
-
-        Parameters
-        ----------
-        cfg : dict
-            A dictionary read from a PSG config file.
-
-        Returns
-        -------
-        Geometry
-            An instance of the Geometry class
-        """
-        return cls._from_cfg(cfg)
-    
-    
-@dataclass
-class NoAtmosphere(Model):
+class Atmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
+    def _type_to_create(self, *args, **kwargs):
+        cfg = kwargs.get('cfg')
+        structure = self.structure.read(cfg)
+        if structure == 'None':
+            return NoAtmosphere
+        elif structure == 'Eqilibrium':
+            return EquilibriumAtmosphere
+        elif structure == 'Coma':
+            return ComaAtmosphere
+        else:
+            raise ValueError(f'Unknown atmosphere type {structure}')
+        
+    
+        
+@dataclass
+class NoAtmosphere(Atmosphere):
     def __post_init__(self):
         self.structure.value = 'None'
 @dataclass
-class EquilibriumAtmosphere(Model):
-    structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
+class EquilibriumAtmosphere(Atmosphere):
     pressure = CodedQuantityField(
         # pylint: disable-next=no-member
         allowed_units=(u.Pa,u.bar,u_psg.kbar,u_psg.mbar,u_psg.ubar,cds.atm,u.torr,imperial.psi),
@@ -168,8 +117,7 @@ class EquilibriumAtmosphere(Model):
     def __post_init__(self):
         self.structure.value = 'Equilibrium'
 @dataclass
-class ComaAtmosphere(Model):
-    structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
+class ComaAtmosphere(Atmosphere):
     gas_production = QuantityField('atmosphere-pressure',u.Unit('s-1'))
     at_1au = BooleanField('atmosphere-punit',true='gasau',false='gas')
     expansion_velocity = QuantityField('atmosphere-weight',u.Unit('m s-1'))
@@ -236,6 +184,22 @@ class Telescope(Model):
         unit_codes=('RP','um','nm','mm','An','cm','MHz','GHz','kHz'),
         fmt = '.4e', names=('generator-resolution','generator-resolutionunit')
     )
+    def _type_to_create(self, *args, **kwargs):
+        cfg = kwargs['cfg']
+        value = self.telescope.read(cfg)
+        if value == 'SINGLE':
+            return SingleTelescope
+        elif value == 'ARRAY':
+            return Interferometer
+        elif value == 'CORONA':
+            return Coronagraph
+        elif value == 'AOTF':
+            return AOTF
+        elif value == 'LIDAR':
+            return LIDAR
+        else:
+            raise ValueError(f'Unknown telescope type: {value}')
+        
 
 class Noise(Model):
     """
@@ -248,6 +212,25 @@ class Noise(Model):
     exp_time = QuantityField('generator-noisetime',u.s)
     n_frames = IntegerField('generator-noiseframes')
     n_pixels = IntegerField('generator-noisepixels')
+    def _type_to_create(self, *args, **kwargs):
+        cfg = kwargs['cfg']
+        value = self.noise_type.read(cfg)
+        if value == 'NO':
+            return Noiseless
+        elif value == 'TRX':
+            return RecieverTemperatureNoise
+        elif value == 'RMS':
+            return ConstantNoise
+        elif value == 'BKG':
+            return ConstantNoiseWithBackground
+        elif value == 'NEP':
+            return PowerEquivalentNoise
+        elif value == 'D*':
+            return Detectability
+        elif value == 'CCD':
+            return CCD
+        else:
+            raise ValueError(f'Unknown noise type: {value}')
 
 
 @dataclass
@@ -272,6 +255,10 @@ class Coronagraph(Telescope):
 class AOTF(Telescope):
     def __post_init__(self):
         self.telescope.value = 'AOTF'
+@dataclass
+class LIDAR(Telescope):
+    def __post_init__(self):
+        self.telescope.value = 'LIDAR'
     
 @dataclass
 class Noiseless(Noise):

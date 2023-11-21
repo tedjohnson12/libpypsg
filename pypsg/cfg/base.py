@@ -999,6 +999,9 @@ class Model:
                 newfield = deepcopy(field)
                 newfield.value = field_value
                 self.__setattr__(field_name, newfield)
+    # @staticmethod
+    def _type_to_create(self,*args,**kwargs):
+        return self.__class__
     
     @classmethod
     def from_cfg(cls,cfg:dict):
@@ -1007,6 +1010,7 @@ class Model:
         """
         initialized = cls() # we must first initialize an instance
                             # so that we have access to the fields
+        cls = initialized._type_to_create(cfg=cfg)
         kwargs = {}
         for field_name, field in initialized.__class__.__dict__.items():
             if isinstance(field, Field):

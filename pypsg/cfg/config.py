@@ -5,7 +5,9 @@ from pathlib import Path
 
 import warnings
 
-class Config:
+from pypsg.cfg import models
+
+class BinaryConfig:
     """
     PSG configuration structure.
     
@@ -85,4 +87,49 @@ class Config:
                 val = line[end_of_kwd:]
                 cfg[kwd] = val
         return cfg
-    
+
+class PyConfig:
+    """
+    A configuration in the form of a python object.
+    """
+    def __init__(
+        self,
+        target:models.Target = models.Target(),
+        geometry:models.Geometry = models.Geometry(),
+        atmosphere:models.Atmosphere = models.NoAtmosphere(),
+        generator:models.Generator = models.Generator(),
+        telescope:models.Telescope = models.SingleTelescope(),
+        noise:models.Noise = models.Noiseless()
+    ):
+        self.target = target
+        self.geometry = geometry
+        self.atmosphere = atmosphere
+        self.generator = generator
+        self.telescope = telescope
+        self.noise = noise
+    @classmethod
+    def from_dict(cls,d:dict):
+        return cls(
+            target=models.Target.from_cfg(d),
+            geometry=models.Geometry.from_cfg(d),
+            atmosphere=models.Atmosphere.from_cfg(d),
+            generator=models.Generator.from_cfg(d),
+            telescope=models.Telescope.from_cfg(d),
+            noise=models.Noise.from_cfg(d)
+        )
+    @classmethod
+    def from_binaryconfig(cls,config:BinaryConfig):
+        return cls.from_dict(config.dict)
+    @classmethod
+    def from_bytes(cls,config:bytes):
+        return cls.from_binaryconfig(BinaryConfig(config))
+    @property
+    def content(self)->bytes:
+        return b'\n'.join([
+            self.target.content,
+            self.geometry.content,
+            self.atmosphere.content,
+            self.generator.content,
+            self.telescope.content,
+            self.noise.content
+        ])
