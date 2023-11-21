@@ -742,12 +742,15 @@ class MoleculesField(Field):
         s = f'{self.ngas}\n{self.gas}\n{self.type}\n{self.abun}\n{self.unit}'
         return bytes(s,encoding=ENCODING)
     def _read(self, d:dict):
-        ngas = int(d['ATMOSPHERE-NGAS'])
-        gases = d['ATMOSPHERE-GAS'].split(',')
-        types = d['ATMOSPHERE-TYPE'].split(',')
-        abuns = d['ATMOSPHERE-ABUN'].split(',')
+        try:
+            ngas = int(d['ATMOSPHERE-NGAS'])
+            gases = d['ATMOSPHERE-GAS'].split(',')
+            types = d['ATMOSPHERE-TYPE'].split(',')
+            abuns = d['ATMOSPHERE-ABUN'].split(',')
+            units = d['ATMOSPHERE-UNIT'].split(',')
+        except KeyError:
+            return None
         abuns = [float(abun) for abun in abuns]
-        units = d['ATMOSPHERE-UNIT'].split(',')
         units = [Molecule.get_unit(unit) for unit in units]
         abuns = [abun*unit for abun, unit in zip(abuns,units)]
         if not len(gases) == ngas:
@@ -811,13 +814,16 @@ class AerosolsField(Field):
         s = f'{self.naero}\n{self.aeros}\n{self.type}\n{self.abun}\n{self.unit}\n{self.size}\n{self.size_unit}'
         return bytes(s,encoding=ENCODING)
     def _read(self,d:dict):
-        naero = int(d['ATMOSPHERE-NAERO'])
-        aeros = d['ATMOSPHERE-AEROS'].split(',')
-        types = d['ATMOSPHERE-ATYPE'].split(',')
-        abuns = d['ATMOSPHERE-AABUN'].split(',')
-        units = d['ATMOSPHERE-AUNIT'].split(',')
-        sizes = d['ATMOSPHERE-ASIZE'].split(',')
-        size_units = d['ATMOSPHERE-ASUNI'].split(',')
+        try:
+            naero = int(d['ATMOSPHERE-NAERO'])
+            aeros = d['ATMOSPHERE-AEROS'].split(',')
+            types = d['ATMOSPHERE-ATYPE'].split(',')
+            abuns = d['ATMOSPHERE-AABUN'].split(',')
+            units = d['ATMOSPHERE-AUNIT'].split(',')
+            sizes = d['ATMOSPHERE-ASIZE'].split(',')
+            size_units = d['ATMOSPHERE-ASUNI'].split(',')
+        except KeyError:
+            return None
         if not len(aeros) == naero:
             raise ValueError('Incorrect number of aerosols in ATMOSPHERE-AEROS.')
         if not len(types) == naero:
@@ -928,8 +934,11 @@ class ProfileField(Field):
         lines = [self.names] + [self.str_nlayers] + [self.get_layer(i) for i in range(self.nlayers)]
         return bytes('\n'.join(lines), encoding=ENCODING)
     def _read(self, d: dict):
-        molecules = d['ATMOSPHERE-LAYERS-MOLECULES'].split(',')
-        n_layers = int(d['ATMOSPHERE-LAYERS'])
+        try:
+            molecules = d['ATMOSPHERE-LAYERS-MOLECULES'].split(',')
+            n_layers = int(d['ATMOSPHERE-LAYERS'])
+        except KeyError:
+            return None
         layers:np.ndarray = np.array([
             np.fromstring(d[f'ATMOSPHERE-LAYER-{i+1}']) for i in range(n_layers)
         ])
@@ -959,7 +968,10 @@ class BooleanField(Field):
         super(BooleanField, BooleanField).value.__set__(self, value_to_set)
     def _read(self, d: dict):
         key = self._name.upper()
-        value = str(d[key])
+        try:
+            value = str(d[key])
+        except KeyError:
+            return None
         if value == self._true:
             return True
         elif value == self._false:
