@@ -643,6 +643,12 @@ class Molecule:
         if isinstance(abn,(int,float)):
             abn = abn*u.dimensionless_unscaled
         self._abn = abn
+    @staticmethod
+    def get_unit(code:str):
+        try:
+            return {code:unit for code,unit in zip(Molecule._unit_codes,Molecule._allowed_units)}[code]
+        except KeyError:
+            raise ValueError(f'Invalid unit code: {code}')
     def _validate(self):
         assert self._abn.unit in self._allowed_units
     @property
@@ -670,6 +676,15 @@ class Aerosol(Molecule):
             size = size*u.dimensionless_unscaled
         self._size = size
         self._validate()
+    @staticmethod
+    def get_size_unit(code:str):
+        try:
+            return {code:unit for code,unit in zip(Aerosol._size_unit_codes,Aerosol._allowed_size_units)}[code]
+        except KeyError:
+            raise ValueError(f'Invalid unit code: {code}')
+    @staticmethod
+    def get_abn_unit(code:str):
+        return Molecule.get_unit(code)
     
     def _validate(self):
         assert self._size.unit in self._allowed_size_units
@@ -726,6 +741,24 @@ class MoleculesField(Field):
     def content(self):
         s = f'{self.ngas}\n{self.gas}\n{self.type}\n{self.abun}\n{self.unit}'
         return bytes(s,encoding=ENCODING)
+    def _read(self, d:dict):
+        ngas = int(d['ATMOSPHERE-NGAS'])
+        gases = d['ATMOSPHERE-GAS'].split(',')
+        types = d['ATMOSPHERE-TYPE'].split(',')
+        abuns = d['ATMOSPHERE-ABUN'].split(',')
+        abuns = [float(abun) for abun in abuns]
+        units = d['ATMOSPHERE-UNIT'].split(',')
+        units = [Molecule.get_unit(unit) for unit in units]
+        abuns = [abun*unit for abun, unit in zip(abuns,units)]
+        if not len(gases) == ngas:
+            raise ValueError('Incorrect number of gases in ATMOSPHERE-GAS.')
+        if not len(types) == ngas:
+            raise ValueError('Incorrect number of types in ATMOSPHERE-TYPE.')
+        if not len(abuns) == ngas:
+            raise ValueError('Incorrect number of abuns in ATMOSPHERE-ABUN.')
+        if not len(units) == ngas:
+            raise ValueError('Incorrect number of units in ATMOSPHERE-UNIT.')
+        return tuple(Molecule(gas,type,abun) for gas,type,abun in zip(gases,types,abuns))
 
 class AerosolsField(Field):
     _value:Tuple[Aerosol]
@@ -777,6 +810,32 @@ class AerosolsField(Field):
     def content(self):
         s = f'{self.naero}\n{self.aeros}\n{self.type}\n{self.abun}\n{self.unit}\n{self.size}\n{self.size_unit}'
         return bytes(s,encoding=ENCODING)
+    def _read(self,d:dict):
+        naero = int(d['ATMOSPHERE-NAERO'])
+        aeros = d['ATMOSPHERE-AEROS'].split(',')
+        types = d['ATMOSPHERE-ATYPE'].split(',')
+        abuns = d['ATMOSPHERE-AABUN'].split(',')
+        units = d['ATMOSPHERE-AUNIT'].split(',')
+        sizes = d['ATMOSPHERE-ASIZE'].split(',')
+        size_units = d['ATMOSPHERE-ASUNI'].split(',')
+        if not len(aeros) == naero:
+            raise ValueError('Incorrect number of aerosols in ATMOSPHERE-AEROS.')
+        if not len(types) == naero:
+            raise ValueError('Incorrect number of types in ATMOSPHERE-ATYPE.')
+        if not len(abuns) == naero:
+            raise ValueError('Incorrect number of abuns in ATMOSPHERE-AABUN.')
+        if not len(units) == naero:
+            raise ValueError('Incorrect number of units in ATMOSPHERE-AUNIT.')
+        if not len(sizes) == naero:
+            raise ValueError('Incorrect number of sizes in ATMOSPHERE-ASIZE.')
+        if not len(size_units) == naero:
+            raise ValueError('Incorrect number of size units in ATMOSPHERE-ASUNI.')
+
+        abuns = [float(abun) for abun in abuns]
+        sizes = [float(size) for size in sizes]
+        units = [Aerosol.get_abn_unit(unit) for unit in units]
+        size_units = [Aerosol.get_size_unit(unit) for unit in size_units]
+        return tuple(Aerosol(aero,type,abun*unit,size*size_unit) for aero,type,abun,unit,size,size_unit in zip(aeros,types,abuns,units,sizes,size_units))
 
 class Profile:
     """
