@@ -841,6 +841,8 @@ class Profile:
     """
     A data container for an atmospheric profile.
     """
+    PRESSURE = 'PRESSURE'
+    TEMPERATURE = 'TEMPERATURE'
     def __init__(self,name:str,dat:np.ndarray,unit:u.Unit = u.dimensionless_unscaled):
         self.name = name
         self._dat = dat
@@ -865,6 +867,14 @@ class Profile:
     @property
     def is_pressure(self):
         return self.unit.physical_type == u.bar.physical_type
+    @staticmethod
+    def get_unit(name:str):
+        if name == Profile.PRESSURE:
+            return u.bar
+        elif name == Profile.TEMPERATURE:
+            return u.K
+        else:
+            return u.dimensionless_unscaled
 
 class ProfileField(Field):
     _value:Tuple[Profile]
@@ -917,6 +927,19 @@ class ProfileField(Field):
     def content(self):
         lines = [self.names] + [self.str_nlayers] + [self.get_layer(i) for i in range(self.nlayers)]
         return bytes('\n'.join(lines), encoding=ENCODING)
+    def _read(self, d: dict):
+        molecules = d['ATMOSPHERE-LAYERS-MOLECULES'].split(',')
+        n_layers = int(d['ATMOSPHERE-LAYERS'])
+        layers:np.ndarray = np.array([
+            np.fromstring(d[f'ATMOSPHERE-LAYER-{i+1}']) for i in range(n_layers)
+        ])
+        profiles = []
+        names = [Profile.PRESSURE, Profile.TEMPERATURE] + molecules
+        for i, name in enumerate(names):
+            dat = layers[:,i]
+            unit = Profile.get_unit(name)
+            profiles.append(Profile(name,dat,unit))
+        return tuple(profiles)
 
 class BooleanField(Field):
     _value:bool
