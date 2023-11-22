@@ -4,7 +4,7 @@ import pytest
 from astropy import units as u
 from pathlib import Path
 
-from pypsg.cfg.config import BinaryConfig
+from pypsg.cfg.config import BinConfig
 
 from pypsg.cfg.models import Target, Geometry
 from pypsg.cfg.models import NoAtmosphere, EquilibriumAtmosphere, ComaAtmosphere
@@ -19,7 +19,7 @@ def test_Target():
     assert target.content == expected
     
     path = Path(__file__).parent / 'data' / 'object_gj1214b.cfg'
-    cfg = BinaryConfig.from_file(path)
+    cfg = BinConfig.from_file(path)
     target = Target.from_cfg(cfg.dict)
     assert target.object.value == b'Exoplanet'
     assert target.name.value == b'GJ 1214b'

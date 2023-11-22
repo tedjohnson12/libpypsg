@@ -10,7 +10,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pypsg.cfg.config import PyConfig, BinaryConfig
+from pypsg.cfg.config import PyConfig, BinConfig
 
 CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
 
@@ -18,7 +18,7 @@ CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
 # Read the file
 # ------------
 
-cfg = BinaryConfig.from_file(CFG_PATH)
+cfg = BinConfig.from_file(CFG_PATH)
 
 print(cfg.content)
 

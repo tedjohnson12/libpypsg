@@ -2,7 +2,7 @@
 from typing import Union
 import requests
 
-from pypsg.cfg import PyConfig, BinaryConfig
+from pypsg.cfg import PyConfig, BinConfig
 from pypsg import settings
 
 
@@ -35,7 +35,7 @@ class APICall:
 
     def __init__(
         self,
-        cfg: Union[BinaryConfig, PyConfig],
+        cfg: Union[BinConfig, PyConfig],
         output_type:str = None,
         app: str = None,
         url: str = None
@@ -63,7 +63,7 @@ class APICall:
         TypeError
             If self.url is not a string.
         """
-        if not isinstance(self.cfg, (PyConfig, BinaryConfig)):
+        if not isinstance(self.cfg, (PyConfig, BinConfig)):
             raise TypeError('apiCall.cfg must be a PyConfig or BinaryConfig object')
         if not (isinstance(self.type, str) or self.type is None):
             raise TypeError('apiCall.type must be a string or None')
@@ -71,7 +71,7 @@ class APICall:
             raise TypeError('apiCall.app must be a string or None')
         if not isinstance(self.url, str):
             raise TypeError('apiCall.url must be a string')
-
+    
     def __call__(self) -> bytes:
         """
         Call the PSG API

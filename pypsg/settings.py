@@ -8,14 +8,15 @@ import json
 REQUEST_TIMEOUT = 120
 
 PSG_URL = 'https://psg.gsfc.nasa.gov/api.php'
-INTERNAL_PSG_URL = 'https://localhost:3000/api.php'
+INTERNAL_PSG_URL = 'http://localhost:3000/api.php'
 
 USER_DATA_PATH = Path.home() / '.pypsg'
 USER_SETTINGS_PATH = USER_DATA_PATH / 'settings.json'
 
 DEFAULT_SETTINGS = {
     'url': PSG_URL,
-    'api_key': None
+    'api_key': None,
+    'encoding': 'utf-8',
 }
 
 
@@ -23,8 +24,13 @@ settings_need_reload = False
 def save_settings(**kwargs):
     if not USER_DATA_PATH.exists():
         USER_DATA_PATH.mkdir()
+    if not USER_SETTINGS_PATH.exists():
+        USER_SETTINGS_PATH.touch()
     with USER_SETTINGS_PATH.open('r') as file:
-        previous_settings = json.load(file)
+        try:
+            previous_settings = json.load(file)
+        except json.decoder.JSONDecodeError:
+            previous_settings = {}
         
     for key, value in kwargs.items():
         if key in DEFAULT_SETTINGS.keys():
@@ -41,8 +47,14 @@ def save_settings(**kwargs):
     reload_settings()
 
 def load_settings():
-    with USER_SETTINGS_PATH.open('r') as file:
-        settings = json.load(file)
+    try:
+        with USER_SETTINGS_PATH.open('r') as file:
+            try:
+                settings = json.load(file)
+            except json.decoder.JSONDecodeError:
+                settings = {}
+    except FileNotFoundError:
+        settings = {}
     for key, value in DEFAULT_SETTINGS.items():
         if key not in settings:
             settings[key] = value

@@ -186,6 +186,8 @@ class Telescope(Model):
         unit_codes=('RP','um','nm','mm','An','cm','MHz','GHz','kHz'),
         fmt = '.4e', names=('generator-resolution','generator-resolutionunit')
     )
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs['cfg']
         value = self.telescope.read(cfg)
@@ -214,6 +216,8 @@ class Noise(Model):
     exp_time = QuantityField('generator-noisetime',u.s)
     n_frames = IntegerField('generator-noiseframes')
     n_pixels = IntegerField('generator-noisepixels')
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs['cfg']
         value = self.noise_type.read(cfg)

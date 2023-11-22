@@ -996,12 +996,15 @@ class Model:
     A base class for data models.
     """
     def __init__(self, **kwargs):
-        for field_name, field in self.__class__.__dict__.items():
-            if isinstance(field, Field):
-                field_value = kwargs.get(field_name, field.default)
-                newfield = deepcopy(field)
-                newfield.value = field_value
-                self.__setattr__(field_name, newfield)
+        field_names = dir(self)
+        for field_name in field_names:
+            if not field_name == 'content':
+                field = getattr(self, field_name)
+                if isinstance(field,Field):
+                    field_value = kwargs.get(field_name, field.default)
+                    newfield = deepcopy(field)
+                    newfield.value = field_value
+                    self.__setattr__(field_name, newfield)                
     # @staticmethod
     def _type_to_create(self,*args,**kwargs):
         return self.__class__
@@ -1015,9 +1018,12 @@ class Model:
                             # so that we have access to the fields
         cls = initialized._type_to_create(cfg=cfg)
         kwargs = {}
-        for field_name, field in cls.__dict__.items():
-            if isinstance(field, Field):
-                kwargs[field_name] = field.read(cfg)
+        field_names = dir(cls)
+        for field_name in field_names:
+            if not field_name == 'content':
+                field = getattr(cls, field_name)
+                if isinstance(field,Field):
+                    kwargs[field_name] = field.read(cfg)
         return cls(**kwargs)
                 
 
@@ -1030,25 +1036,28 @@ class Model:
     @property
     def content(self):
         lines = []
-        for _, field in self.__dict__.items():
-            if isinstance(field,Field):
-                if not field.is_null:
-                    lines.append(field.content)
+        field_names = dir(self)
+        for field_name in field_names:
+            if not field_name == 'content':
+                field = getattr(self, field_name)
+                if isinstance(field,Field):
+                    if not field.is_null:
+                        lines.append(field.content)
         return b'\n'.join(lines)
-    @property
-    def keys(self)->dict:
-        """
-        Get the keys of a Model, formated
-        for PSG as {'attr_name':'PSG_name'}.
+    # @property
+    # def keys(self)->dict:
+    #     """
+    #     Get the keys of a Model, formated
+    #     for PSG as {'attr_name':'PSG_name'}.
 
-        :type:dict
-        """
-        keys = {}
-        for key, value in self.__dict__.items():
-            if isinstance(value,Field):
-                value:Field
-                keys[key] = value.name
-        return keys
+    #     :type:dict
+    #     """
+    #     keys = {}
+    #     for key, value in self.__dict__.items():
+    #         if isinstance(value,Field):
+    #             value:Field
+    #             keys[key] = value.name
+    #     return keys
     @property
     def fields(self)->dict:
         """

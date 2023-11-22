@@ -8,7 +8,7 @@ import warnings
 
 from pypsg.cfg import models
 
-class BinaryConfig:
+class BinConfig:
     """
     PSG configuration structure.
     
@@ -145,11 +145,14 @@ class PyConfig:
             noise=models.Noise.from_cfg(d)
         )
     @classmethod
-    def from_binaryconfig(cls,config:BinaryConfig):
+    def from_binaryconfig(cls,config:BinConfig):
         return cls.from_dict(config.dict)
     @classmethod
     def from_bytes(cls,config:bytes):
-        return cls.from_binaryconfig(BinaryConfig(config))
+        return cls.from_binaryconfig(BinConfig(config))
+    @classmethod
+    def from_file(cls,path:Path):
+        return cls.from_binaryconfig(BinConfig.from_file(path))
     @property
     def content(self)->bytes:
         return b'\n'.join([
