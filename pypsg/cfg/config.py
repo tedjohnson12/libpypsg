@@ -1,6 +1,7 @@
 """
 Methods to parse config files.
 """
+from typing import Union, Type
 from pathlib import Path
 
 import warnings
@@ -74,7 +75,7 @@ class BinaryConfig:
 
         :type: dict
         """
-        warnings.warn('This method has not been tested.',RuntimeWarning)
+        # warnings.warn('This method has not been tested.',RuntimeWarning)
         content = self.content
         if self.has_binary:
             content = content.split(b'<BINARY>')[0] + content.split(b'</BINARY>')[1]
@@ -94,19 +95,45 @@ class PyConfig:
     """
     def __init__(
         self,
-        target:models.Target = models.Target(),
-        geometry:models.Geometry = models.Geometry(),
-        atmosphere:models.Atmosphere = models.NoAtmosphere(),
-        generator:models.Generator = models.Generator(),
-        telescope:models.Telescope = models.SingleTelescope(),
-        noise:models.Noise = models.Noiseless()
+        target:models.Target = None,
+        geometry:models.Geometry = None,
+        atmosphere:models.Atmosphere = None,
+        generator:models.Generator = None,
+        telescope:models.Telescope = None,
+        noise:models.Noise = None
     ):
-        self.target = target
-        self.geometry = geometry
-        self.atmosphere = atmosphere
-        self.generator = generator
-        self.telescope = telescope
-        self.noise = noise
+        self.target:models.Target = target
+        if self.target is None:
+            self.target = models.Target()
+        
+        self.geometry:models.Geometry = geometry
+        if self.geometry is None:
+            self.geometry = models.Geometry()
+        
+        self.atmosphere:Union[
+            models.NoAtmosphere,models.EquilibriumAtmosphere,models.ComaAtmosphere
+            ] = atmosphere
+        if self.atmosphere is None:
+            self.atmosphere = models.NoAtmosphere()
+        
+        self.generator:models.Generator = generator
+        if self.generator is None:
+            self.generator = models.Generator()
+        
+        self.telescope:Union[
+            models.SingleTelescope,models.Interferometer,models.Coronagraph,
+            models.AOTF,models.LIDAR
+            ] = telescope
+        if self.telescope is None:
+            self.telescope = models.SingleTelescope()
+        
+        self.noise:Union[
+            models.Noiseless,models.RecieverTemperatureNoise,
+            models.ConstantNoise,models.ConstantNoiseWithBackground,
+            models.PowerEquivalentNoise,models.Detectability,models.CCD
+            ] = noise
+        if self.noise is None:
+            self.noise = models.Noiseless()
     @classmethod
     def from_dict(cls,d:dict):
         return cls(

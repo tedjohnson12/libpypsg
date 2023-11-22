@@ -1,8 +1,6 @@
 """
 A module to store PSG config models.
 """
-from dataclasses import dataclass
-
 from astropy import units as u
 from astropy.units import cds
 from astropy.units import imperial
@@ -16,7 +14,6 @@ from pypsg.cfg.base import CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
 from pypsg.cfg.base import GeometryOffsetField, GeometryUserParamField, MoleculesField, AerosolsField
 from pypsg.cfg.base import ProfileField, BooleanField
-from pypsg.cfg.utils import radiance_units, diameter, diffraction, resolving_power
 
 
 class Target(Model):
@@ -58,7 +55,7 @@ class Geometry(Model):
     ref = CharField('geometry-ref',max_length=50)
     offset = GeometryOffsetField()
     obs_altitude = CodedQuantityField(
-        allowed_units=(u.AU,u.km,diameter,u.pc),
+        allowed_units=(u.AU,u.km,u_psg.diameter,u.pc),
         unit_codes=('AU','km','diameter','pc'),
         fmt='.4f',
         names=('geometry-obs-altitude','geometry-altitude-unit')
@@ -79,12 +76,14 @@ class Geometry(Model):
 
 class Atmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs.get('cfg')
         structure = self.structure.read(cfg)
         if structure == 'None':
             return NoAtmosphere
-        elif structure == 'Eqilibrium':
+        elif structure == 'Equilibrium':
             return EquilibriumAtmosphere
         elif structure == 'Coma':
             return ComaAtmosphere
@@ -93,11 +92,11 @@ class Atmosphere(Model):
         
     
         
-@dataclass
 class NoAtmosphere(Atmosphere):
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.structure.value = 'None'
-@dataclass
+
 class EquilibriumAtmosphere(Atmosphere):
     pressure = CodedQuantityField(
         # pylint: disable-next=no-member
@@ -114,9 +113,10 @@ class EquilibriumAtmosphere(Atmosphere):
     lmax = IntegerField('atmosphere-lmax')
     description = CharField('atmosphere-description',max_length=200)
     profile = ProfileField()
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.structure.value = 'Equilibrium'
-@dataclass
+
 class ComaAtmosphere(Atmosphere):
     gas_production = QuantityField('atmosphere-pressure',u.Unit('s-1'))
     at_1au = BooleanField('atmosphere-punit',true='gasau',false='gas')
@@ -129,8 +129,10 @@ class ComaAtmosphere(Atmosphere):
     tau = QuantityField('atmosphere-tau',u.s)
     description = CharField('atmosphere-description',max_length=200)
     profile = ProfileField()
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.structure.value = 'Coma'
+    
     
 
 class Generator(Model):
@@ -143,7 +145,7 @@ class Generator(Model):
     telluric_params = CharField('generator-trans',max_length=20)
     rad_units = CharChoicesField(
         'generator-radunits',
-        options=(key for key in radiance_units.keys())
+        options=tuple(key for key in u_psg.radiance_units.keys())
     )
     log_rad = BooleanField('generator-lograd')
     gcm_binning = IntegerField('generator-gcm-binning')
@@ -161,7 +163,7 @@ class Telescope(Model):
     apperture = QuantityField('generator-diamtele',u.Unit('m'))
     zodi = FloatField('generator-telescope2')
     fov = CodedQuantityField(
-        allowed_units=(u.arcsec, u.arcmin, u.deg, u.km, diameter, diffraction),
+        allowed_units=(u.arcsec, u.arcmin, u.deg, u.km, u_psg.diameter, u_psg.diffraction),
         unit_codes=('arcsec','arcmin','deg','km','diameter','diffrac'),
         fmt = '.4e',
         names=('generator-beam','generator-beamunit')
@@ -179,7 +181,7 @@ class Telescope(Model):
         fmt = '.4e', names=('generator-range2','generator-rangeunit')
     )
     resolution = CodedQuantityField(
-        allowed_units=(resolving_power,u.um,u.nm,u.mm,u.AA,
+        allowed_units=(u_psg.resolving_power,u.um,u.nm,u.mm,u.AA,
                        u.Unit('cm-1'),u.MHz,u.GHz,u.kHz),
         unit_codes=('RP','um','nm','mm','An','cm','MHz','GHz','kHz'),
         fmt = '.4e', names=('generator-resolution','generator-resolutionunit')
@@ -233,78 +235,78 @@ class Noise(Model):
             raise ValueError(f'Unknown noise type: {value}')
 
 
-@dataclass
 class SingleTelescope(Telescope):
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.telescope.value = 'SINGLE'
 
-@dataclass
 class Interferometer(Telescope):
     n_telescopes = IntegerField('generator-telescope1')
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.telescope.value = 'ARRAY'
 
-@dataclass
 class Coronagraph(Telescope):
     contrast = FloatField('generator-telescope1')
     iwa = FloatField('generator-telescope3')
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.telescope.value = 'CORONA'
 
-@dataclass
 class AOTF(Telescope):
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.telescope.value = 'AOTF'
-@dataclass
 class LIDAR(Telescope):
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.telescope.value = 'LIDAR'
-    
-@dataclass
+
 class Noiseless(Noise):
     thoughput = FloatField('generator-noiseoeff')
     emissivity = FloatField('generator-noieoemis')
     temperature = QuantityField('generator-noisetemp',u.K)
     desc = CharField('generator-instrument',max_length=500)
     pixel_depth = QuantityField('generator-noisewell',u.electron)
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.noise_type.value = 'NO'
 
-@dataclass
 class RecieverTemperatureNoise(Noise):
     temperature = FloatField('generator-noise1')
     g_factor = FloatField('generator-noise2')
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.noise_type.value = 'TRX'
 
-@dataclass
 class ConstantNoise(Noise):
     sigma = FloatField('generator-noise1')
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.noise_type.value = 'RMS'
 
-@dataclass
 class ConstantNoiseWithBackground(Noise):
     sigma = FloatField('generator-noise1')
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.noise_type.value = 'BKG'
 
-@dataclass
 class PowerEquivalentNoise(Noise):
     sensitivity = QuantityField('generator-noise1',u.W/u.Hz**(1/2))
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.noise_type.value = 'NEP'
 
-@dataclass
 class Detectability(Noise):
     sensitivity = QuantityField('generator-noise1',u.cm*u.Hz**(1/2)/u.W)
     pixel_size = QuantityField('generator-noise2',u.um)
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.noise_type.value = 'D*'
 
-@dataclass
 class CCD(Noise):
     read_noise = QuantityField('generator-noise1',u.electron)
     dark_current = QuantityField('generator-noise2',u.electron/u.s)
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.noise_type.value = 'CCD'

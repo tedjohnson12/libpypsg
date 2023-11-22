@@ -153,6 +153,9 @@ class Field:
             The information necessary to construct a class instance.
         """
         return self._read(d)
+    @property
+    def raw_value(self):
+        return self._value
 
 
 class CharField(Field):
@@ -940,7 +943,7 @@ class ProfileField(Field):
         except KeyError:
             return None
         layers:np.ndarray = np.array([
-            np.fromstring(d[f'ATMOSPHERE-LAYER-{i+1}']) for i in range(n_layers)
+            np.fromstring(d[f'ATMOSPHERE-LAYER-{i+1}'],sep=',') for i in range(n_layers)
         ])
         profiles = []
         names = [Profile.PRESSURE, Profile.TEMPERATURE] + molecules
@@ -1012,7 +1015,7 @@ class Model:
                             # so that we have access to the fields
         cls = initialized._type_to_create(cfg=cfg)
         kwargs = {}
-        for field_name, field in initialized.__class__.__dict__.items():
+        for field_name, field in cls.__dict__.items():
             if isinstance(field, Field):
                 kwargs[field_name] = field.read(cfg)
         return cls(**kwargs)
