@@ -38,6 +38,5 @@ plt.xlabel('Temperature')
 plt.ylabel('Pressure')
 plt.yscale('log')
 plt.ylim(*np.flip(plt.ylim()))
-0
 
 

@@ -1,10 +1,12 @@
+
+from typing import Union
 import requests
 
-from pypsg.cfg.cfg import Config
+from pypsg.cfg import PyConfig, BinaryConfig
 from pypsg import settings
 
 
-class apiCall:
+class APICall:
     """
     A class to call the PSG API.
 
@@ -33,15 +35,17 @@ class apiCall:
 
     def __init__(
         self,
-        cfg: Config,
-        output_type: str,
-        app: str,
-        url: str
+        cfg: Union[BinaryConfig, PyConfig],
+        output_type:str = None,
+        app: str = None,
+        url: str = None
     ):
         self.cfg = cfg
         self.type = output_type
         self.app = app
         self.url = url
+        if self.url is None:
+            self.url = settings.get_setting('url')
         self._validate()
 
     def _validate(self):
@@ -59,8 +63,8 @@ class apiCall:
         TypeError
             If self.url is not a string.
         """
-        if not isinstance(self.cfg, Config):
-            raise TypeError('apiCall.cfg must be a Config object')
+        if not isinstance(self.cfg, (PyConfig, BinaryConfig)):
+            raise TypeError('apiCall.cfg must be a PyConfig or BinaryConfig object')
         if not (isinstance(self.type, str) or self.type is None):
             raise TypeError('apiCall.type must be a string or None')
         if not (isinstance(self.app, str) or self.app is None):
@@ -82,9 +86,9 @@ class apiCall:
             data['type'] = self.type
         if self.app is not None:
             data['app'] = self.app
-        if settings.API_KEY_PATH.exists():
-            with open(settings.API_KEY_PATH, encoding='UTF-8') as file:
-                data['key'] = file.read()
+        api_key = settings.get_setting('api_key')
+        if api_key is not None:
+            data['key'] = api_key
         reply = requests.post(
             url=self.url,
             data=data,

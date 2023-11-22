@@ -1,11 +1,11 @@
 
-from pypsg.request import apiCall
+from pypsg.request import APICall
 from pypsg.cfg.cfg import Config,StringParam
 
 
 def test_api_init():
     config = Config(StringParam('object-name','Exoplanet'))
-    psg = apiCall(
+    psg = APICall(
         cfg=config,
         output_type='cfg',
         app=None,
@@ -18,7 +18,7 @@ def test_api_init():
 
 def test_api_call():
     config = Config(StringParam('object-name','Exoplanet'))
-    psg = apiCall(
+    psg = APICall(
         cfg=config,
         output_type='cfg',
         app=None,
