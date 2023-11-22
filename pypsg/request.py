@@ -1,9 +1,34 @@
 
 from typing import Union
 import requests
+import re
 
 from pypsg.cfg import PyConfig, BinConfig
 from pypsg import settings
+from pypsg.rad import PyRad
+
+class PSGResponse:
+    def __init__(
+        self,
+        cfg: PyConfig=None,
+        rad: PyRad=None
+    ):
+        self.cfg = cfg
+        self.rad = rad
+    @classmethod
+    def from_bytes(cls,b:bytes):
+        pattern = rb'results_([\w]+).txt'
+        split_text = re.split(pattern,b)
+        names = split_text[1::2]
+        content = split_text[2::2]
+        data = {}
+        for name,dat in zip(names,content):
+            data[name] = dat.strip()
+        return cls(
+            cfg=PyConfig.from_bytes(data['cfg']),
+            rad=PyRad.from_bytes(data['rad'])
+        )
+        
 
 
 class APICall:
@@ -72,6 +97,14 @@ class APICall:
         if not isinstance(self.url, str):
             raise TypeError('apiCall.url must be a string')
     
+    @property
+    def is_single_file(self):
+        if isinstance(self.type,(tuple,list)):
+            return False
+        if self.type == 'all':
+            return False
+        return True
+        
     def __call__(self) -> bytes:
         """
         Call the PSG API
@@ -94,4 +127,17 @@ class APICall:
             data=data,
             timeout=settings.REQUEST_TIMEOUT
         )
-        return reply.content
+        if reply.status_code != 200:
+            raise requests.exceptions.HTTPError(reply.content)
+        if not self.is_single_file:
+            return PSGResponse.from_bytes(reply.content)
+        elif self.type == 'cfg':
+            return PSGResponse(
+                cfg=PyConfig.from_bytes(reply.content),
+            )
+        elif self.type == 'rad':
+            return PSGResponse(
+                rad=PyRad.from_bytes(reply.content),
+            )
+        else:
+            raise ValueError('Unknown output type')
