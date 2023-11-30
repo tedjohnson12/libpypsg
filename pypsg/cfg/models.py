@@ -12,7 +12,7 @@ from pypsg import units as u_psg
 from pypsg.cfg.base import Model
 from pypsg.cfg.base import CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
-from pypsg.cfg.base import GeometryOffsetField, GeometryUserParamField, MoleculesField, AerosolsField
+from pypsg.cfg.base import GeometryOffsetField, MoleculesField, AerosolsField
 from pypsg.cfg.base import ProfileField, BooleanField
 
 
@@ -54,14 +54,13 @@ class Geometry(Model):
     geometry = CharField('geometry',max_length=20)
     ref = CharField('geometry-ref',max_length=50)
     offset = GeometryOffsetField()
-    obs_altitude = CodedQuantityField(
+    observer_altitude = CodedQuantityField(
         allowed_units=(u.AU,u.km,u_psg.diameter,u.pc),
         unit_codes=('AU','km','diameter','pc'),
         fmt='.4f',
         names=('geometry-obs-altitude','geometry-altitude-unit')
     )
     azimuth = QuantityField('geometry-azimuth',u.deg)
-    user_parameter = GeometryUserParamField()
     stellar_type = CharChoicesField('geometry-stellar-type',('O','B','A','F','G','K','M',''),max_length=1)
     stellar_temperature = QuantityField('geometry-stellar-temperature',u.K)
     stellar_magnitude = FloatField('geometry-stellar-magnitude')
@@ -73,6 +72,64 @@ class Geometry(Model):
     # GEOMETRY-STAR-DISTANCE -- Computed by PSG
     # GEOMETRY-ROTATION -- Computed by PSG
     # GEOMETRY-BRDFSCALER -- Computed by PSG
+    def _type_to_create(self, *args, **kwargs):
+        cfg = kwargs.get('cfg')
+        geometry = self.geometry.read(cfg)
+        if geometry == 'Observatory':
+            return Observatory
+        elif geometry == 'Nadir':
+            return Nadir
+        elif geometry == 'Limb':
+            return Limb
+        else:
+            raise ValueError(f'Unknown geometry type {geometry}')
+
+class Observatory(Geometry):
+    """
+    Observatory Geometry
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.geometry.value = 'Observatory'
+class Nadir(Geometry):
+    """
+    Nadir Geometry
+    """
+    zenith = QuantityField('geometry-user-param',u.deg)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.geometry.value = 'Nadir'
+
+class Limb(Geometry):
+    """
+    Limb Geometry
+    """
+    limb_altitude = QuantityField('geometry-user-param',u.km)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.geometry.value = 'Limb'
+
+class Occultation(Geometry):
+    """
+    Occultation Geometry
+    """
+    occultation_altitude = QuantityField('geometry-user-param',u.km)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.geometry.value = ''
+        raise NotImplementedError('I don\'t know the keyword for this geometry')
+class LookingUp(Geometry):
+    """
+    Looking Up Geometry
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.geometry.value = ''
+        raise NotImplementedError('I don\'t know the keyword for this geometry')
+
+    
+
+
 
 class Atmosphere(Model):
     structure = CharChoicesField('atmosphere-structure',('None','Equilibrium','Coma'))
