@@ -17,6 +17,44 @@ ENCODING = 'UTF-8'
 class NullFieldComparisonError(Exception):
     pass
 
+
+class Table:
+    def __init__(
+        self,
+        x: np.ndarray | u.Quantity,
+        y: np.ndarray | u.Quantity,
+    ):
+        if not len(x) == len(y):
+            raise ValueError('x and y must have the same length')
+        self.x = x
+        self.y = y
+    
+    def to_string(self,xunit:u.Unit=None,yunit:u.Unit=None,fmt='.2e'):
+        x,y = self.x,self.y
+        if xunit is not None:
+            x = x.to_value(xunit)
+        if yunit is not None:
+            y = y.to_value(yunit)
+        if isinstance(x,u.Quantity):
+            raise TypeError('x must be a numpy array')
+        if isinstance(y,u.Quantity):
+            raise TypeError('y must be a numpy array')
+        return ','.join([f'{_y:{fmt}}@{_x:{fmt}}' for _x,_y in zip(x,y)])
+    @staticmethod
+    def read(dat:str)->Tuple[np.ndarray,np.ndarray]:
+        pairs = dat.split(',')
+        y = [float(pair.split('@')[0]) for pair in pairs]
+        x = [float(pair.split('@')[1]) for pair in pairs]
+        return np.array(x), np.array(y)
+    def __eq__(self, other:'Table'):
+        if not isinstance(other, Table):
+            raise TypeError('other must be a Table')
+        return np.all(self.x == other.x) and np.all(self.y == other.y)
+        
+    
+
+
+
 class Field:
     """
     A data field for storing PSG configurations.
@@ -313,40 +351,92 @@ class QuantityField(Field):
     """
     A data field representing a quantity.
     """
-    _value:u.Quantity
+    _value:u.Quantity | Table
     def __init__(
         self,
         name: str,
         unit: u.Unit,
         default: u.Quantity = None,
         null: bool = True,
-        fmt: str = '.2f'
+        fmt: str = '.2f',
+        allow_table: bool = False,
+        xunit: u.Unit = None,
+        yunit: u.Unit = None,
     ):
         super().__init__(name, default, null)
         self.unit = unit
         self.fmt = fmt
-
+        if not allow_table and (xunit is not None) or (yunit is not None):
+            raise ValueError('If allow_table is False, xunit and yunit must be None.')
+        self.allow_table = allow_table
+        self.xunit = xunit
+        self.yunit = yunit
+    @property
+    def is_table(self):
+        return isinstance(self._value,Table)
     @property
     def _str_property(self):
-        return f'{self._value.to_value(self.unit):{self.fmt}}'
-
+        if self.is_table:
+            return self._value.to_string(self.xunit,self.yunit,self.fmt)
+        else:
+            return f'{self._value.to_value(self.unit):{self.fmt}}'
+    
+    def _check_table(self,table:Table):
+        if not self.allow_table:
+            msg = f'Table values are not allowed for field `{self._name}`.'
+            raise TypeError(msg)
+        if self.xunit is None:
+            if isinstance(table.x,u.Quantity):
+                msg = f'Field `{self._name}` requires table x values to be numpy arrays.'
+                raise TypeError(msg)
+        else: # xunit is some unit
+            if not isinstance(table.x,u.Quantity):
+                msg = f'Field `{self._name}` requires table x values to be astropy quantities.'
+                raise TypeError(msg)
+            if not self.xunit.physical_type == table.x.unit.physical_type:
+                msg = f'Field `{self._name}` requires table x values to be of type {self.xunit.physical_type}.'
+                raise u.UnitConversionError(msg)
+        if self.yunit is None:
+            if isinstance(table.y,u.Quantity):
+                msg = f'Field `{self._name}` requires table y values to be numpy arrays.'
+                raise TypeError(msg)
+        else: # yunit is some unit
+            if not isinstance(table.y,u.Quantity):
+                msg = f'Field `{self._name}` requires table y values to be astropy quantities.'
+                raise TypeError(msg)
+            if not self.yunit.physical_type == table.y.unit.physical_type:
+                msg = f'Field `{self._name}` requires table y values to be of type {self.yunit.physical_type}.'
+                raise u.UnitConversionError(msg)
+    def _check_quantity(self,value:u.Quantity):
+        if not value.isscalar:
+            raise ValueError('QuantityField values must be a scalar, not an array.')
+        if value.unit.physical_type != self.unit.physical_type:
+            msg = f'Value set is {value} ({value.unit.physical_type}). '
+            msg += f'Must be of type {self.unit.physical_type}.'
+            raise u.UnitConversionError(msg)
     @Field.value.setter
     def value(self, value_to_set):
         if value_to_set is None:
             pass
-        elif not isinstance(value_to_set, u.Quantity):
-            raise TypeError('Value must be a Quantity.')
-        elif not value_to_set.isscalar:
-            raise ValueError('QuantityField values must be a scalar, not an array.')
-        elif value_to_set.unit.physical_type != self.unit.physical_type:
-            msg = f'Value set is {value_to_set} ({value_to_set.unit.physical_type}). '
-            msg += f'Must be of type {self.unit.physical_type}.'
-            raise u.UnitConversionError(msg)
+        else:
+            if isinstance(value_to_set,Table):
+                self._check_table(value_to_set)
+            elif isinstance(value_to_set, u.Quantity):
+                self._check_quantity(value_to_set)
+            else:
+                raise TypeError('Value must be a Quantity or BaseTable.')
         super(QuantityField, QuantityField).value.__set__(self, value_to_set)
     def _read(self,d:dict):
         key = self._name.upper()
         try:
             return u.Quantity(float(d[key]),self.unit)
+        except ValueError:
+            x,y = Table.read(d[key])
+            if self.xunit is not None:
+                x = x*self.xunit
+            if self.yunit is not None:
+                y = y*self.yunit
+            return Table(x,y)
         except KeyError:
             return None
 

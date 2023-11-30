@@ -7,12 +7,43 @@ import numpy as np
 
 from pypsg import units as u_psg
 
+from pypsg.cfg.base import Table
 from pypsg.cfg.base import Field, Model, CharField, IntegerField
 from pypsg.cfg.base import FloatField, QuantityField
 from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField, GeometryUserParamField
 from pypsg.cfg.base import CodedQuantityField, MultiQuantityField
 from pypsg.cfg.base import Molecule, MoleculesField, Aerosol, AerosolsField
 from pypsg.cfg.base import Profile, ProfileField, BooleanField
+
+
+def test_table():
+    """
+    Tests the Table class
+    """
+    x = np.array([1,2,3])
+    y = np.array([4,5,6])
+    t = Table(x,y)
+    assert np.all(t.x == x)
+    assert np.all(t.y == y)
+    assert t.to_string(fmt='.1f') == '4.0@1.0,5.0@2.0,6.0@3.0'
+    
+    x = np.array([1,2,3])*u.m
+    y = np.array([4,5,6])*u.K
+    t = Table(x,y)
+    
+    with pytest.raises(TypeError):
+        _ = t.to_string(fmt='.1f')
+    
+    assert t.to_string(xunit=u.cm, yunit=u.K, fmt='.1f') == '4.0@100.0,5.0@200.0,6.0@300.0'
+
+def test_table_read():
+    cfg = '4.0@1.0,5.0@2.0,6.0@3.0'
+    x,y = Table.read(cfg)
+    t = Table(x,y)
+    assert t.to_string(fmt='.1f') == cfg
+    
+    
+
 
 def test_field():
     field = Field(
@@ -80,7 +111,7 @@ def test_FloatField():
     assert f.read(d) == 0.0
 
 def test_QuantityField():
-    q = QuantityField('quant',u.m,null=False)
+    q = QuantityField('quant',u.m,null=False,allow_table=True,fmt='.2f')
     q.value = 1*u.m
     with pytest.raises(TypeError):
         q.value = 1
@@ -91,6 +122,22 @@ def test_QuantityField():
     assert q.value == b'1.00'
     d = {'QUANT':1}
     assert q.read(d) == 1*u.m
+    
+    t = Table(
+        np.array([1,2,3]),
+        np.array([4,5,6])
+    )
+    q.value = t
+    assert q.value == b'4.00@1.00,5.00@2.00,6.00@3.00'
+    assert q.content == b'<QUANT>4.00@1.00,5.00@2.00,6.00@3.00'
+    
+    d = {'QUANT':str(q.value,'utf-8')}
+    t2 = q.read(d)
+    assert np.all(t2.x == t.x)
+    assert np.all(t2.y == t.y)
+    
+    
+    
 
 def test_CodedQuantityField():
     g = CodedQuantityField(
@@ -329,7 +376,7 @@ def test_model():
     assert person.name.content == b'<NAME>Ted'
     assert person.age.value == b'23'
     assert person.age.content == b'<AGE>23'
-    expected = b'<NAME>Ted\n<AGE>23'
+    expected = b'<AGE>23\n<NAME>Ted'
     assert person.content == expected
     
     person2 = TestModel(name='Cactus')
