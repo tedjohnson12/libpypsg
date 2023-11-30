@@ -934,7 +934,7 @@ class Molecule:
     ----------
     name : str
         The molecular identifier, e.g. `H2O` for water.
-    type : str
+    database : str
         The profile database to use, e.g. `HIT[1]` for HITRAN water data.
     abn : astropy.units.Quantity or float or int
         The abundance of the molecule. Floats and ints will be cast to dimensionless.
@@ -951,11 +951,11 @@ class Molecule:
     def __init__(
         self,
         name: str,
-        type: str,
+        database: str,
         abn: u.Quantity
     ):
         self.name = name
-        self.type = type
+        self.database = database
         if isinstance(abn, (int, float)):
             abn = abn*u.dimensionless_unscaled
         self._abn = abn
@@ -970,7 +970,7 @@ class Molecule:
         try:
             return {code: unit for code, unit in zip(Molecule._unit_codes, Molecule._allowed_units)}[code]
         except KeyError as e:
-            raise ValueError(f'Invalid unit code: {code}', e)
+            raise ValueError(f'Invalid unit code: {code}', e) from e
 
     def _validate(self):
         assert self._abn.unit in self._allowed_units
@@ -1006,6 +1006,17 @@ class Molecule:
 class Aerosol(Molecule):
     """
     Extension of the `Molecule` class for Aerosols.
+    
+    Parameters
+    ----------
+    name : str
+        The aerosol identifier, e.g. `Water` for water.
+    database : str
+        The profile database to use.
+    abn : astropy.units.Quantity
+        The abundance of the aerosol.
+    size : astropy.units.Quantity
+        The size of the aerosol.
 
     .. warning::
         PSG also allows a `wg` size unit type. This should be implemented in the future.
@@ -1015,8 +1026,14 @@ class Aerosol(Molecule):
     _size_unit_codes = ('um', 'm', 'lum', 'scl')
     _fmt_size = '.2e'
 
-    def __init__(self, name: str, type: str, abn: u.Quantity, size: u.Quantity):
-        super().__init__(name, type, abn)
+    def __init__(
+        self,
+        name: str,
+        database: str,
+        abn: u.Quantity,
+        size: u.Quantity
+    ):
+        super().__init__(name, database, abn)
         if isinstance(size, (int, float)):
             size = size*u.dimensionless_unscaled
         self._size = size
@@ -1045,7 +1062,7 @@ class Aerosol(Molecule):
         try:
             return {code: unit for code, unit in zip(Aerosol._size_unit_codes, Aerosol._allowed_size_units)}[code]
         except KeyError as e:
-            raise ValueError(f'Invalid unit code: {code}', e)
+            raise ValueError(f'Invalid unit code: {code}', e) from e
 
     @staticmethod
     def get_abn_unit(code: str):
@@ -1165,7 +1182,7 @@ class MoleculesField(Field):
 
         :type: str
         """
-        types = [mol.type for mol in self._value]
+        types = [mol.database for mol in self._value]
         return f'<ATMOSPHERE-TYPE>{",".join(types)}'
 
     @property
@@ -1277,7 +1294,7 @@ class AerosolsField(Field):
 
         :type: str
         """
-        types = [aero.type for aero in self._value]
+        types = [aero.database for aero in self._value]
         return f'<ATMOSPHERE-ATYPE>{",".join(types)}'
 
     @property
@@ -1503,11 +1520,11 @@ class ProfileField(Field):
             if not len(nlayers) == 1:
                 raise ValueError('Profiles must all have the same shape.')
             is_temp = [profile.is_temperature for profile in profiles]
-            if not np.sum(is_temp) == 1:
+            if np.sum(is_temp) != 1:
                 raise ValueError(
                     f'ProfileField recieved {np.sum(is_temp)} temperature profiles!')
             is_press = [profile.is_pressure for profile in profiles]
-            if not np.sum(is_press) == 1:
+            if np.sum(is_press) != 1:
                 raise ValueError(
                     f'ProfileField recieved {np.sum(is_press)} pressure profiles!')
             super(ProfileField, ProfileField).value.__set__(self, profiles)
@@ -1709,7 +1726,7 @@ class Model:
                     newfield = deepcopy(field)
                     newfield.value = field_value
                     self.__setattr__(field_name, newfield)
-
+    # pylint: disable-next=unused-argument
     def _type_to_create(self, *args, **kwargs):
         return self.__class__
 
