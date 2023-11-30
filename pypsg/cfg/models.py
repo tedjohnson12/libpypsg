@@ -252,7 +252,12 @@ class Interferometer(Telescope):
 
 class Coronagraph(Telescope):
     contrast = FloatField('generator-telescope1')
-    iwa = FloatField('generator-telescope3')
+    iwa = FloatField(
+        'generator-telescope3',
+        allow_table=True,
+        xunit=None,
+        yunit=None
+    )
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.telescope.value = 'CORONA'
