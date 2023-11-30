@@ -15,10 +15,41 @@ from pypsg import units as u_psg
 ENCODING = 'UTF-8'
 
 class NullFieldComparisonError(Exception):
+    """
+    Exception raised when comparing a null field to a non-null field.
+    """
     pass
 
 
 class Table:
+    """
+    A python representation of a PSG datatable.
+    
+    Parameters
+    ----------
+    x : np.ndarray | u.Quantity
+        The x values.
+    y : np.ndarray | u.Quantity
+        The y values.
+    
+    Raises
+    ------
+    ValueError
+        If x and y do not have the same length.
+    
+    Attributes
+    ----------
+    x : np.ndarray | u.Quantity
+        The x values.
+    y : np.ndarray | u.Quantity
+        The y values.
+    
+    Examples
+    --------
+    >>> t = Table(np.array([1,2,3]),np.array([4,5,6]))
+    >>> t.to_string()
+    '4.00@1.00,5.00@2.00,6.00@3.00'
+    """
     def __init__(
         self,
         x: np.ndarray | u.Quantity,
@@ -30,6 +61,34 @@ class Table:
         self.y = y
     
     def to_string(self,xunit:u.Unit=None,yunit:u.Unit=None,fmt='.2e'):
+        """
+        Format the table as a string.
+        
+        Parameters
+        ----------
+        xunit : u.Unit, optional
+            The unit of the x values. Defaults to None.
+        yunit : u.Unit, optional
+            The unit of the y values. Defaults to None.
+        fmt : str, optional
+            The format string. Defaults to '.2e'.
+        
+        Returns
+        -------
+        str
+            The table as a string. This is the format that PSG expects.
+        
+        Raises
+        ------
+        TypeError
+            If x or y are quantities and the corresponding unit is None.
+        
+        Examples
+        --------
+        >>> t = Table(np.array([1,2,3]),np.array([4,5,6]))
+        >>> t.to_string()
+        '4.00@1.00,5.00@2.00,6.00@3.00'
+        """
         x,y = self.x,self.y
         if xunit is not None:
             x = x.to_value(xunit)
@@ -42,6 +101,26 @@ class Table:
         return ','.join([f'{_y:{fmt}}@{_x:{fmt}}' for _x,_y in zip(x,y)])
     @staticmethod
     def read(dat:str)->Tuple[np.ndarray,np.ndarray]:
+        """
+        Read a string representation of a table.
+        
+        Parameters
+        ----------
+        dat : str
+            The string representation of the table.
+        
+        Returns
+        -------
+        np.ndarray
+            The x values.
+        np.ndarray
+            The y values.
+        
+        Notes
+        -----
+        The purpose of this method is to read a table from a
+        config file and format it to be initialized by a field.
+        """
         pairs = dat.split(',')
         y = [float(pair.split('@')[0]) for pair in pairs]
         x = [float(pair.split('@')[1]) for pair in pairs]
@@ -50,10 +129,6 @@ class Table:
         if not isinstance(other, Table):
             raise TypeError('other must be a Table')
         return np.all(self.x == other.x) and np.all(self.y == other.y)
-        
-    
-
-
 
 class Field:
     """
