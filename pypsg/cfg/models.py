@@ -272,7 +272,13 @@ class Noise(Model):
     )
     exp_time = QuantityField('generator-noisetime',u.s)
     n_frames = IntegerField('generator-noiseframes')
-    n_pixels = IntegerField('generator-noisepixels')
+    n_pixels = FloatField(
+        'generator-noisepixels',
+        allow_table=True,
+        xunit=u.um,
+        yunit=None
+    )
+    desc = CharField('generator-instrument',max_length=500)
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     def _type_to_create(self, *args, **kwargs):
@@ -329,11 +335,7 @@ class LIDAR(Telescope):
         self.telescope.value = 'LIDAR'
 
 class Noiseless(Noise):
-    thoughput = FloatField('generator-noiseoeff')
-    emissivity = FloatField('generator-noieoemis')
-    temperature = QuantityField('generator-noisetemp',u.K)
-    desc = CharField('generator-instrument',max_length=500)
-    pixel_depth = QuantityField('generator-noisewell',u.electron)
+    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.noise_type.value = 'NO'
@@ -371,8 +373,29 @@ class Detectability(Noise):
         self.noise_type.value = 'D*'
 
 class CCD(Noise):
-    read_noise = QuantityField('generator-noise1',u.electron)
-    dark_current = QuantityField('generator-noise2',u.electron/u.s)
+    read_noise = QuantityField(
+        'generator-noise1',
+        u.electron,
+        allow_table=True,
+        xunit=u.um,
+        yunit=u.electron
+    )
+    dark_current = QuantityField(
+        'generator-noise2',
+        u.electron/u.s,
+        allow_table=True,
+        xunit=u.um,
+        yunit=u.electron/u.s
+    )
+    thoughput = FloatField(
+        'generator-noiseoeff',
+        allow_table=True,
+        xunit=u.um,
+        yunit=None
+    )
+    emissivity = FloatField('generator-noieoemis')
+    temperature = QuantityField('generator-noisetemp',u.K)
+    pixel_depth = QuantityField('generator-noisewell',u.electron)
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.noise_type.value = 'CCD'
