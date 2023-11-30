@@ -109,6 +109,23 @@ def test_FloatField():
     assert f.value == b'1.00e+06'
     d = {'FLOAT':0.0}
     assert f.read(d) == 0.0
+    
+    f = FloatField('float',fmt='.2f',allow_table=True)
+    t = Table(
+        np.array([1,2,3]),
+        np.array([4,5,6])
+    )
+    f.value = t
+    assert f.value == b'4.00@1.00,5.00@2.00,6.00@3.00'
+    
+    f2 = FloatField('float2',allow_table=False)
+    with pytest.raises(TypeError):
+        f2.value = t
+    
+    d = {'FLOAT':str(f.value,'utf-8')}
+    t2 = f.read(d)
+    assert np.all(t2.x == t.x)
+    assert np.all(t2.y == t.y)
 
 def test_QuantityField():
     q = QuantityField('quant',u.m,null=False,allow_table=True,fmt='.2f')
