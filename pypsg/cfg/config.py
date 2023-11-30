@@ -44,7 +44,7 @@ class BinConfig:
         Config
             A config constructed using the provided file.
         """
-        warnings.warn('This method has not been tested.',RuntimeWarning)
+        # warnings.warn('This method has not been tested.',RuntimeWarning)
         with open(path,'rb') as file:
             content = file.read()
         return cls(content=content)
@@ -55,7 +55,7 @@ class BinConfig:
         
         :type: bool
         """
-        warnings.warn('This method has not been tested.',RuntimeWarning)
+        # warnings.warn('This method has not been tested.',RuntimeWarning)
         return b'<BINARY>' in self.content
     @property
     def binary(self)->bytes:
@@ -64,7 +64,7 @@ class BinConfig:
         
         :type: bytes
         """
-        warnings.warn('This method has not been tested.',RuntimeWarning)
+        # warnings.warn('This method has not been tested.',RuntimeWarning)
         if not self.has_binary:
             raise ValueError('This config contains no binary section.')
         return self.content.split(b'<BINARY>')[1].split(b'</BINARY>')[0]
