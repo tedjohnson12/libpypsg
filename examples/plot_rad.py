@@ -16,7 +16,10 @@ from pypsg import settings
 from pypsg.rad import PyRad
 from pypsg.cfg.base import Table
 
-CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
+try:
+    CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
+except NameError:
+    CFG_PATH = Path('psg_cfg.txt')
 
 settings.save_settings(url=settings.INTERNAL_PSG_URL)
 settings.reload_settings()
