@@ -20,12 +20,12 @@ def test_Target():
     
     path = Path(__file__).parent / 'data' / 'object_gj1214b.cfg'
     cfg = BinConfig.from_file(path)
-    target = Target.from_cfg(cfg.dict)
+    target:Target = Target.from_cfg(cfg.dict)
     assert target.object.value == b'Exoplanet'
     assert target.name.value == b'GJ 1214b'
     assert target.date.value == b'2020/04/08 01:32'
-    assert target.diameter._value == 35031.1 * u.km
-    
+    # pylint: disable-next:protected-access
+    assert target.diameter._value == 35031.1 * u.km    
 
 def test_Geometry():
     geo = Geometry(

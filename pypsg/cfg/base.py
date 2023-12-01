@@ -1731,7 +1731,7 @@ class Model:
         return self.__class__
 
     @classmethod
-    def from_cfg(cls, cfg: dict):
+    def from_cfg(cls, cfg: dict)-> 'Model':
         """
         Construct a Model instance from a config dict.
 
