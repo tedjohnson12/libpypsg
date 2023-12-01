@@ -21,8 +21,8 @@ using the ``PyConfig`` class.
         )
     print(cfg.content)
 
- .. code-block:: none
-
+.. code-block:: none
+    
     b'<OBJECT-NAME>Proxima Cen b\n<OBJECT>Exoplanet'
 
 We can then call PSG with our setup.
@@ -50,7 +50,7 @@ Now let's take a look at the rad file we get back
     print(total.spectral_axis)
     print(total.flux)
 
- .. code-block:: none
+.. code-block:: none
 
     [1.  1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9] um
     [231.99203  184.89523  148.08486  119.38777   96.962337  79.349429
