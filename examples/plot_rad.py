@@ -25,7 +25,7 @@ settings.reload_settings()
 
 #%%
 # Read the file
-# ------------
+# -------------
 
 pycfg = PyConfig.from_file(CFG_PATH)
 
@@ -45,6 +45,7 @@ y = (np.sin((x/(3*u.um)).to_value(u.dimensionless_unscaled))+1)*pycfg.noise.dark
 pycfg.noise.dark_current = Table(x,y)
 
 print('Now the dark current is:')
+print(pycfg.noise.dark_current.asbytes.decode('utf-8'))
 
 plt.plot(x,y)
 plt.xlabel(f'Wavelength ({x.unit})')
