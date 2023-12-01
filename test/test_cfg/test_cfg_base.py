@@ -8,7 +8,7 @@ import numpy as np
 from pypsg import units as u_psg
 
 from pypsg.cfg.base import Table
-from pypsg.cfg.base import Field, Model, CharField, IntegerField
+from pypsg.cfg.base import Model, CharField, IntegerField
 from pypsg.cfg.base import FloatField, QuantityField
 from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
 from pypsg.cfg.base import CodedQuantityField
@@ -82,14 +82,14 @@ def test_FloatField():
     f = FloatField('float')
     f.value = 0
     f.value = 0.
-    assert f.value == b'0.00'
+    assert f.asbytes == b'0.00'
     with pytest.raises(TypeError):
         f.value = '0'
     f = FloatField('float',null=True)
     f.value = None
     f = FloatField('float',fmt='.2e')
     f.value = 1e6
-    assert f.value == b'1.00e+06'
+    assert f.asbytes == b'1.00e+06'
     d = {'FLOAT':0.0}
     assert f.read(d) == 0.0
     
@@ -99,13 +99,13 @@ def test_FloatField():
         np.array([4,5,6])
     )
     f.value = t
-    assert f.value == b'4.00@1.00,5.00@2.00,6.00@3.00'
+    assert f.asbytes == b'4.00@1.00,5.00@2.00,6.00@3.00'
     
     f2 = FloatField('float2',allow_table=False)
     with pytest.raises(TypeError):
         f2.value = t
     
-    d = {'FLOAT':str(f.value,'utf-8')}
+    d = {'FLOAT':str(f.asbytes,'utf-8')}
     t2 = f.read(d)
     assert np.all(t2.x == t.x)
     assert np.all(t2.y == t.y)
@@ -122,7 +122,7 @@ def test_QuantityField():
         q.value = None
     with pytest.raises(u.UnitConversionError):
         q.value = 1*u.s
-    assert q.value == b'1.00'
+    assert q.asbytes == b'1.00'
     d = {'QUANT':1}
     assert q.read(d) == 1*u.m
     
@@ -131,10 +131,10 @@ def test_QuantityField():
         np.array([4,5,6])
     )
     q.value = t
-    assert q.value == b'4.00@1.00,5.00@2.00,6.00@3.00'
+    assert q.asbytes == b'4.00@1.00,5.00@2.00,6.00@3.00'
     assert q.content == b'<QUANT>4.00@1.00,5.00@2.00,6.00@3.00'
     
-    d = {'QUANT':str(q.value,'utf-8')}
+    d = {'QUANT':str(q.asbytes,'utf-8')}
     t2 = q.read(d)
     assert np.all(t2.x == t.x)
     assert np.all(t2.y == t.y)
@@ -154,12 +154,12 @@ def test_CodedQuantityField():
     )
     # g = GravityField()
     with pytest.raises(NotImplementedError):
-        _ = g.value
+        _ = g.asbytes
     with pytest.raises(NotImplementedError):
         _ = g.name
     
     g.value = 1*u.M_earth
-    assert g.raw_value == 1*u.M_earth
+    assert g.value == 1*u.M_earth
     g.value = 10*u.m / u.s**2
     g.value = 5*u.g / u.cm**3
     with pytest.raises(u.UnitConversionError):
@@ -196,7 +196,7 @@ def test_DateField():
     """
     d = DateField('date')
     d.value = '2023-08-10 14:15'
-    assert d.value == b'2023/08/10 14:15'
+    assert d.asbytes == b'2023/08/10 14:15'
     cfg = {'DATE':'2023-08-10 14:15'}
     assert d.read(cfg) == '2023-08-10 14:15'
 
@@ -206,7 +206,7 @@ def test_CharChoicesField():
     """
     c = CharChoicesField('char_choice',options=['a','b'])
     c.value = 'a'
-    assert c.value == b'a'
+    assert c.asbytes == b'a'
     with pytest.raises(ValueError):
         c.value = 'c'
     d = {'CHAR_CHOICE':'b'}
@@ -387,22 +387,22 @@ def test_model():
     person = TestModel(name='Ted', age=23)
     person.age:IntegerField
     assert isinstance(person.name,CharField)
-    assert person.name.value == b'Ted'
+    assert person.name.asbytes == b'Ted'
     assert person.name.content == b'<NAME>Ted'
-    assert person.age.value == b'23'
+    assert person.age.asbytes == b'23'
     assert person.age.content == b'<AGE>23'
     expected = b'<AGE>23\n<NAME>Ted'
     assert person.content == expected
     
     person2 = TestModel(name='Cactus')
-    assert person2.name.value == b'Cactus'
+    assert person2.name.asbytes == b'Cactus'
     assert person2.name.content == b'<NAME>Cactus'
-    assert person2.age.value == b'0'
+    assert person2.age.asbytes == b'0'
     assert person2.age.content == b'<AGE>0'
-    person2.age = 3
-    assert person2.age.value == b'3'
+    person2.age.value = 3
+    assert person2.age.asbytes == b'3'
     
-    assert person.name.value == b'Ted'
+    assert person.name.asbytes == b'Ted'
     
     class OtherModel(Model):
         name = CharField(name='name',max_length=30)
@@ -411,7 +411,7 @@ def test_model():
             self.favorite_color = favorite_color
             
     person3 = OtherModel(name='Barbie',favorite_color='#e0218a')
-    assert person3.name.value == b'Barbie'
+    assert person3.name.asbytes == b'Barbie'
     assert person3.favorite_color == '#e0218a'
     
     expected = b'<NAME>Barbie'

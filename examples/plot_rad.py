@@ -8,11 +8,13 @@ Get a rad file from PSG and plot it.
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
+import astropy.units as u
 
 from pypsg.cfg.config import PyConfig
 from pypsg import APICall
 from pypsg import settings
 from pypsg.rad import PyRad
+from pypsg.cfg.base import Table
 
 CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
 
@@ -30,7 +32,21 @@ pycfg = PyConfig.from_file(CFG_PATH)
 # ---------------
 # For fun
 
-print(f'This config is looking at a {pycfg.target.object.raw_value}')
+print(f'This config is looking at a {pycfg.target.object.value} object')
+print(f'It is called {pycfg.target.name.value}')
+print(f'It is {pycfg.geometry.observer_altitude.value} away.')
+
+print(f'We will observe from {pycfg.telescope.range1.value} to {pycfg.telescope.range2.value}.')
+print(f'The dark current is {pycfg.noise.dark_current.value}. Let\'s change it.')
+x = np.linspace(1,20,10)*u.um
+y = (np.sin((x/(3*u.um)).to_value(u.dimensionless_unscaled))+1)*pycfg.noise.dark_current.value
+pycfg.noise.dark_current.value = Table(x,y)
+
+print('Now the dark current is:')
+
+plt.plot(x,y)
+plt.xlabel(f'Wavelength ({x.unit})')
+plt.ylabel(f'Dark current ({y.unit})')
 
 
 

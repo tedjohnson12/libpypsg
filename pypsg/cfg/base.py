@@ -200,14 +200,21 @@ class Field(ABC):
         return bytes(f'<{self._name.upper()}>', encoding=ENCODING)
 
     @property
-    def value(self) -> bytes:
+    def asbytes(self) -> bytes:
         """
         The value of this field.
 
         :type: bytes
         """
         return bytes(self._str_property, encoding=ENCODING)
+    @property
+    def value(self):
+        """
+        Get the raw value of the field
 
+        :type: Any
+        """
+        return self._value
     @value.setter
     @abstractmethod
     def value(self, value_to_set: Any):
@@ -229,7 +236,7 @@ class Field(ABC):
         self._value = value_to_set if value_to_set is not None else self.default
 
     @property
-    def content(self) -> bytes:
+    def content(self) -> asbytes:
         """
         The field formated as a line in a PSG config file.
 
@@ -238,7 +245,7 @@ class Field(ABC):
         if self.is_null:
             return b''
         else:
-            return self.name + self.value
+            return self.name + self.asbytes
 
     @property
     @abstractmethod
@@ -276,14 +283,7 @@ class Field(ABC):
         raise NotImplementedError(
             'Attempted to call abstract _read method from the base class.')
 
-    @property
-    def raw_value(self):
-        """
-        Get the raw value of the field
-
-        :type: Any
-        """
-        return self._value
+    
 
 
 class CharField(Field):
@@ -429,8 +429,9 @@ class UnitChoicesField(Field):
         super(UnitChoicesField, UnitChoicesField).value.__set__(self, value_to_set)
     def read(self,d:dict)->u.Unit:
         key = self._name.upper()
+        decoder = {code:unit for unit,code in zip(self._options,self._codes)}
         try:
-            return u.Unit(d[key])
+            return u.Unit(decoder[d[key]])
         except KeyError:
             return None
 

@@ -184,4 +184,4 @@ class APICall:
             return PSGResponse.from_bytes(reply.content)
         else:
             returntype = typedict[self.type]
-            return returntype.from_bytes(reply.content)
+            return PSGResponse(**{self.type:returntype.from_bytes(reply.content)})

@@ -35,7 +35,7 @@ from pypsg.cfg.models import (
 
 def test_Target():
     target = Target(object='Exoplanet')
-    assert target.object.value == b'Exoplanet'
+    assert target.object.asbytes == b'Exoplanet'
     with pytest.raises(ValueError):
         _ = Target(object='Black Hole')
     expected = b'<OBJECT>Exoplanet'
@@ -44,9 +44,9 @@ def test_Target():
     path = Path(__file__).parent / 'data' / 'object_gj1214b.cfg'
     cfg = BinConfig.from_file(path)
     target:Target = Target.from_cfg(cfg.dict)
-    assert target.object.value == b'Exoplanet'
-    assert target.name.value == b'GJ 1214b'
-    assert target.date.value == b'2020/04/08 01:32'
+    assert target.object.asbytes == b'Exoplanet'
+    assert target.name.asbytes == b'GJ 1214b'
+    assert target.date.asbytes == b'2020/04/08 01:32'
     # pylint: disable-next:protected-access
     assert target.diameter._value == 35031.1 * u.km    
 
@@ -55,7 +55,7 @@ def test_Geometry():
         geometry='Observatory',
         obs_altitude = 1.3*u.pc
     )
-    assert geo.geometry.value == b'Observatory'
+    assert geo.geometry.asbytes == b'Observatory'
     expected = b'<GEOMETRY>Observatory\n'
     expected += b'<GEOMETRY-OBS-ALTITUDE>1.3000'
 
