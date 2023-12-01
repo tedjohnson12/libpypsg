@@ -1,4 +1,9 @@
+"""
+PyPSG Requests
+--------------
 
+Direct access to the PSG API
+"""
 from typing import Union, Dict
 import re
 import requests
