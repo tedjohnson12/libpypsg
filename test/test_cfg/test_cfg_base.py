@@ -44,40 +44,8 @@ def test_table_read():
     x,y = Table.read(cfg)
     t = Table(x,y)
     assert t.to_string(fmt='.1f') == cfg
-    
-    
 
-
-def test_field():
-    """
-    Test the Field class
-    """
-    field = Field(
-        name='test'
-    )
-    assert field.is_null
-    assert field.default is None
-    assert field.null is True
-    
-    field.value = 2
-    assert not field.is_null
-    assert field.raw_value == 2
-    assert field.value == b'2'
-    assert field.content == b'<TEST>2'
-    
-    
-    ####
-    field = Field(
-        name='test',
-        default=3,
-        null=False
-    )
-    assert field.default == 3
-    assert field.null is False
-    with pytest.raises(ValueError):
-        field.value = None
-
-def test_CharField():
+def test_charfield():
     """
     Test the CharField class
     """
@@ -267,11 +235,11 @@ def test_Molecule():
     mol = Molecule('H2O','HIT[1]',1*u.pct)
     assert mol.abn == pytest.approx(1.0,abs=1e-6)
     assert mol.unit_code == '%'
-    assert Molecule.get_unit(mol.unit_code) == u.pct
+    assert Molecule.get_abn_unit(mol.unit_code) == u.pct
     mol = Molecule('H2O', 'HIT[1]',1)
     assert mol.abn == pytest.approx(1.0,abs=1e-6)
     assert mol.unit_code == 'scl'
-    assert Molecule.get_unit(mol.unit_code) == u.dimensionless_unscaled
+    assert Molecule.get_abn_unit(mol.unit_code) == u.dimensionless_unscaled
     
 
 def test_Aerosol():
@@ -282,17 +250,14 @@ def test_Aerosol():
     assert aero.abn == pytest.approx(1.00,abs=1e-6)
     assert aero.unit_code == 'scl'
     assert Aerosol.get_abn_unit(aero.unit_code) == u.dimensionless_unscaled
-    with pytest.raises(NotImplementedError):
-        _ = Aerosol.get_unit(aero.unit_code)
     assert aero.size == pytest.approx(1.00,abs=1e-6)
     assert aero.size_unit_code == 'um'
     assert Aerosol.get_size_unit(aero.size_unit_code) == u.um
+    
     aero = Aerosol('Water','watertype',1*u.pct,4*u.LogUnit(u.um))
     assert aero.abn == pytest.approx(1.0,abs=1e-6)
     assert aero.unit_code == '%'
     assert Aerosol.get_abn_unit(aero.unit_code) == u.pct
-    with pytest.raises(NotImplementedError):
-        _ = Aerosol.get_unit(aero.unit_code)
     assert aero.size == pytest.approx(4.00,abs=1e-6)
     assert aero.size_unit_code == 'lum'
     assert Aerosol.get_size_unit(aero.size_unit_code) == u.LogUnit(u.um)

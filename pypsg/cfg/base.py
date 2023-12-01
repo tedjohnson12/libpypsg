@@ -2,13 +2,14 @@
 This module contains the basic functionality for fields in PSG
 config objects.
 """
-from typing import Any, Tuple, List
+from typing import Any, Tuple, List, Optional
 import warnings
 from copy import deepcopy
 from astropy import units as u
 from astropy import time
 from dateutil.parser import parse as parse_date
 import numpy as np
+from abc import ABC, abstractmethod
 
 from pypsg import units as u_psg
 
@@ -134,7 +135,7 @@ class Table:
         return np.all(self.x == other.x) and np.all(self.y == other.y)
 
 
-class Field:
+class Field(ABC):
     """
     A data field for storing PSG configurations.
 
@@ -239,27 +240,23 @@ class Field:
             return self.name + self.value
 
     @property
+    @abstractmethod
     def _str_property(self):
         """
         The ``Field._value`` formated as a string.
 
         :type: str
         """
-        return str(self._value)
+        raise NotImplementedError(
+            'Attempted to call abstract _str_property method from the base class.')
 
     def __str__(self):
         return str(self.content, encoding=ENCODING)
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self._name!r}, value={self._value!r})"
-
-    def _read(self, d: dict):
-        """
-        Abstract _read method
-        """
-        raise NotImplementedError(
-            'Attempted to call abstract _read method from the base class.')
-
+    
+    @abstractmethod
     def read(self, d: dict):
         """
         Read a dictionary and return the information necessary to
@@ -275,7 +272,8 @@ class Field:
         Any
             The information necessary to construct a class instance.
         """
-        return self._read(d)
+        raise NotImplementedError(
+            'Attempted to call abstract _read method from the base class.')
 
     @property
     def raw_value(self):
@@ -336,7 +334,24 @@ class CharField(Field):
             raise ValueError("Value exceeds max length.")
         super(CharField, CharField).value.__set__(self, value_to_set)
 
-    def _read(self, d: dict):
+    def read(self, d: dict)->str:
+        """
+        Read a dictionary and return the information necessary to
+        construct a class instance. Does not construct that instance.
+        
+        If the desired field is not in the dictionary, return None (i.e. the field is null)
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        str
+            The information necessary to construct a class instance.
+        
+        """
         key = self._name.upper()
         try:
             return str(d[key])
@@ -347,10 +362,30 @@ class CharField(Field):
 class CharChoicesField(CharField):
     """
     A character string datafield with limited options.
+    
+    Parameters
+    ----------
+    name : str
+        The name of the field.
+    options : Tuple of str
+        The options for the field.
+    default : str, optional
+        The default value of the field. Default is None.
+    null : bool, optional
+        If false, the field cannot be empty. Default is True.
+    max_length : int
+        The maximum length of the string.
     """
     _value: str
 
-    def __init__(self, name: str, options: Tuple, default: str = None, null: bool = True, max_length: int = 255):
+    def __init__(
+        self,
+        name: str,
+        options: Tuple[str],
+        default: str = None,
+        null: bool = True,
+        max_length: int = 255
+    ):
         super().__init__(name, default, null, max_length)
         self._options = options
 
@@ -384,7 +419,23 @@ class DateField(Field):
             value_to_set = time.Time(value_to_set)
         super(DateField, DateField).value.__set__(self, value_to_set)
 
-    def _read(self, d: dict):
+    def read(self, d: dict)->str:
+        """
+        Read a dictionary and return the information necessary to
+        construct a class instance. Does not construct that instance.
+        
+        If the desired field is not in the dictionary, return None (i.e. the field is null)
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        str
+            The information necessary to construct an instance of DateField.
+        """
         key = self._name.upper()
         try:
             return str(d[key])
@@ -397,7 +448,6 @@ class IntegerField(Field):
     A data field containing an integer value.
     """
     _value: int
-
     @property
     def _str_property(self):
         return str(self._value)
@@ -408,7 +458,23 @@ class IntegerField(Field):
             raise TypeError("Value must be an integer.")
         super(IntegerField, IntegerField).value.__set__(self, value_to_set)
 
-    def _read(self, d: dict):
+    def read(self, d: dict):
+        """
+        Read a dictionary and return the information necessary to
+        construct a class instance. Does not construct that instance.
+        
+        If the desired field is not in the dictionary, return None (i.e. the field is null)
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        str
+            The information necessary to construct an instance of IntegerField.
+        """
         key = self._name.upper()
         try:
             return int(d[key])
@@ -524,7 +590,23 @@ class FloatField(Field):
                     raise TypeError("Value must be a float.")
         super(FloatField, FloatField).value.__set__(self, value_to_set)
 
-    def _read(self, d: dict):
+    def read(self, d: dict)->float | Table:
+        """
+        Read a dictionary and return the information necessary to
+        construct a class instance. Does not construct that instance.
+        
+        If the desired field is not in the dictionary, return None (i.e. the field is null)
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        float | Table
+            The information necessary to construct an instance of FloatField.
+        """
         key = self._name.upper()
         try:
             return float(d[key])
@@ -662,7 +744,23 @@ class QuantityField(Field):
                 raise TypeError('Value must be a Quantity or BaseTable.')
         super(QuantityField, QuantityField).value.__set__(self, value_to_set)
 
-    def _read(self, d: dict):
+    def read(self, d: dict)->u.Quantity | Table:
+        """
+        Read a dictionary and return the information necessary to construct
+        a QuantityField instance.
+        
+        If the desired field is not in the dictionary, return None (i.e. the field is null)
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        u.Quantity | Table
+            The information necessary to construct an instance of QuantityField.
+        """
         key = self._name.upper()
         try:
             return u.Quantity(float(d[key]), self.unit)
@@ -679,17 +777,30 @@ class QuantityField(Field):
 
 class CodedQuantityField(Field):
     """
-    A base class for fields where PSG requires a unit to be specified.
+    A quantity field where PSG requires the unit be specified.
+    
+    Parameters
+    ----------
+    allowed_units : tuple
+        The allowed units.
+    unit_codes : tuple
+        The allowed unit codes.
+    fmt : str
+        The format string.
+    names : tuple
+        The names of the field.
+    default : astropy.units.Quantity, optional
+        The default value. Default is None.
     """
     _value: u.Quantity
 
     def __init__(
             self,
-            allowed_units: Tuple[u.Unit],
-            unit_codes: Tuple[u.Unit],
-            fmt: Tuple[str] or str,
-            names: Tuple[str],
-            default: Any = None,
+            allowed_units: Tuple[u.Unit, ...],
+            unit_codes: Tuple[u.Unit, ...],
+            fmt: Tuple[str, ...] or str,
+            names: Tuple[str, ...],
+            default: u.Quantity = None,
             null: bool = True
     ):
         super().__init__(None, default, null)
@@ -824,7 +935,23 @@ class CodedQuantityField(Field):
         d = {c: unit for c, unit in zip(codes, units)}
         return d[code]
 
-    def _read(self, d: dict):
+    def read(self, d: dict)->u.Quantity:
+        """
+        Read a dictionary and return the information necessary to construct
+        a CodedQuantityField instance.
+        
+        If the desired fields are not in the dictionary, return None (i.e. the field is null)
+        
+        Parameters
+        ----------
+        d : dict
+            The dictionary to read.
+        
+        Returns
+        -------
+        astropy.units.Quantity
+            The quantity read from the dictionary.
+        """
         value_key, unit_key = self._names
         value_key = value_key.upper()
         unit_key = unit_key.upper()
@@ -840,6 +967,16 @@ class CodedQuantityField(Field):
 class GeometryOffsetField(Field):
     """
     Data field for the geometry offset.
+    
+    Parameters
+    ----------
+    default : astropy.units.Quantity
+        The default value of the field. Default is None.
+    null : bool, optional
+        If false, the field cannot be empty. Default is True.
+    
+    .. todo::
+        This should be replaced by a more general `TupleQuantityField`.
     """
     _allowed_units: Tuple[u.Unit] = (u.Unit('arcsec'), u.Unit(
         'arcmin'), u.deg, u.km, u.dimensionless_unscaled)
@@ -914,7 +1051,23 @@ class GeometryOffsetField(Field):
             line3_str = f'<GEOMETRY-OFFSET-UNIT>{unit_code}'
             return bytes(f'{line1_str}\n{line2_str}\n{line3_str}', encoding=ENCODING)
 
-    def _read(self, d: dict):
+    def read(self, d: dict)-> Tuple[u.Quantity, u.Quantity]:
+        """
+        Read a dictionary and return the information necessary to construct
+        a GeometryOffsetField instance.
+        
+        If the dictionary does not contain the necessary keys, return None.
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        Tuple of astropy.units.Quantity
+            The NS and EW offsets.
+        """
         try:
             ns_value = float(d['GEOMETRY-OFFSET-NS'])
             ew_value = float(d['GEOMETRY-OFFSET-EW'])
@@ -961,7 +1114,7 @@ class Molecule:
         self._abn = abn
 
     @staticmethod
-    def get_unit(code: str) -> u.Unit:
+    def get_abn_unit(code: str) -> u.Unit:
         """
         Get the unit for a given unit code.
 
@@ -1079,15 +1232,7 @@ class Aerosol(Molecule):
         astropy.units.Unit
             The associated unit.
         """
-        return Molecule.get_unit(code)
-
-    @staticmethod
-    def get_unit(code: str):
-        """
-        This inherited method is ambiguous.
-        """
-        raise NotImplementedError(
-            'get_unit not implemented for Aerosol as it is ambiguous.')
+        return Molecule.get_abn_unit(code)
 
     def _validate(self):
         assert self._size.unit in self._allowed_size_units
@@ -1210,7 +1355,25 @@ class MoleculesField(Field):
         s = f'{self.ngas}\n{self.gas}\n{self.type}\n{self.abun}\n{self.unit}'
         return bytes(s, encoding=ENCODING)
 
-    def _read(self, d: dict):
+    def read(self, d: dict)-> Tuple[Molecule]:
+        """
+        Read the data from a dictionary.
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        tuple of Molecule
+            A tuple of Molecule objects.
+        
+        Raises
+        ------
+        ValueError
+            If the number of molecules in the dictionary is incorrect.
+        """
         try:
             ngas = int(d['ATMOSPHERE-NGAS'])
             gases = d['ATMOSPHERE-GAS'].split(',')
@@ -1220,7 +1383,7 @@ class MoleculesField(Field):
         except KeyError:
             return None
         abuns = [float(abun) for abun in abuns]
-        units = [Molecule.get_unit(unit) for unit in units]
+        units = [Molecule.get_abn_unit(unit) for unit in units]
         abuns = [abun*unit for abun, unit in zip(abuns, units)]
         if not len(gases) == ngas:
             raise ValueError('Incorrect number of gases in ATMOSPHERE-GAS.')
@@ -1342,7 +1505,25 @@ class AerosolsField(Field):
         s = f'{self.naero}\n{self.aeros}\n{self.type}\n{self.abun}\n{self.unit}\n{self.size}\n{self.size_unit}'
         return bytes(s, encoding=ENCODING)
 
-    def _read(self, d: dict):
+    def read(self, d: dict)-> Tuple[Aerosol]:
+        """
+        Read the data from the dictionary.
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        Tuple[Aerosol]
+            A tuple of Aerosol objects.
+        
+        Raises
+        ------
+        ValueError
+            If the dictionary gives conflicting information.
+        """
         try:
             naero = int(d['ATMOSPHERE-NAERO'])
             aeros = d['ATMOSPHERE-AEROS'].split(',')
@@ -1638,8 +1819,25 @@ class ProfileField(Field):
         lines = [self.names] + [self.str_nlayers] + \
             [self.get_layer(i) for i in range(self.nlayers)]
         return bytes('\n'.join(lines), encoding=ENCODING)
+    
+    @property
+    def _str_property(self):
+        raise NotImplementedError('This method is not defined for this class')
 
-    def _read(self, d: dict):
+    def read(self, d: dict)->Tuple[Profile]:
+        """
+        Read the field from a dictionary.
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        Tuple[Profile]
+            The profiles read from the dictionary.
+        """
         try:
             molecules = d['ATMOSPHERE-LAYERS-MOLECULES'].split(',')
             n_layers = int(d['ATMOSPHERE-LAYERS'])
@@ -1691,7 +1889,21 @@ class BooleanField(Field):
             raise TypeError("Value must be boolean.")
         super(BooleanField, BooleanField).value.__set__(self, value_to_set)
 
-    def _read(self, d: dict):
+    def read(self, d: dict)->bool | None:
+        """
+        Read a dictionary and return the information necessary to
+        construct a class instance. Does not construct that instance.
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        
+        Returns
+        -------
+        bool
+            The information necessary to construct an instance of BooleanField.
+        """
         key = self._name.upper()
         try:
             value = str(d[key])
@@ -1706,7 +1918,7 @@ class BooleanField(Field):
                 f'Value must be one of {self._true} or {self._false}.')
 
 
-class Model:
+class Model(ABC):
     """
     A base class for data models.
 
