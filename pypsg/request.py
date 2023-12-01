@@ -156,7 +156,7 @@ class APICall:
             return False
         return True
 
-    def __call__(self) -> bytes:
+    def __call__(self) -> PSGResponse:
         """
         Call the PSG API
 

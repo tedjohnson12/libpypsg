@@ -25,18 +25,25 @@ settings.reload_settings()
 
 pycfg = PyConfig.from_file(CFG_PATH)
 
+#%%
+# Examine the cfg
+# ---------------
+# For fun
+
+print(f'This config is looking at a {pycfg.target.object.raw_value}')
+
+
 
 #%%
 # Run PSG
 # -------
 
 psg = APICall(pycfg,'rad')
-out = psg()
+rad = psg().rad
 
 #%%
 # Read the response
 # -----------------
-rad = PyRad.from_bytes(out)
 
 spec = rad.target
 

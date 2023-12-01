@@ -2,7 +2,7 @@
 This module contains the basic functionality for fields in PSG
 config objects.
 """
-from typing import Any, Tuple, List, Optional
+from typing import Any, Tuple, List
 import warnings
 from copy import deepcopy
 from astropy import units as u
