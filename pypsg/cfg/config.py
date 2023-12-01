@@ -120,7 +120,7 @@ class PyConfig:
             models.NoAtmosphere,models.EquilibriumAtmosphere,models.ComaAtmosphere
             ] = atmosphere
         if self.atmosphere is None:
-            self.atmosphere = models.NoAtmosphere()
+            self.atmosphere = models.Atmosphere()
         
         self.surface:models.Surface = surface
         if self.surface is None:
@@ -135,7 +135,7 @@ class PyConfig:
             models.AOTF,models.LIDAR
             ] = telescope
         if self.telescope is None:
-            self.telescope = models.SingleTelescope()
+            self.telescope = models.Telescope()
         
         self.noise:Union[
             models.Noiseless,models.RecieverTemperatureNoise,
@@ -143,7 +143,7 @@ class PyConfig:
             models.PowerEquivalentNoise,models.Detectability,models.CCD
             ] = noise
         if self.noise is None:
-            self.noise = models.Noiseless()
+            self.noise = models.Noise()
         
         self.gcm:globes.GCM | None = gcm
         
@@ -170,13 +170,19 @@ class PyConfig:
         return cls.from_binaryconfig(BinConfig.from_file(path))
     @property
     def content(self)->bytes:
-        return b'\n'.join([
-            self.target.content,
-            self.geometry.content,
-            self.atmosphere.content,
-            self.surface.content,
-            self.generator.content,
-            self.telescope.content,
-            self.noise.content,
-            self.gcm.content if self.gcm is not None else b''
-        ])
+        lines = []
+        for model in [
+            self.target,
+            self.geometry,
+            self.atmosphere,
+            self.surface,
+            self.generator,
+            self.telescope,
+            self.noise
+        ]:
+            c = model.content
+            if c != b'':
+                lines.append(c)
+        if self.gcm is not None:
+            lines.append(self.gcm.content)
+        return b'\n'.join(lines)

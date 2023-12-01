@@ -69,4 +69,3 @@ spec = rad.target
 plt.plot(spec.spectral_axis,spec.flux)
 plt.xlabel(spec.spectral_axis.unit)
 plt.ylabel(spec.flux.unit)
-0
