@@ -13,17 +13,19 @@ import astropy.units as u
 from pypsg.cfg.config import PyConfig
 from pypsg import APICall
 from pypsg import settings
-from pypsg.rad import PyRad
 from pypsg.cfg.base import Table
 
-CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
+try:
+    CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
+except NameError:
+    CFG_PATH = Path('psg_cfg.txt')
 
 settings.save_settings(url=settings.INTERNAL_PSG_URL)
 settings.reload_settings()
 
 #%%
 # Read the file
-# ------------
+# -------------
 
 pycfg = PyConfig.from_file(CFG_PATH)
 
@@ -40,9 +42,10 @@ print(f'We will observe from {pycfg.telescope.range1.value} to {pycfg.telescope.
 print(f'The dark current is {pycfg.noise.dark_current.value}. Let\'s change it.')
 x = np.linspace(1,20,10)*u.um
 y = (np.sin((x/(3*u.um)).to_value(u.dimensionless_unscaled))+1)*pycfg.noise.dark_current.value
-pycfg.noise.dark_current.value = Table(x,y)
+pycfg.noise.dark_current = Table(x,y)
 
 print('Now the dark current is:')
+print(pycfg.noise.dark_current.asbytes.decode('utf-8'))
 
 plt.plot(x,y)
 plt.xlabel(f'Wavelength ({x.unit})')
@@ -66,4 +69,3 @@ spec = rad.target
 plt.plot(spec.spectral_axis,spec.flux)
 plt.xlabel(spec.spectral_axis.unit)
 plt.ylabel(spec.flux.unit)
-0

@@ -1,4 +1,7 @@
 """
+CFG Base
+~~~~~~~~
+
 This module contains the basic functionality for fields in PSG
 config objects.
 """
@@ -354,9 +357,9 @@ class CharField(Field):
         
         """
         key = self._name.upper()
-        try:
+        if key in d:
             return str(d[key])
-        except KeyError:
+        else:
             return None
 
 

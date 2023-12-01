@@ -154,6 +154,8 @@ class Atmosphere(Model):
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs.get('cfg')
         structure = self.structure.read(cfg)
+        if structure is None:
+            return Atmosphere
         if structure == 'None':
             return NoAtmosphere
         elif structure == 'Equilibrium':

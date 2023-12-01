@@ -1,0 +1,14 @@
+[project]
+name = "pypsg"
+authors = [
+    {name = "Ted Johnson", email = "ted.johnson@unlv.edu"},
+]
+description = "A Python package for accessing the Planetary System Generator."
+readme = "docs/readme.rst"
+
+version = "0.1.0"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+dependencies = [
+
+    ]

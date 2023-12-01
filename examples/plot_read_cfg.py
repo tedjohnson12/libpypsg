@@ -13,7 +13,10 @@ import numpy as np
 from pypsg.cfg.config import PyConfig, BinConfig
 from pypsg.cfg.base import Profile
 
-CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
+try:
+    CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
+except NameError:
+    CFG_PATH = Path('psg_cfg.txt')
 
 #%%
 # Read the file

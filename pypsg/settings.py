@@ -1,5 +1,8 @@
 """
-Global settings
+PyPSG settings
+==============
+
+This module allows users to configure PyPSG.
 """
 from pathlib import Path
 import warnings
