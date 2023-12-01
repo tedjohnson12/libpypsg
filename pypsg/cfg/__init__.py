@@ -13,6 +13,7 @@ from pypsg.cfg.models import (
     NoAtmosphere,
     EquilibriumAtmosphere,
     ComaAtmosphere,
+    Surface,
     Generator,
     Telescope,
     SingleTelescope,

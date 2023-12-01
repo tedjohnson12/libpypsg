@@ -1,4 +1,7 @@
 """
+CFG Base
+~~~~~~~~
+
 This module contains the basic functionality for fields in PSG
 config objects.
 """

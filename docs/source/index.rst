@@ -11,6 +11,7 @@ Welcome to pypsg's documentation!
    :caption: Contents:
    
    intro
+   api
    auto_examples/index
 
 

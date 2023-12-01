@@ -161,3 +161,4 @@ cython_debug/
 
 # sphinx stuff
 docs/source/auto_examples
+docs/source/api
