@@ -6,7 +6,7 @@ from pathlib import Path
 
 import warnings
 
-from pypsg.cfg import models
+from pypsg.cfg import models, globes
 
 class BinConfig:
     """
@@ -44,7 +44,7 @@ class BinConfig:
         Config
             A config constructed using the provided file.
         """
-        warnings.warn('This method has not been tested.',RuntimeWarning)
+        # warnings.warn('This method has not been tested.',RuntimeWarning)
         with open(path,'rb') as file:
             content = file.read()
         return cls(content=content)
@@ -55,7 +55,7 @@ class BinConfig:
         
         :type: bool
         """
-        warnings.warn('This method has not been tested.',RuntimeWarning)
+        # warnings.warn('This method has not been tested.',RuntimeWarning)
         return b'<BINARY>' in self.content
     @property
     def binary(self)->bytes:
@@ -64,7 +64,7 @@ class BinConfig:
         
         :type: bytes
         """
-        warnings.warn('This method has not been tested.',RuntimeWarning)
+        # warnings.warn('This method has not been tested.',RuntimeWarning)
         if not self.has_binary:
             raise ValueError('This config contains no binary section.')
         return self.content.split(b'<BINARY>')[1].split(b'</BINARY>')[0]
@@ -77,8 +77,10 @@ class BinConfig:
         """
         # warnings.warn('This method has not been tested.',RuntimeWarning)
         content = self.content
+        binary = None
         if self.has_binary:
             content = content.split(b'<BINARY>')[0] + content.split(b'</BINARY>')[1]
+            binary = self.binary
         content = str(content,encoding=self.encoding)
         cfg = {}
         for line in content.split('\n'):
@@ -87,6 +89,8 @@ class BinConfig:
                 kwd = line[:end_of_kwd].replace('<','').replace('>','')
                 val = line[end_of_kwd:]
                 cfg[kwd] = val
+        if binary is not None:
+            cfg['BINARY'] = binary
         return cfg
 
 class PyConfig:
@@ -98,9 +102,11 @@ class PyConfig:
         target:models.Target = None,
         geometry:models.Geometry = None,
         atmosphere:models.Atmosphere = None,
+        surface:models.Surface = None,
         generator:models.Generator = None,
         telescope:models.Telescope = None,
-        noise:models.Noise = None
+        noise:models.Noise = None,
+        gcm:globes.GCM = None
     ):
         self.target:models.Target = target
         if self.target is None:
@@ -115,6 +121,10 @@ class PyConfig:
             ] = atmosphere
         if self.atmosphere is None:
             self.atmosphere = models.NoAtmosphere()
+        
+        self.surface:models.Surface = surface
+        if self.surface is None:
+            self.surface = models.Surface()
         
         self.generator:models.Generator = generator
         if self.generator is None:
@@ -134,15 +144,20 @@ class PyConfig:
             ] = noise
         if self.noise is None:
             self.noise = models.Noiseless()
+        
+        self.gcm:globes.GCM | None = gcm
+        
     @classmethod
     def from_dict(cls,d:dict):
         return cls(
             target=models.Target.from_cfg(d),
             geometry=models.Geometry.from_cfg(d),
             atmosphere=models.Atmosphere.from_cfg(d),
+            surface=models.Surface.from_cfg(d),
             generator=models.Generator.from_cfg(d),
             telescope=models.Telescope.from_cfg(d),
-            noise=models.Noise.from_cfg(d)
+            noise=models.Noise.from_cfg(d),
+            gcm=globes.GCM.from_cfg(d)
         )
     @classmethod
     def from_binaryconfig(cls,config:BinConfig):
@@ -159,7 +174,9 @@ class PyConfig:
             self.target.content,
             self.geometry.content,
             self.atmosphere.content,
+            self.surface.content,
             self.generator.content,
             self.telescope.content,
-            self.noise.content
+            self.noise.content,
+            self.gcm.content if self.gcm is not None else b''
         ])

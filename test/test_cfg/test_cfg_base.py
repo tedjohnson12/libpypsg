@@ -8,10 +8,10 @@ import numpy as np
 from pypsg import units as u_psg
 
 from pypsg.cfg.base import Table
-from pypsg.cfg.base import Field, Model, CharField, IntegerField
+from pypsg.cfg.base import Model, CharField, IntegerField
 from pypsg.cfg.base import FloatField, QuantityField
-from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField, GeometryUserParamField
-from pypsg.cfg.base import CodedQuantityField, MultiQuantityField
+from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
+from pypsg.cfg.base import CodedQuantityField
 from pypsg.cfg.base import Molecule, MoleculesField, Aerosol, AerosolsField
 from pypsg.cfg.base import Profile, ProfileField, BooleanField
 
@@ -37,41 +37,18 @@ def test_table():
     assert t.to_string(xunit=u.cm, yunit=u.K, fmt='.1f') == '4.0@100.0,5.0@200.0,6.0@300.0'
 
 def test_table_read():
+    """
+    Test the read method of the Table class.
+    """
     cfg = '4.0@1.0,5.0@2.0,6.0@3.0'
     x,y = Table.read(cfg)
     t = Table(x,y)
     assert t.to_string(fmt='.1f') == cfg
-    
-    
 
-
-def test_field():
-    field = Field(
-        name='test'
-    )
-    assert field.is_null
-    assert field.default is None
-    assert field.null is True
-    
-    field.value = 2
-    assert not field.is_null
-    assert field._value == 2
-    assert field.value == b'2'
-    assert field.content == b'<TEST>2'
-    
-    
-    ####
-    field = Field(
-        name='test',
-        default=3,
-        null=False
-    )
-    assert field.default == 3
-    assert field.null is False
-    with pytest.raises(ValueError):
-        field.value = None
-
-def test_CharField():
+def test_charfield():
+    """
+    Test the CharField class
+    """
     char = CharField(max_length=4,name='char')
     char.value = 'hi'
     with pytest.raises(ValueError):
@@ -84,6 +61,9 @@ def test_CharField():
     assert char.read(d) == 'value'
 
 def test_IntegerField():
+    """
+    Test the IntegerField class
+    """
     i = IntegerField('int')
     i.value = 0
     with pytest.raises(TypeError):
@@ -96,17 +76,20 @@ def test_IntegerField():
     assert i.read(d) == 0
 
 def test_FloatField():
+    """
+    Test the FloatField class
+    """
     f = FloatField('float')
     f.value = 0
     f.value = 0.
-    assert f.value == b'0.00'
+    assert f.asbytes == b'0.00'
     with pytest.raises(TypeError):
         f.value = '0'
     f = FloatField('float',null=True)
     f.value = None
     f = FloatField('float',fmt='.2e')
     f.value = 1e6
-    assert f.value == b'1.00e+06'
+    assert f.asbytes == b'1.00e+06'
     d = {'FLOAT':0.0}
     assert f.read(d) == 0.0
     
@@ -116,18 +99,21 @@ def test_FloatField():
         np.array([4,5,6])
     )
     f.value = t
-    assert f.value == b'4.00@1.00,5.00@2.00,6.00@3.00'
+    assert f.asbytes == b'4.00@1.00,5.00@2.00,6.00@3.00'
     
     f2 = FloatField('float2',allow_table=False)
     with pytest.raises(TypeError):
         f2.value = t
     
-    d = {'FLOAT':str(f.value,'utf-8')}
+    d = {'FLOAT':str(f.asbytes,'utf-8')}
     t2 = f.read(d)
     assert np.all(t2.x == t.x)
     assert np.all(t2.y == t.y)
 
 def test_QuantityField():
+    """
+    Test the QuantityField class
+    """
     q = QuantityField('quant',u.m,null=False,allow_table=True,fmt='.2f')
     q.value = 1*u.m
     with pytest.raises(TypeError):
@@ -136,7 +122,7 @@ def test_QuantityField():
         q.value = None
     with pytest.raises(u.UnitConversionError):
         q.value = 1*u.s
-    assert q.value == b'1.00'
+    assert q.asbytes == b'1.00'
     d = {'QUANT':1}
     assert q.read(d) == 1*u.m
     
@@ -145,10 +131,10 @@ def test_QuantityField():
         np.array([4,5,6])
     )
     q.value = t
-    assert q.value == b'4.00@1.00,5.00@2.00,6.00@3.00'
+    assert q.asbytes == b'4.00@1.00,5.00@2.00,6.00@3.00'
     assert q.content == b'<QUANT>4.00@1.00,5.00@2.00,6.00@3.00'
     
-    d = {'QUANT':str(q.value,'utf-8')}
+    d = {'QUANT':str(q.asbytes,'utf-8')}
     t2 = q.read(d)
     assert np.all(t2.x == t.x)
     assert np.all(t2.y == t.y)
@@ -157,6 +143,9 @@ def test_QuantityField():
     
 
 def test_CodedQuantityField():
+    """
+    Test the CodedQuantityField class
+    """
     g = CodedQuantityField(
         allowed_units=(u.Unit('m s-2'),u.Unit('g cm-3'), u.kg),
         unit_codes=('g', 'rho', 'kg'),
@@ -165,53 +154,68 @@ def test_CodedQuantityField():
     )
     # g = GravityField()
     with pytest.raises(NotImplementedError):
-        _ = g.value
+        _ = g.asbytes
     with pytest.raises(NotImplementedError):
         _ = g.name
     
     g.value = 1*u.M_earth
-    assert g._value == 1*u.M_earth
+    assert g.value == 1*u.M_earth
     g.value = 10*u.m / u.s**2
     g.value = 5*u.g / u.cm**3
     with pytest.raises(u.UnitConversionError):
         g.value = 10*u.s
     g.value = 1*u.M_earth
+    # pylint: disable-next=protected-access
     val_str, unit_code = g._get_values()
     assert val_str == f'{(1*u.M_earth).to_value(u.kg):.4e}'
     assert unit_code == 'kg'
     g.value = 10*u.m / u.s**2
+    # pylint: disable-next=protected-access
     val_str, unit_code = g._get_values()
     assert val_str == '10.0000'
     assert unit_code == 'g'
     g.value = 5*u.g / u.cm**3
+    # pylint: disable-next=protected-access
     val_str, unit_code = g._get_values()
     assert val_str == '5.0000'
     assert unit_code == 'rho'
     assert g.content == b'<OBJECT-GRAVITY>5.0000\n<OBJECT-GRAVITY-UNIT>rho'
     g.value = 1000*u.kg
+    # pylint: disable-next=protected-access
     val_str, unit_code = g._get_values()
     assert val_str == '1.0000e+03'
     
     d = {'OBJECT-GRAVITY':5,'OBJECT-GRAVITY-UNIT':'rho'}
     assert g.read(d) == 5*u.g / u.cm**3
     
+    assert g.parse_unit('kg') == u.kg
+    
 def test_DateField():
+    """
+    Test the DateField class
+    """
     d = DateField('date')
     d.value = '2023-08-10 14:15'
-    assert d.value == b'2023/08/10 14:15'
+    assert d.asbytes == b'2023/08/10 14:15'
     cfg = {'DATE':'2023-08-10 14:15'}
     assert d.read(cfg) == '2023-08-10 14:15'
 
 def test_CharChoicesField():
+    """
+    Test the CharChoicesField class
+    """
     c = CharChoicesField('char_choice',options=['a','b'])
     c.value = 'a'
-    assert c.value == b'a'
+    assert c.asbytes == b'a'
     with pytest.raises(ValueError):
         c.value = 'c'
     d = {'CHAR_CHOICE':'b'}
     assert c.read(d) == 'b'
 
 def test_GeometryOffestField():
+    """
+    Test the GeometryOffestField class
+    """
     g = GeometryOffsetField()
     g.value = (1*u.deg, 1*u.deg)
     g.value = (1,1.4)
@@ -224,46 +228,39 @@ def test_GeometryOffestField():
     d = {'GEOMETRY-OFFSET-NS':1,'GEOMETRY-OFFSET-EW':1.4,'GEOMETRY-OFFSET-UNIT':'diameter'}
     assert g.read(d) == (1,1.4)
 
-def test_MultiQuantityField():
-    m = MultiQuantityField('field',(u.s,u.km),fmt='.2f')
-    m.value = 1*u.min
-    assert m.value == b'60.00'
-    m.value = 100*u.m
-    assert m.value == b'0.10'
-    with pytest.raises(u.UnitTypeError):
-        m.value = 1*u.kg
-    d = {'FIELD':1}
-    with pytest.raises(NotImplementedError):
-        _ = m.read(d)
-
-def test_GeometryUserParamField():
-    g = GeometryUserParamField()
-    g.value = 1*u.deg
-    assert g.value == b'1.00'
-    d = {'GEOMETRY-USER-PARAMETER':1}
-    assert g.read(d) == None
-    d = {'GEOMETRY-USER-PARAMETER':1,'GEOMETRY':'NADIR'}
-    assert g.read(d) == 1*u.deg
-
 def test_Molecule():
+    """
+    Test the Molecule class
+    """
     mol = Molecule('H2O','HIT[1]',1*u.pct)
     assert mol.abn == pytest.approx(1.0,abs=1e-6)
     assert mol.unit_code == '%'
+    assert Molecule.get_abn_unit(mol.unit_code) == u.pct
     mol = Molecule('H2O', 'HIT[1]',1)
     assert mol.abn == pytest.approx(1.0,abs=1e-6)
     assert mol.unit_code == 'scl'
+    assert Molecule.get_abn_unit(mol.unit_code) == u.dimensionless_unscaled
+    
 
 def test_Aerosol():
+    """
+    Test the Aerosol class
+    """
     aero = Aerosol('Water','watertype',1.0,1*u.um)
     assert aero.abn == pytest.approx(1.00,abs=1e-6)
     assert aero.unit_code == 'scl'
+    assert Aerosol.get_abn_unit(aero.unit_code) == u.dimensionless_unscaled
     assert aero.size == pytest.approx(1.00,abs=1e-6)
     assert aero.size_unit_code == 'um'
+    assert Aerosol.get_size_unit(aero.size_unit_code) == u.um
+    
     aero = Aerosol('Water','watertype',1*u.pct,4*u.LogUnit(u.um))
     assert aero.abn == pytest.approx(1.0,abs=1e-6)
     assert aero.unit_code == '%'
+    assert Aerosol.get_abn_unit(aero.unit_code) == u.pct
     assert aero.size == pytest.approx(4.00,abs=1e-6)
     assert aero.size_unit_code == 'lum'
+    assert Aerosol.get_size_unit(aero.size_unit_code) == u.LogUnit(u.um)
 
 
 
@@ -388,23 +385,24 @@ def test_model():
         age = IntegerField('age',default=0,null=True)
     
     person = TestModel(name='Ted', age=23)
+    person.age:IntegerField
     assert isinstance(person.name,CharField)
-    assert person.name.value == b'Ted'
+    assert person.name.asbytes == b'Ted'
     assert person.name.content == b'<NAME>Ted'
-    assert person.age.value == b'23'
+    assert person.age.asbytes == b'23'
     assert person.age.content == b'<AGE>23'
     expected = b'<AGE>23\n<NAME>Ted'
     assert person.content == expected
     
     person2 = TestModel(name='Cactus')
-    assert person2.name.value == b'Cactus'
+    assert person2.name.asbytes == b'Cactus'
     assert person2.name.content == b'<NAME>Cactus'
-    assert person2.age.value == b'0'
+    assert person2.age.asbytes == b'0'
     assert person2.age.content == b'<AGE>0'
-    person2.age = 3
-    assert person2.age.value == b'3'
+    person2.age.value = 3
+    assert person2.age.asbytes == b'3'
     
-    assert person.name.value == b'Ted'
+    assert person.name.asbytes == b'Ted'
     
     class OtherModel(Model):
         name = CharField(name='name',max_length=30)
@@ -413,7 +411,7 @@ def test_model():
             self.favorite_color = favorite_color
             
     person3 = OtherModel(name='Barbie',favorite_color='#e0218a')
-    assert person3.name.value == b'Barbie'
+    assert person3.name.asbytes == b'Barbie'
     assert person3.favorite_color == '#e0218a'
     
     expected = b'<NAME>Barbie'

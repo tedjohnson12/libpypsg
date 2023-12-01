@@ -1,34 +1,76 @@
+"""
+PyPSG Requests
+--------------
 
-from typing import Union
-import requests
+Direct access to the PSG API
+"""
+from typing import Union, Dict
 import re
+import requests
 
 from pypsg.cfg import PyConfig, BinConfig
 from pypsg import settings
 from pypsg.rad import PyRad
+from pypsg.lyr import PyLyr
+
+typedict: Dict[str, Union[PyConfig, PyRad, PyLyr]] = {
+    'cfg': PyConfig,
+    'rad': PyRad,
+    'lyr': PyLyr,
+    'noi': PyRad
+}
+
 
 class PSGResponse:
+    """
+    A class to parse the response from the PSG API.
+    
+    Parameters
+    ----------
+    cfg : PyConfig
+        The PSG .cfg file.
+    rad : PyRad
+        The PSG .rad file.
+    lyr : PyLyr
+        The PSG .lyr file.
+    noi : PyRad
+        The PSG .noi file.
+    """
     def __init__(
         self,
-        cfg: PyConfig=None,
-        rad: PyRad=None
+        cfg: PyConfig = None,
+        rad: PyRad = None,
+        lyr: PyLyr = None,
+        noi: PyRad = None
     ):
         self.cfg = cfg
         self.rad = rad
+        self.lyr = lyr
+        self.noi = noi
+
     @classmethod
-    def from_bytes(cls,b:bytes):
-        pattern = rb'results_([\w]+).txt'
-        split_text = re.split(pattern,b)
-        names = split_text[1::2]
-        content = split_text[2::2]
-        data = {}
-        for name,dat in zip(names,content):
-            data[name] = dat.strip()
-        return cls(
-            cfg=PyConfig.from_bytes(data['cfg']),
-            rad=PyRad.from_bytes(data['rad'])
-        )
+    def from_bytes(cls, b: bytes):
+        """
+        Read the response from PSG as a byte string.
         
+        Parameters
+        ----------
+        b : bytes
+            The response from the PSG. This is the returned file read as bytes.
+        """
+        pattern = rb'results_([\w]+).txt'
+        split_text = re.split(pattern, b)
+        names = split_text[0::2]
+        content = split_text[1::2]
+        data = {}
+        for name, dat in zip(names, content):
+            data[name] = dat.strip()
+        kwargs = {}
+        for key, value in typedict.items():
+            value: PyConfig | PyRad | PyLyr
+            if key in data:
+                kwargs[key] = value.from_bytes(data[key])
+        return cls(**kwargs)
 
 
 class APICall:
@@ -61,7 +103,7 @@ class APICall:
     def __init__(
         self,
         cfg: Union[BinConfig, PyConfig],
-        output_type:str = None,
+        output_type: str = None,
         app: str = None,
         url: str = None
     ):
@@ -89,23 +131,32 @@ class APICall:
             If self.url is not a string.
         """
         if not isinstance(self.cfg, (PyConfig, BinConfig)):
-            raise TypeError('apiCall.cfg must be a PyConfig or BinaryConfig object')
+            raise TypeError(
+                'apiCall.cfg must be a PyConfig or BinaryConfig object')
         if not (isinstance(self.type, str) or self.type is None):
             raise TypeError('apiCall.type must be a string or None')
         if not (isinstance(self.app, str) or self.app is None):
             raise TypeError('apiCall.app must be a string or None')
         if not isinstance(self.url, str):
             raise TypeError('apiCall.url must be a string')
-    
+
     @property
     def is_single_file(self):
-        if isinstance(self.type,(tuple,list)):
+        """
+        True if only a single file is expected back from the PSG API.
+        
+        Returns
+        -------
+        bool
+            True if only a single file is expected back from the PSG API.
+        """
+        if isinstance(self.type, (tuple, list)):
             return False
         if self.type == 'all':
             return False
         return True
-        
-    def __call__(self) -> bytes:
+
+    def __call__(self) -> PSGResponse:
         """
         Call the PSG API
 
@@ -131,13 +182,6 @@ class APICall:
             raise requests.exceptions.HTTPError(reply.content)
         if not self.is_single_file:
             return PSGResponse.from_bytes(reply.content)
-        elif self.type == 'cfg':
-            return PSGResponse(
-                cfg=PyConfig.from_bytes(reply.content),
-            )
-        elif self.type == 'rad':
-            return PSGResponse(
-                rad=PyRad.from_bytes(reply.content),
-            )
         else:
-            raise ValueError('Unknown output type')
+            returntype = typedict[self.type]
+            return PSGResponse(**{self.type:returntype.from_bytes(reply.content)})
