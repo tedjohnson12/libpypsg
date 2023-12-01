@@ -10,7 +10,7 @@ from pypsg.cfg.base import Model
 from pypsg.cfg.base import CharField, IntegerField, DateField
 from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
 from pypsg.cfg.base import GeometryOffsetField, MoleculesField, AerosolsField
-from pypsg.cfg.base import ProfileField, BooleanField
+from pypsg.cfg.base import ProfileField, BooleanField, UnitChoicesField
 
 
 class Target(Model):
@@ -177,6 +177,7 @@ class EquilibriumAtmosphere(Atmosphere):
     pressure = CodedQuantityField(
         # pylint: disable-next=no-member
         allowed_units=(u.Pa, u.bar, u_psg.kbar, u_psg.mbar,
+                       # pylint: disable-next=no-member
                        u_psg.ubar, cds.atm, u.torr, imperial.psi),
         unit_codes=('Pa', 'bar', 'kbar', 'mbar', 'ubar',
                     'atm', 'torr', 'psi'),  # what is `at`?
@@ -215,6 +216,16 @@ class ComaAtmosphere(Atmosphere):
         self.structure.value = 'Coma'
 
 
+class Surface(Model):
+    """
+    The surface model.
+    """
+    temperature = QuantityField('surface-temperature', u.K)
+    albedo = FloatField('surface-albedo')
+    emissivity = FloatField('surface-emissivity')
+    
+
+
 class Generator(Model):
     resolution_kernel = BooleanField('generator-resolutionkernel')
     gas_model = BooleanField('generator-gasmodel')
@@ -223,9 +234,10 @@ class Generator(Model):
     apply_telluric_noise = BooleanField('generator-trans-show')
     apply_telluir_obs = BooleanField('generator-trans-apply')
     telluric_params = CharField('generator-trans', max_length=20)
-    rad_units = CharChoicesField(
+    rad_units = UnitChoicesField(
         'generator-radunits',
-        options=tuple(key for key in u_psg.radiance_units.keys())
+        options=tuple(value for value in u_psg.radiance_units.values()),
+        codes = tuple(key for key in u_psg.radiance_units)
     )
     log_rad = BooleanField('generator-lograd')
     gcm_binning = IntegerField('generator-gcm-binning')
@@ -371,7 +383,7 @@ class Noiseless(Noise):
 
 
 class RecieverTemperatureNoise(Noise):
-    temperature = FloatField('generator-noise1')
+    temperature = QuantityField('generator-noise1', u.K)
     g_factor = FloatField('generator-noise2')
 
     def __init__(self, **kwargs):

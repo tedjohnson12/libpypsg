@@ -209,6 +209,7 @@ class Field(ABC):
         return bytes(self._str_property, encoding=ENCODING)
 
     @value.setter
+    @abstractmethod
     def value(self, value_to_set: Any):
         """
         Setter function for ``Field._value``
@@ -397,6 +398,44 @@ class CharChoicesField(CharField):
             msg = f'Value must be one of {",".join(self._options)}.'
             raise ValueError(msg)
         super(CharField, CharField).value.__set__(self, value_to_set)
+
+class UnitChoicesField(Field):
+    def __init__(
+        self,
+        name: str,
+        options: Tuple[u.Unit, ...],
+        codes: Tuple[str, ...],
+        default: str = None,
+        null: bool = True,
+    ):
+        super().__init__(name, default, null)
+        self._options = options
+        self._codes = codes
+    @property
+    def _code(self):
+        return {unit:code for unit,code in zip(self._options,self._codes)}[self._value]
+    @property
+    def _str_property(self):
+        return self._code
+    @Field.value.setter
+    def value(self, value_to_set):
+        if value_to_set is None:
+            pass
+        elif not isinstance(value_to_set, (u.Unit,u.CompositeUnit)):
+            raise TypeError(f"Value must be a unit. Instead got {type(value_to_set)}")
+        elif value_to_set not in self._options:
+            msg = f'Value must be one of {",".join([unit.to_string() for unit in self._options])}.'
+            raise u.UnitTypeError(msg)
+        super(UnitChoicesField, UnitChoicesField).value.__set__(self, value_to_set)
+    def read(self,d:dict)->u.Unit:
+        key = self._name.upper()
+        try:
+            return u.Unit(d[key])
+        except KeyError:
+            return None
+
+    
+    
 
 
 class DateField(Field):
