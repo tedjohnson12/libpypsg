@@ -71,6 +71,9 @@ class PSGResponse:
             if key in data:
                 kwargs[key] = value.from_bytes(data[key])
         return cls(**kwargs)
+    @classmethod
+    def null(cls):
+        return cls()
 
 
 class APICall:
@@ -180,7 +183,9 @@ class APICall:
         )
         if reply.status_code != 200:
             raise requests.exceptions.HTTPError(reply.content)
-        if not self.is_single_file:
+        if self.type in ['upd', 'set']:
+            return PSGResponse.null()
+        elif not self.is_single_file:
             return PSGResponse.from_bytes(reply.content)
         else:
             returntype = typedict[self.type]
