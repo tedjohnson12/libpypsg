@@ -64,8 +64,8 @@ rad = psg().rad
 # Read the response
 # -----------------
 
-spec = rad.target
-
-plt.plot(spec.spectral_axis,spec.flux)
-plt.xlabel(spec.spectral_axis.unit)
-plt.ylabel(spec.flux.unit)
+wl = rad.wl
+flux = rad['Total']
+plt.plot(wl,flux)
+plt.xlabel(wl.unit)
+plt.ylabel(flux.unit)

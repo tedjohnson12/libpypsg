@@ -186,3 +186,14 @@ class PyConfig:
         if self.gcm is not None:
             lines.append(self.gcm.content)
         return b'\n'.join(lines)
+    def to_file(self,path:Path):
+        """
+        Write the config to a file.
+        
+        Parameters
+        ----------
+        path : pathlib.Path
+            The path to the file.
+        """
+        with open(path,'wb') as f:
+            f.write(self.content)
