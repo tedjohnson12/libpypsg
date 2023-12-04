@@ -323,6 +323,8 @@ class Noise(Model):
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs['cfg']
         value = self.noise_type.read(cfg)
+        if value is None:
+            return Noise
         if value == 'NO':
             return Noiseless
         elif value == 'TRX':
