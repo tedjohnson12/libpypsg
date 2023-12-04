@@ -77,6 +77,8 @@ class Geometry(Model):
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs.get('cfg')
         geometry = self.geometry.read(cfg)
+        if geometry is None:
+            return Geometry
         if geometry == 'Observatory':
             return Observatory
         elif geometry == 'Nadir':
@@ -284,6 +286,8 @@ class Telescope(Model):
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs['cfg']
         value = self.telescope.read(cfg)
+        if value is None:
+            return Telescope
         if value == 'SINGLE':
             return SingleTelescope
         elif value == 'ARRAY':
