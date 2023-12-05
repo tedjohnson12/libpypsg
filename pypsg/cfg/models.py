@@ -36,7 +36,7 @@ class Target(Model):
     inclination = QuantityField('object-inclination', u.deg)
     position_angle = QuantityField('object-position-angle', u.deg)
     star_type = CharChoicesField(
-        'object-star-type', ('O', 'B', 'A', 'F', 'G', 'K', 'M', ''), max_length=1)
+        'object-star-type', ('O', 'B', 'A', 'F', 'G', 'K', 'M', '', '-'), max_length=1)
     star_temperature = QuantityField('object-star-temperature', u.K)
     star_radius = QuantityField('object-star-radius', u.R_sun)
     star_metallicity = FloatField('object-star-metallicity')

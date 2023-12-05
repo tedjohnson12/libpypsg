@@ -398,7 +398,7 @@ class CharChoicesField(CharField):
         if value_to_set is None:
             pass
         elif not any([value_to_set == option for option in self._options]):
-            msg = f'Value must be one of {",".join(self._options)}.'
+            msg = f'Value must be one of {",".join(self._options)}. Got {value_to_set}'
             raise ValueError(msg)
         super(CharField, CharField).value.__set__(self, value_to_set)
 
