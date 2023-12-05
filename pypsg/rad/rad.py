@@ -30,53 +30,56 @@ class PyRad(table.QTable):
     """
     Python representation of rad files.
     """
+    SPEC_UNIT = 'SPECUNIT'
+    RAD_UNIT = 'RADUNIT'
+    _NAMES = 'NAMES'
     @staticmethod
     def _get_metadata(header:str):
         metadata = {}
         
-        metadata['type'] = re.findall(
-            r'#[ ]+([\w]+ spectrum)',
-            header
-        )[0]
-        metadata['source'] = re.findall(
-            r'spectrum\n#(.+)\n',
-            header
-        )[0]
-        metadata['date'] = re.findall(
-            r'# Synthesized on (.+)\n',
-            header
-        )[0]
+        # metadata['type'] = re.findall(
+        #     r'#[ ]+([\w]+ spectrum)',
+        #     header
+        # )[0]
+        # metadata['source'] = re.findall(
+        #     r'spectrum\n#(.+)\n',
+        #     header
+        # )[0]
+        # metadata['date'] = re.findall(
+        #     r'# Synthesized on (.+)\n',
+        #     header
+        # )[0]
         
-        vel_unit = u.Unit(
-            re.findall(r'Doppler velocities \[(.+)\] ',header)[0]
-        )
-        vel_names = re.findall(
-            r'Doppler velocities \[.+\] \((.+)\)',
-            header
-        )[0].split(',')
-        vel_values = re.findall(
-            r'Doppler velocities.+:(.+)\n',
-            header
-        )[0].split(',')
-        for name,value in zip(vel_names,vel_values):
-            metadata[name] = float(value) * vel_unit
+        # vel_unit = u.Unit(
+        #     re.findall(r'Doppler velocities \[(.+)\] ',header)[0]
+        # )
+        # vel_names = re.findall(
+        #     r'Doppler velocities \[.+\] \((.+)\)',
+        #     header
+        # )[0].split(',')
+        # vel_values = re.findall(
+        #     r'Doppler velocities.+:(.+)\n',
+        #     header
+        # )[0].split(',')
+        # for name,value in zip(vel_names,vel_values):
+        #     metadata[name] = float(value) * vel_unit
         
-        metadata['spectral_model'] = re.findall(
-            r'Spectra synthesized with the (.+)\n',
-            header
-        )[0]
-        metadata['scattering_method'] = re.findall(
-            r'Spectra synthesized with the .+\n# (.+)\n',
-            header
-        )[0]
+        # metadata['spectral_model'] = re.findall(
+        #     r'Spectra synthesized with the (.+)\n',
+        #     header
+        # )[0]
+        # metadata['scattering_method'] = re.findall(
+        #     r'Spectra synthesized with the .+\n# (.+)\n',
+        #     header
+        # )[0]
         
-        metadata['spectral_unit'] = u.Unit(
+        metadata[PyRad.SPEC_UNIT] = u.Unit(
             re.findall(r'Spectral unit:.+\[(.+)\]\n',header)[0]
         )
-        metadata['radiance_unit'] = u.Unit(
+        metadata[PyRad.RAD_UNIT] = u.Unit(
             re.findall(r'Radiance unit:.+\[(.+)\]\n',header)[0]
         )
-        metadata['names_string'] = re.findall(
+        metadata[PyRad._NAMES] = re.findall(
             r'# (Wave\/freq.+)',
             header
         )[0]
@@ -90,10 +93,10 @@ class PyRad(table.QTable):
         
         metadata = cls._get_metadata('\n'.join(header))
         
-        spectral_unit:u.Unit = metadata['spectral_unit']
-        radiance_unit:u.Unit = metadata['radiance_unit']
+        spectral_unit:u.Unit = metadata[cls.SPEC_UNIT]
+        radiance_unit:u.Unit = metadata[cls.RAD_UNIT]
         
-        names = metadata['names_string'].split(' ')
+        names = metadata[cls._NAMES].split(' ')
         content = np.array(
             [
                 np.fromstring(line,sep=' ') for line in content
@@ -102,8 +105,7 @@ class PyRad(table.QTable):
         data = {}
         for i, name in enumerate(names):
             data[name] = content[:,i] * (spectral_unit if i==0 else radiance_unit)
-        
-        return cls(data=data,meta=metadata)
+        return cls(data=data)
     @property
     def wl(self):
         return self['Wave/freq']
