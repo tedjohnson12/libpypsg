@@ -13,11 +13,11 @@ from pypsg import settings
 from pypsg.rad import PyRad
 from pypsg.lyr import PyLyr
 
-typedict: Dict[str, Union[PyConfig, PyRad, PyLyr]] = {
-    'cfg': PyConfig,
-    'rad': PyRad,
-    'lyr': PyLyr,
-    'noi': PyRad
+typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
+    b'cfg': PyConfig,
+    b'rad': PyRad,
+    b'lyr': PyLyr,
+    b'noi': PyRad
 }
 
 
@@ -60,8 +60,8 @@ class PSGResponse:
         """
         pattern = rb'results_([\w]+).txt'
         split_text = re.split(pattern, b)
-        names = split_text[0::2]
-        content = split_text[1::2]
+        names = split_text[1::2]
+        content = split_text[2::2]
         data = {}
         for name, dat in zip(names, content):
             data[name] = dat.strip()
@@ -69,7 +69,7 @@ class PSGResponse:
         for key, value in typedict.items():
             value: PyConfig | PyRad | PyLyr
             if key in data:
-                kwargs[key] = value.from_bytes(data[key])
+                kwargs[key.decode(settings.get_setting('encoding'))] = value.from_bytes(data[key])
         return cls(**kwargs)
     @classmethod
     def null(cls):
@@ -176,8 +176,11 @@ class APICall:
         api_key = settings.get_setting('api_key')
         if api_key is not None:
             data['key'] = api_key
+        url = self.url
+        if '/api.php' not in url:
+            url = f'{url}/api.php'
         reply = requests.post(
-            url=self.url,
+            url=url,
             data=data,
             timeout=settings.REQUEST_TIMEOUT
         )
