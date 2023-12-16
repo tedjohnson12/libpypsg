@@ -232,7 +232,7 @@ class Surface(Model):
 
 class Generator(Model):
     resolution_kernel = BooleanField('generator-resolutionkernel')
-    gas_model = BooleanField('generator-gasmodel')
+    gas_model = BooleanField('generator-gas-model')
     continuum_model = BooleanField('generator-cont-model')
     continuum_stellar = BooleanField('generator-cont-stellar')
     apply_telluric_noise = BooleanField('generator-trans-show')

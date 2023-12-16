@@ -20,6 +20,7 @@ DEFAULT_SETTINGS = {
     'url': PSG_URL,
     'api_key': None,
     'encoding': 'utf-8',
+    'cfg_max_lines': 1500
 }
 
 

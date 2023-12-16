@@ -5,7 +5,7 @@ CFG
 Dealing with PSG config files.
 """
 
-from pypsg.cfg.config import PyConfig, BinConfig
+from pypsg.cfg.config import PyConfig, BinConfig, ConfigTooLongWarning
 from pypsg.cfg.models import (
     Target,
     Geometry,
