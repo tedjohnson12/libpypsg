@@ -453,8 +453,8 @@ class CCD(Noise):
         xunit=u.um,
         yunit=None
     )
-    emissivity = FloatField('generator-noieoemis')
-    temperature = QuantityField('generator-noisetemp', u.K)
+    emissivity = FloatField('generator-noiseoemis')
+    temperature = QuantityField('generator-noiseotemp', u.K)
     pixel_depth = QuantityField('generator-noisewell', u.electron)
 
     def __init__(self, **kwargs):
