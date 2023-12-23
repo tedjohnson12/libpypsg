@@ -14,7 +14,6 @@ readme = "docs/readme.rst"
 license = {file = "LICENSE"}
 keywords =  ["astronomy", "exoplanet", "planet", "spectroscopy", "PSG"]
 requires-python = ">=3.9"
-license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
