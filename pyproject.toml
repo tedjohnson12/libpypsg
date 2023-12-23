@@ -1,14 +1,53 @@
+[build-system]
+# Minimum requirements for the build system to execute.
+requires = ["setuptools", "wheel"]  # PEP 508 specifications.
+
 [project]
+version = "0.1.0"
 name = "pypsg"
 authors = [
     {name = "Ted Johnson", email = "ted.johnson@unlv.edu"},
 ]
+maintainers = [ { name = "Ted Johnson", email = "ted.johnson@unlv.edu" } ]
 description = "A Python package for accessing the Planetary System Generator."
 readme = "docs/readme.rst"
-
-version = "0.1.0"
-requires-python = ">=3.6"
-license = {text = "MIT"}
+license = {file = "LICENSE"}
+keywords =  ["astronomy", "exoplanet", "planet", "spectroscopy", "PSG"]
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
 dependencies = [
-
-    ]
+    "astropy",
+    "numpy",
+    "json",
+    "requests",
+]
+[project.optional-dependencies]
+plot = [
+    "matplotlib",
+]
+dev = [
+    "pytest",
+    "pep8",
+    "furo==2023.9.10",
+    "numpydoc",
+    "sphinx",
+    "sphinx-automodapi",
+    "sphinx-gallery",
+    "sphinxcontrib-bibtex",
+    "sphinxcontrib-napoleon",
+    "sphinxcontrib-bibtex",
+]
+[project.urls]
+Repository = "https://github.com/tedjohnson12/pypsg"
+Issues = "https://github.com/tedjohnson12/pypsg/issues"
