@@ -2,7 +2,6 @@
 Helpers for running psg locally
 """
 import docker
-import socket
 
 from . import settings
 
@@ -63,8 +62,9 @@ def is_psg_running()->bool:
     try:
         container = get_psg_container()
     except docker.errors.NotFound as e:
-        msg = 'PSG container not found. '
-        msg += 'Visit https://psg.gsfc.nasa.gov/helpapi.php#installation for installation instructions.'
+        msg = 'PSG is not installed. '
+        url = 'https://psg.gsfc.nasa.gov/helpapi.php#installation'
+        msg += f'Visit {url} for installation instructions.'
         raise PSGNotInstalledError(msg) from e
     return container.status == 'running'
 
@@ -80,7 +80,8 @@ def start_psg(strict=True):
     if not is_psg_installed():
         if strict:
             msg = 'PSG is not installed. '
-            msg += 'Visit https://psg.gsfc.nasa.gov/helpapi.php#installation for installation instructions.'
+            url = 'https://psg.gsfc.nasa.gov/helpapi.php#installation'
+            msg += f'Visit {url} for installation instructions.'
             raise PSGNotInstalledError(msg)
         else:
             return None
@@ -99,7 +100,8 @@ def stop_psg(strict=True):
     if not is_psg_installed():
         if strict:
             msg = 'PSG is not installed. '
-            msg += 'Visit https://psg.gsfc.nasa.gov/helpapi.php#installation for installation instructions.'
+            url = 'https://psg.gsfc.nasa.gov/helpapi.php#installation'
+            msg += f'Visit {url} for installation instructions.'
             raise PSGNotInstalledError(msg)
         else:
             return None
@@ -137,7 +139,3 @@ def set_url_and_run():
     else:
         url = settings.PSG_URL
     settings.save_settings(url=url)
-
-        
-        
-

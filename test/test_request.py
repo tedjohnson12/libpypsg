@@ -1,12 +1,11 @@
 """
 Test pypsg.request module.
 """
+from pathlib import Path
 import pytest
 from astropy import units as u
-from pathlib import Path
 
 from pypsg import PyConfig, APICall, PyRad, PyLyr
-from pypsg import cfg
 from pypsg import request as psgrequest
 
 
@@ -17,12 +16,16 @@ def default_cfg():
     """
     return PyConfig.from_dict({'OBJECT-NAME': 'Test'})
 
+
 @pytest.fixture
 def advanced_cfg():
     """
     A more complex configuration object. 
     """
     return PyConfig.from_file(Path(__file__).parent / 'data' / 'advanced.cfg')
+# pylint: disable=redefined-outer-name
+
+
 def test_api_init(default_cfg):
     """
     Test api intialization.
@@ -30,8 +33,9 @@ def test_api_init(default_cfg):
     api = APICall(default_cfg, 'rad', 'globes', 'testurl')
     assert api.url == 'testurl'
     assert api.app == 'globes'
-    assert api._type == 'rad'
+    assert api.type == 'rad'
     assert api.cfg.target.name.value == 'Test'
+
 
 def test_api_call_rad(default_cfg):
     """
@@ -39,9 +43,10 @@ def test_api_call_rad(default_cfg):
     """
     api = APICall(default_cfg, 'rad')
     response = api()
-    assert isinstance(response,psgrequest.PSGResponse)
+    assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.rad, PyRad)
     assert isinstance(response.rad.wl, u.Quantity)
+
 
 def test_api_call_all(default_cfg):
     """
@@ -49,9 +54,10 @@ def test_api_call_all(default_cfg):
     """
     api = APICall(default_cfg, 'all')
     response = api()
-    assert isinstance(response,psgrequest.PSGResponse)
+    assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.cfg, PyConfig)
     assert isinstance(response.rad, PyRad)
+
 
 def test_api_call_multiple(default_cfg):
     """
@@ -60,20 +66,20 @@ def test_api_call_multiple(default_cfg):
     with pytest.raises(NotImplementedError):
         _ = APICall(default_cfg, ('rad', 'cfg'))
 
+
 def test_api_call_advanced(advanced_cfg):
     """
     Test api call.
     """
     api = APICall(advanced_cfg, 'all')
     response = api()
-    assert isinstance(response,psgrequest.PSGResponse)
+    assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.rad, PyRad)
     assert isinstance(response.lyr, PyLyr)
     assert isinstance(response.noi, PyRad)
     assert isinstance(response.cfg, PyConfig)
     assert response.rad.wl.unit == u.micron
-    
-        
-        
+
+
 if __name__ == '__main__':
     pytest.main(args=[__file__])
