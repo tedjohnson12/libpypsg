@@ -30,6 +30,7 @@ dependencies = [
     "numpy",
     "requests",
     "docker",
+    "dateutil",
 ]
 [project.optional-dependencies]
 plot = [
