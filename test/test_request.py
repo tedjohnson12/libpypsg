@@ -3,8 +3,10 @@ Test pypsg.request module.
 """
 import pytest
 from astropy import units as u
+from pathlib import Path
 
 from pypsg import PyConfig, APICall, PyRad, PyLyr
+from pypsg import cfg
 from pypsg import request as psgrequest
 
 
@@ -15,6 +17,12 @@ def default_cfg():
     """
     return PyConfig.from_dict({'OBJECT-NAME': 'Test'})
 
+@pytest.fixture
+def advanced_cfg():
+    """
+    A more complex configuration object. 
+    """
+    return PyConfig.from_file(Path(__file__).parent / 'data' / 'advanced.cfg')
 def test_api_init(default_cfg):
     """
     Test api intialization.
@@ -51,6 +59,20 @@ def test_api_call_multiple(default_cfg):
     """
     with pytest.raises(NotImplementedError):
         _ = APICall(default_cfg, ('rad', 'cfg'))
+
+def test_api_call_advanced(advanced_cfg):
+    """
+    Test api call.
+    """
+    api = APICall(advanced_cfg, 'all')
+    response = api()
+    assert isinstance(response,psgrequest.PSGResponse)
+    assert isinstance(response.rad, PyRad)
+    assert isinstance(response.lyr, PyLyr)
+    assert isinstance(response.noi, PyRad)
+    assert isinstance(response.cfg, PyConfig)
+    assert response.rad.wl.unit == u.micron
+    
         
         
 if __name__ == '__main__':
