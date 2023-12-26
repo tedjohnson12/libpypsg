@@ -28,7 +28,6 @@ classifiers = [
 dependencies = [
     "astropy",
     "numpy",
-    "json",
     "requests",
     "docker",
 ]

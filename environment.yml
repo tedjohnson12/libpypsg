@@ -1,4 +1,5 @@
 name: pypsg
 dependencies:
+  - pip
   - pip:
     - .
