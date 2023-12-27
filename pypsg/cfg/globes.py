@@ -57,7 +57,7 @@ class GCM:
         bytes
             The content of the GCM.
         """
-        params_line = bytes(self.KEY, encoding=self.ENCODING)
+        params_line = bytes(f'<{self.KEY}>{self.header}\n', encoding=self.ENCODING)
         start_tag = bytes(f'<{self.BIN_KEY}>', encoding=self.ENCODING)
         end_tag = bytes(f'</{self.BIN_KEY}>', encoding=self.ENCODING)
         dat = self.dat.tobytes(order='C')

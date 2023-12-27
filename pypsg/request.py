@@ -13,11 +13,11 @@ from pypsg import settings
 from pypsg.rad import PyRad
 from pypsg.lyr import PyLyr
 
-typedict: Dict[str, Union[PyConfig, PyRad, PyLyr]] = {
-    'cfg': PyConfig,
-    'rad': PyRad,
-    'lyr': PyLyr,
-    'noi': PyRad
+typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
+    b'cfg': PyConfig,
+    b'rad': PyRad,
+    b'lyr': PyLyr,
+    b'noi': PyRad
 }
 
 
@@ -60,8 +60,8 @@ class PSGResponse:
         """
         pattern = rb'results_([\w]+).txt'
         split_text = re.split(pattern, b)
-        names = split_text[0::2]
-        content = split_text[1::2]
+        names = split_text[1::2]
+        content = split_text[2::2]
         data = {}
         for name, dat in zip(names, content):
             data[name] = dat.strip()
@@ -69,8 +69,11 @@ class PSGResponse:
         for key, value in typedict.items():
             value: PyConfig | PyRad | PyLyr
             if key in data:
-                kwargs[key] = value.from_bytes(data[key])
+                kwargs[key.decode(settings.get_setting('encoding'))] = value.from_bytes(data[key])
         return cls(**kwargs)
+    @classmethod
+    def null(cls):
+        return cls()
 
 
 class APICall:
@@ -108,7 +111,7 @@ class APICall:
         url: str = None
     ):
         self.cfg = cfg
-        self.type = output_type
+        self._type = output_type
         self.app = app
         self.url = url
         if self.url is None:
@@ -133,8 +136,14 @@ class APICall:
         if not isinstance(self.cfg, (PyConfig, BinConfig)):
             raise TypeError(
                 'apiCall.cfg must be a PyConfig or BinaryConfig object')
-        if not (isinstance(self.type, str) or self.type is None):
-            raise TypeError('apiCall.type must be a string or None')
+        if not (isinstance(self._type, str) or self._type is None):
+            if not isinstance(self._type, (list, tuple)):
+                raise TypeError('apiCall.type must be a string or None')
+            else:
+                raise NotImplementedError('Multiple types not implemented. If you know how to do this please open an issue.')
+                # for t in self._type:
+                #     if not isinstance(t, str):
+                #         raise TypeError('apiCall.type must be a string or None')
         if not (isinstance(self.app, str) or self.app is None):
             raise TypeError('apiCall.app must be a string or None')
         if not isinstance(self.url, str):
@@ -150,11 +159,22 @@ class APICall:
         bool
             True if only a single file is expected back from the PSG API.
         """
-        if isinstance(self.type, (tuple, list)):
+        if isinstance(self._type, (tuple, list)):
             return False
-        if self.type == 'all':
+        if self._type == 'all':
             return False
         return True
+    @property
+    def type(self):
+        """
+        The type of output to ask for.
+
+        :type: str
+        """
+        if isinstance(self._type,str):
+            return self._type
+        else:
+            return ','.join(self._type)
 
     def __call__(self) -> PSGResponse:
         """
@@ -173,15 +193,20 @@ class APICall:
         api_key = settings.get_setting('api_key')
         if api_key is not None:
             data['key'] = api_key
+        url = self.url
+        if '/api.php' not in url:
+            url = f'{url}/api.php'
         reply = requests.post(
-            url=self.url,
+            url=url,
             data=data,
             timeout=settings.REQUEST_TIMEOUT
         )
         if reply.status_code != 200:
             raise requests.exceptions.HTTPError(reply.content)
-        if not self.is_single_file:
+        if self._type in ['upd', 'set']:
+            return PSGResponse.null()
+        elif not self.is_single_file:
             return PSGResponse.from_bytes(reply.content)
         else:
-            returntype = typedict[self.type]
-            return PSGResponse(**{self.type:returntype.from_bytes(reply.content)})
+            returntype = typedict[self._type.encode(settings.get_setting('encoding'))]
+            return PSGResponse(**{self._type:returntype.from_bytes(reply.content)})

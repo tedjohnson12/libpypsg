@@ -39,19 +39,23 @@ We can then call PSG with our setup.
 
 
 
-Now let's take a look at the rad file we get back
+Now let's take a look at the rad file we get back.
+The ``PyRad`` class inherits from ``astropy.table.QTable``.
 
 .. code-block:: python
 
     rad = response.rad
 
-    total = rad.total
-
-    print(total.spectral_axis)
-    print(total.flux)
+    rad
 
 .. code-block:: none
 
-    [1.  1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9] um
-    [231.99203  184.89523  148.08486  119.38777   96.962337  79.349429
-      65.427132  54.343872  45.45587   38.276023] W / (sr um m2)
+    Wave/freq     Total          Object       Reflected       Thermal    
+        um    W / (sr um m2) W / (sr um m2) W / (sr um m2) W / (sr um m2)
+    float64     float64        float64        float64        float64    
+    --------- -------------- -------------- -------------- --------------
+        1.0      231.99203        231.992        231.992    1.76851e-13
+        1.1      184.89523        184.895        184.895    8.59289e-12
+        ...            ...            ...            ...            ...
+        1.8       45.45587        45.4559        45.4559    1.69172e-05
+        1.9      38.276023         38.276         38.276    5.24737e-05

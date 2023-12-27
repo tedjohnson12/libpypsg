@@ -3,8 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pypsg's documentation!
-=================================
+Welcome to ``pypsg``!
+=====================
+
+``pypsg`` is a Python wrapper for the Planetary Spectrum Generator (PSG). PSG is
+used widely by astronomers and planetary scientists to create synthetic spectra
+of exoplanets and solar system objects. The goal of this package is to make
+PSG more accessible to new users, but still be powerfull enough that expert
+users will find it useful.
 
 .. toctree::
    :maxdepth: 2

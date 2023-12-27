@@ -36,7 +36,7 @@ class Target(Model):
     inclination = QuantityField('object-inclination', u.deg)
     position_angle = QuantityField('object-position-angle', u.deg)
     star_type = CharChoicesField(
-        'object-star-type', ('O', 'B', 'A', 'F', 'G', 'K', 'M', ''), max_length=1)
+        'object-star-type', ('O', 'B', 'A', 'F', 'G', 'K', 'M', '', '-'), max_length=1)
     star_temperature = QuantityField('object-star-temperature', u.K)
     star_radius = QuantityField('object-star-radius', u.R_sun)
     star_metallicity = FloatField('object-star-metallicity')
@@ -77,6 +77,8 @@ class Geometry(Model):
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs.get('cfg')
         geometry = self.geometry.read(cfg)
+        if geometry is None:
+            return Geometry
         if geometry == 'Observatory':
             return Observatory
         elif geometry == 'Nadir':
@@ -176,6 +178,9 @@ class NoAtmosphere(Atmosphere):
 
 
 class EquilibriumAtmosphere(Atmosphere):
+    """
+    An atmosphere that is in hydrostatic equilibrium.
+    """
     pressure = CodedQuantityField(
         # pylint: disable-next=no-member
         allowed_units=(u.Pa, u.bar, u_psg.kbar, u_psg.mbar,
@@ -201,6 +206,9 @@ class EquilibriumAtmosphere(Atmosphere):
 
 
 class ComaAtmosphere(Atmosphere):
+    """
+    An atmosphere that is the result of outgassing.
+    """
     gas_production = QuantityField('atmosphere-pressure', u.Unit('s-1'))
     at_1au = BooleanField('atmosphere-punit', true='gasau', false='gas')
     expansion_velocity = QuantityField('atmosphere-weight', u.Unit('m s-1'))
@@ -225,12 +233,14 @@ class Surface(Model):
     temperature = QuantityField('surface-temperature', u.K)
     albedo = FloatField('surface-albedo')
     emissivity = FloatField('surface-emissivity')
-    
 
 
 class Generator(Model):
+    """
+    Combines the source and instrument models into spectra.
+    """
     resolution_kernel = BooleanField('generator-resolutionkernel')
-    gas_model = BooleanField('generator-gasmodel')
+    gas_model = BooleanField('generator-gas-model')
     continuum_model = BooleanField('generator-cont-model')
     continuum_stellar = BooleanField('generator-cont-stellar')
     apply_telluric_noise = BooleanField('generator-trans-show')
@@ -284,6 +294,8 @@ class Telescope(Model):
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs['cfg']
         value = self.telescope.read(cfg)
+        if value is None:
+            return Telescope
         if value == 'SINGLE':
             return SingleTelescope
         elif value == 'ARRAY':
@@ -319,6 +331,8 @@ class Noise(Model):
     def _type_to_create(self, *args, **kwargs):
         cfg = kwargs['cfg']
         value = self.noise_type.read(cfg)
+        if value is None:
+            return Noise
         if value == 'NO':
             return Noiseless
         elif value == 'TRX':
@@ -338,12 +352,25 @@ class Noise(Model):
 
 
 class SingleTelescope(Telescope):
+    """
+    A simple telescope with a single apperture.
+    
+    Handbook
+    --------
+    This mode is the classical observatory / instrument
+    optical setup, in which the etendue is defined by the
+    effective collecting area of the main mirror :math:`A_{Tele}`
+    and its corresponding solid angle :math:`\\Omega`.
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.telescope.value = 'SINGLE'
 
 
 class Interferometer(Telescope):
+    """
+    An interferometry array.
+    """
     n_telescopes = IntegerField('generator-telescope1')
 
     def __init__(self, **kwargs):
@@ -352,6 +379,9 @@ class Interferometer(Telescope):
 
 
 class Coronagraph(Telescope):
+    """
+    A coronagraph.
+    """
     contrast = FloatField('generator-telescope1')
     iwa = FloatField(
         'generator-telescope3',
@@ -366,25 +396,36 @@ class Coronagraph(Telescope):
 
 
 class AOTF(Telescope):
+    """
+    Acousto-Optical-Tunable-Filter (AOTF)
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.telescope.value = 'AOTF'
 
 
 class LIDAR(Telescope):
+    """
+    A laser source is injected into the FOV.
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.telescope.value = 'LIDAR'
 
 
 class Noiseless(Noise):
-
+    """
+    No noise. This is not the same as a `null` value.
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.noise_type.value = 'NO'
 
 
 class RecieverTemperatureNoise(Noise):
+    """
+    Receiver temperature (radio).
+    """
     temperature = QuantityField('generator-noise1', u.K)
     g_factor = FloatField('generator-noise2')
 
@@ -394,6 +435,9 @@ class RecieverTemperatureNoise(Noise):
 
 
 class ConstantNoise(Noise):
+    """
+    Constant noise model.
+    """
     sigma = FloatField('generator-noise1')
 
     def __init__(self, **kwargs):
@@ -402,6 +446,9 @@ class ConstantNoise(Noise):
 
 
 class ConstantNoiseWithBackground(Noise):
+    """
+    No additional description in handbook.
+    """
     sigma = FloatField('generator-noise1')
 
     def __init__(self, **kwargs):
@@ -410,6 +457,9 @@ class ConstantNoiseWithBackground(Noise):
 
 
 class PowerEquivalentNoise(Noise):
+    """
+    Noise Equivalent Power
+    """
     sensitivity = QuantityField('generator-noise1', u.W/u.Hz**(1/2))
 
     def __init__(self, **kwargs):
@@ -418,6 +468,9 @@ class PowerEquivalentNoise(Noise):
 
 
 class Detectability(Noise):
+    """
+    Detectivity
+    """
     sensitivity = QuantityField('generator-noise1', u.cm*u.Hz**(1/2)/u.W)
     pixel_size = QuantityField('generator-noise2', u.um)
 
@@ -427,6 +480,9 @@ class Detectability(Noise):
 
 
 class CCD(Noise):
+    """
+    Charge image sensor (e.g., CCD, CMOS, EMCCD, ICCD / MCP)
+    """
     read_noise = QuantityField(
         'generator-noise1',
         u.electron,
@@ -447,8 +503,8 @@ class CCD(Noise):
         xunit=u.um,
         yunit=None
     )
-    emissivity = FloatField('generator-noieoemis')
-    temperature = QuantityField('generator-noisetemp', u.K)
+    emissivity = FloatField('generator-noiseoemis')
+    temperature = QuantityField('generator-noiseotemp', u.K)
     pixel_depth = QuantityField('generator-noisewell', u.electron)
 
     def __init__(self, **kwargs):

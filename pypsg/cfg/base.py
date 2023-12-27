@@ -398,7 +398,7 @@ class CharChoicesField(CharField):
         if value_to_set is None:
             pass
         elif not any([value_to_set == option for option in self._options]):
-            msg = f'Value must be one of {",".join(self._options)}.'
+            msg = f'Value must be one of {",".join(self._options)}. Got {value_to_set}'
             raise ValueError(msg)
         super(CharField, CharField).value.__set__(self, value_to_set)
 
@@ -1568,13 +1568,21 @@ class AerosolsField(Field):
             If the dictionary gives conflicting information.
         """
         try:
+            def parse_empty(l:list):
+                """
+                Ensure that `''.split()` returns an empty list.
+                """
+                if len(l) == 1:
+                    if l[0] == '':
+                        return []
+                return l
             naero = int(d['ATMOSPHERE-NAERO'])
-            aeros = d['ATMOSPHERE-AEROS'].split(',')
-            types = d['ATMOSPHERE-ATYPE'].split(',')
-            abuns = d['ATMOSPHERE-AABUN'].split(',')
-            units = d['ATMOSPHERE-AUNIT'].split(',')
-            sizes = d['ATMOSPHERE-ASIZE'].split(',')
-            size_units = d['ATMOSPHERE-ASUNI'].split(',')
+            aeros = parse_empty(d['ATMOSPHERE-AEROS'].split(','))
+            types = parse_empty(d['ATMOSPHERE-ATYPE'].split(','))
+            abuns = parse_empty(d['ATMOSPHERE-AABUN'].split(','))
+            units = parse_empty(d['ATMOSPHERE-AUNIT'].split(','))
+            sizes = parse_empty(d['ATMOSPHERE-ASIZE'].split(','))
+            size_units = parse_empty(d['ATMOSPHERE-ASUNI'].split(','))
         except KeyError:
             return None
         if not len(aeros) == naero:

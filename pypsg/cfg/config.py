@@ -7,6 +7,15 @@ from pathlib import Path
 import warnings
 
 from pypsg.cfg import models, globes
+from pypsg import settings
+
+
+class ConfigTooLongWarning(UserWarning):
+    """
+    The PSG configuration is too long,
+    and may stop updating soon.
+    """
+
 
 class BinConfig:
     """
@@ -82,6 +91,9 @@ class BinConfig:
             content = content.split(b'<BINARY>')[0] + content.split(b'</BINARY>')[1]
             binary = self.binary
         content = str(content,encoding=self.encoding)
+        n_lines = len(content.split('\n'))
+        if n_lines > settings.get_setting('cfg_max_lines'):
+            warnings.warn('The config is too long.',ConfigTooLongWarning)
         cfg = {}
         for line in content.split('\n'):
             if not (line.isspace() or len(line)==0):
@@ -186,3 +198,14 @@ class PyConfig:
         if self.gcm is not None:
             lines.append(self.gcm.content)
         return b'\n'.join(lines)
+    def to_file(self,path:Path):
+        """
+        Write the config to a file.
+        
+        Parameters
+        ----------
+        path : pathlib.Path
+            The path to the file.
+        """
+        with open(path,'wb') as f:
+            f.write(self.content)
