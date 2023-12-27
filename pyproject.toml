@@ -28,8 +28,9 @@ classifiers = [
 dependencies = [
     "astropy",
     "numpy",
-    "json",
     "requests",
+    "docker",
+    "python-dateutil",
 ]
 [project.optional-dependencies]
 plot = [

@@ -11,7 +11,8 @@ import json
 REQUEST_TIMEOUT = 120
 
 PSG_URL = 'https://psg.gsfc.nasa.gov/api.php'
-INTERNAL_PSG_URL = 'http://localhost:3000/api.php'
+PSG_PORT = 3000
+INTERNAL_PSG_URL = f'http://localhost:{PSG_PORT}/api.php'
 
 USER_DATA_PATH = Path.home() / '.pypsg'
 USER_SETTINGS_PATH = USER_DATA_PATH / 'settings.json'
