@@ -14,7 +14,7 @@ def default_cfg():
     """
     Get a simple default configuration object.
     """
-    return PyConfig.from_dict({'OBJECT-NAME': 'Test'})
+    return PyConfig.from_file(Path(__file__).parent / 'data' / 'simple.cfg')
 
 
 @pytest.fixture
@@ -34,25 +34,25 @@ def test_api_init(default_cfg):
     assert api.url == 'testurl'
     assert api.app == 'globes'
     assert api.type == 'rad'
-    assert api.cfg.target.name.value == 'Test'
+    assert api.cfg.target.object.value == 'Exoplanet'
 
 
-def test_api_call_rad(default_cfg):
+def test_api_call_rad(default_cfg,psg_url):
     """
     Test api call.
     """
-    api = APICall(default_cfg, 'rad')
+    api = APICall(default_cfg, 'rad',url=psg_url)
     response = api()
     assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.rad, PyRad)
     assert isinstance(response.rad.wl, u.Quantity)
 
 
-def test_api_call_all(default_cfg):
+def test_api_call_all(default_cfg, psg_url):
     """
     Test api call.
     """
-    api = APICall(default_cfg, 'all')
+    api = APICall(default_cfg, 'all',url=psg_url)
     response = api()
     assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.cfg, PyConfig)
@@ -82,4 +82,4 @@ def test_api_call_advanced(advanced_cfg):
 
 
 if __name__ == '__main__':
-    pytest.main(args=[__file__])
+    pytest.main(args=[__file__,'--external'])
