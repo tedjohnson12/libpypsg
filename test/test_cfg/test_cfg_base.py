@@ -419,5 +419,5 @@ def test_model():
 
 
 if __name__ in '__main__':
-    test_model()
+    pytest.main(args=[__file__])
     
