@@ -33,7 +33,4 @@ response = psg()
 # --------------------
 rad = response.rad
 
-total = rad.total
-
-print(total.spectral_axis)
-print(total.flux)
+print(rad)

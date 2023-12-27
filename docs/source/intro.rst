@@ -10,12 +10,12 @@ To install using pip:
 
 .. code-block:: shell
 
-    pip install git+https://github.com/tedjohnson12/pypsg@main
+    pip install pypsg
 
 or in development mode:
 
 .. code-block:: shell
 
     git clone https://github.com/tedjohnson12/pypsg.git
-    cd VSPEC
-    pip install -e .
+    cd pypsg
+    pip install -e .[dev]
