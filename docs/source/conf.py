@@ -9,7 +9,7 @@
 project = 'pypsg'
 copyright = '2023, Ted Johnson, The PSG Team'
 author = 'Ted Johnson, The PSG Team'
-release = '0.1.0'
+release = '0.1.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
