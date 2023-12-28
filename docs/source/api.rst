@@ -14,3 +14,4 @@ The main submodules are:
     modules/lyr
     modules/rad
     modules/settings
+    modules/docker
