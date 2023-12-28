@@ -10,3 +10,4 @@ from pypsg.rad import PyRad
 from pypsg.lyr import PyLyr
 from pypsg import settings
 from pypsg import units
+from . import docker
