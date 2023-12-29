@@ -2,7 +2,7 @@
 PyPSG top-level module
 ======================
 """
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 from pypsg.request import APICall
 from pypsg import cfg
 from pypsg.cfg import PyConfig
