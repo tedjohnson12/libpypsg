@@ -25,14 +25,23 @@ def is_psg_installed()->bool:
     This function also checks the name of the image. This is important
     because the name is used to start/stop the container. The expected
     name is `psg`.
+    
+    Warning
+    -------
+    Prior to `v0.1.2`, this function would throw an error if the
+    docker engine was not installed. Since `v0.1.2`, this function
+    returns `False` if the docker engine is not installed.
     """
-    installed_containers = docker.from_env().containers.list(all=True)
-    for container in installed_containers:
-        image = container.image
-        if PSG_LATEST in image.attrs['RepoTags']:
-            if container.name == PSG_CONTAINER_NAME:
-                return True
-    return False
+    try:
+        installed_containers = docker.from_env().containers.list(all=True)
+        for container in installed_containers:
+            image = container.image
+            if PSG_LATEST in image.attrs['RepoTags']:
+                if container.name == PSG_CONTAINER_NAME:
+                    return True
+        return False
+    except docker.errors.DockerException:
+        return False
 
 def get_psg_container()->docker.models.containers.Container:
     """
