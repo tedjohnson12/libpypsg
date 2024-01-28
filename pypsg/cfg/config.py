@@ -96,8 +96,11 @@ class BinConfig:
             warnings.warn('The config is too long.',ConfigTooLongWarning)
         cfg = {}
         for line in content.split('\n'):
-            if not (line.isspace() or len(line)==0):
-                end_of_kwd = line.index('>')+1
+            if not (line.isspace() or len(line)==0 or line[0]=='#'):
+                try:
+                    end_of_kwd = line.index('>')+1
+                except ValueError as err:
+                    raise ValueError(f'Invalid config line: {line}') from err
                 kwd = line[:end_of_kwd].replace('<','').replace('>','')
                 val = line[end_of_kwd:]
                 cfg[kwd] = val

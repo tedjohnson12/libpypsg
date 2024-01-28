@@ -7,9 +7,11 @@ Direct access to the PSG API
 from typing import Union, Dict
 import re
 import requests
+import warnings
 
 from pypsg.cfg import PyConfig, BinConfig
 from pypsg import settings
+from pypsg import exceptions
 from pypsg.rad import PyRad
 from pypsg.lyr import PyLyr
 
@@ -20,6 +22,37 @@ typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
     b'noi': PyRad
 }
 
+def parse_exceptions(content:bytes):
+    
+    content = re.sub(b'<BINARY>.*</BINARY>',b'',content)
+    content = str(content,encoding=settings.get_setting('encoding'))
+    
+    exception_dict = {
+        'GlobES': exceptions.GlobESError,
+        'PUMAS': exceptions.PUMASError
+    }
+    warning_dict = {
+        'Generator': exceptions.GeneratorWarning,
+        'PUMAS': exceptions.PUMASWarning
+    }
+    
+    matchs = re.findall(r'WARNING \| ([\w]+) \| (.*)', content)
+    psg_warnings = [
+        warning_dict.get(match[0], exceptions.UnknownPSGWarning)(match[1]) for match in matchs
+    ]
+    for warning in psg_warnings:
+        warnings.warn(warning)
+    
+    
+    matchs = re.findall(r'ERROR \| ([\w]+) \| (.*)', content)
+    if len(matchs) == 0:
+        return None
+    errors = [
+        exception_dict.get(match[0], exceptions.UnknownPSGError)(match[1]) for match in matchs
+    ]
+    if len(errors) == 1:
+        raise errors[0]
+    raise exceptions.PSGMultiError(errors)
 
 class PSGResponse:
     """
@@ -171,10 +204,17 @@ class APICall:
 
         :type: str
         """
-        if isinstance(self._type,str):
-            return self._type
-        else:
-            return ','.join(self._type)
+        match self._type:
+            case None:
+                return None
+            case str():
+                return self._type
+            case _:
+                try:
+                    return ','.join(self._type)
+                except TypeError as err:
+                    msg = f'APICall output type must be None, a string or a list of strings. Got {self._type}.'
+                    raise TypeError(msg) from err
 
     def __call__(self) -> PSGResponse:
         """
@@ -203,10 +243,13 @@ class APICall:
         )
         if reply.status_code != 200:
             raise requests.exceptions.HTTPError(reply.content)
+        parse_exceptions(reply.content)
         if self._type in ['upd', 'set']:
             return PSGResponse.null()
         elif not self.is_single_file:
             return PSGResponse.from_bytes(reply.content)
+        elif self._type is None:
+            return PSGResponse(rad=PyRad.from_bytes(reply.content))
         else:
             returntype = typedict[self._type.encode(settings.get_setting('encoding'))]
             return PSGResponse(**{self._type:returntype.from_bytes(reply.content)})

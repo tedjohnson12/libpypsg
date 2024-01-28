@@ -301,7 +301,7 @@ def test_MoleculeField():
 def test_AerosolField():
     aeros = (
         Aerosol('Water','water_dat',1.0,1.0),
-        Aerosol('WaterIce','waterice_dat',10*u_psg.ppmv,3*u.LogUnit(u.um))
+        Aerosol('WaterIce','waterice_dat',10*u_psg.ppm,3*u.LogUnit(u.um))
     )
     a = AerosolsField()
     a.value = aeros
