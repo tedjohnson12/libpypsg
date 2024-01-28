@@ -375,6 +375,7 @@ def test_BooleanField():
     b.value = True
     assert b.content == b'<BOOLEAN>Y'
     b = BooleanField('boolean',true='yes',false='no')
+    assert b.read({'BOOLEAN':'yes'}) is True
     b.value = False
     assert b.content == b'<BOOLEAN>no'
     b = BooleanField('boolean',true=['y','yes'],false='no')
