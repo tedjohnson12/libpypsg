@@ -375,8 +375,29 @@ def test_BooleanField():
     b.value = True
     assert b.content == b'<BOOLEAN>Y'
     b = BooleanField('boolean',true='yes',false='no')
+    assert b.read({'BOOLEAN':'yes'}) is True
     b.value = False
     assert b.content == b'<BOOLEAN>no'
+    b = BooleanField('boolean',true=['y','yes'],false='no')
+    assert b.read({}) is None
+    assert b.read({'BOOLEAN':'yes'}) is True
+    assert b.read({'BOOLEAN':'no'}) is False
+    assert b.read({'BOOLEAN':'y'}) is True
+    with pytest.raises(ValueError):
+        b.read({'BOOLEAN':'n'})
+    
+    b = BooleanField('boolean',true=['y','yes'],false=['n','no'])
+    assert b.read({}) is None
+    assert b.read({'BOOLEAN':'yes'}) is True
+    assert b.read({'BOOLEAN':'no'}) is False
+    assert b.read({'BOOLEAN':'y'}) is True
+    assert b.read({'BOOLEAN':'n'}) is False
+    with pytest.raises(ValueError):
+        b.read({'BOOLEAN':'b'})
+    b.value = True
+    assert b.content == b'<BOOLEAN>y'
+    b.value = False
+    assert b.content == b'<BOOLEAN>n'
 
     
 def test_model():
