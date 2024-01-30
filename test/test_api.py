@@ -5,7 +5,7 @@ import pytest
 import requests
 from pathlib import Path
 
-from pypsg.cfg import PyConfig, BinConfig
+from pypsg.cfg import PyConfig, BinConfig, models
 from pypsg import settings
 from pypsg.exceptions import GlobESError, PSGMultiError
 from pypsg.settings import INTERNAL_PSG_URL, PSG_URL
@@ -158,7 +158,71 @@ def test_apicall(keep_psg_settings):
                             except Exception as e:
                                 msg = f'Failed for\npsg_running={psg_running}\ncfg={cfg}\noutput_type={output_type}\napp={app}\nurl={url}\nurl_setting={url_setting}\nn_tested={n_tested}'
                                 raise Exception(msg) from e
+                            
 
+class TestPyConfig:
+    """
+    Test user interaction with the PyConfig class
+    """
+    
+    def test_init(self):
+        """
+        Test the initialization of the PyConfig class
+        
+        Parameters
+        ----------
+        target : models.Target
+            Target object
+        geometry : models.Geometry
+            Geometry object
+        atmosphere : models.Atmosphere
+            Atmosphere object
+        surface : models.Surface
+            Surface object
+        generator : models.Generator
+            Generator object
+        telescope : models.Telescope
+            Telescope object
+        noise : models.Noise
+            Noise object
+        gcm : globes.GCM
+            GCM object
+        
+        Expectations
+        ------------
+        Each argument will either be kept as is or (in the case where None is passed),
+        replaced with the default (empty) version of the Model.
+        
+        The exception is for `gcm`, which is kept as is always.
+        """
+        # Case where everything is None
+        cfg = PyConfig()
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.content == b'', f'Target content is {cfg.target.content}'
+        assert isinstance(cfg.geometry, models.Geometry), f'Geometry is {type(cfg.geometry)}'
+        assert cfg.geometry.content == b'', f'Geometry content is {cfg.geometry.content}'
+        assert isinstance(cfg.atmosphere, models.Atmosphere), f'Atmosphere is {type(cfg.atmosphere)}'
+        assert cfg.atmosphere.content == b'', f'Atmosphere content is {cfg.atmosphere.content}'
+        assert isinstance(cfg.surface, models.Surface), f'Surface is {type(cfg.surface)}'
+        assert cfg.surface.content == b'', f'Surface content is {cfg.surface.content}'
+        assert isinstance(cfg.generator, models.Generator), f'Generator is {type(cfg.generator)}'
+        assert cfg.generator.content == b'', f'Generator content is {cfg.generator.content}'
+        assert isinstance(cfg.telescope, models.Telescope), f'Telescope is {type(cfg.telescope)}'
+        assert cfg.telescope.content == b'', f'Telescope content is {cfg.telescope.content}'
+        assert isinstance(cfg.noise, models.Noise), f'Noise is {type(cfg.noise)}'
+        assert cfg.noise.content == b'', f'Noise content is {cfg.noise.content}'
+        assert cfg.gcm is None, f'GCM is {type(cfg.gcm)}'
+        
+        # Case with Target
+        cfg = PyConfig(target=models.Target(object='Exoplanet',name='earth',))
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.object.value == 'Exoplanet'
+        assert cfg.target.name.value == 'earth'
+        assert cfg.target.date.value is None
+        
+        # Case with Geometry
+        # TODO: Add more tests
+        
 
 if __name__ in '__main__':
     pytest.main(args=[__file__])

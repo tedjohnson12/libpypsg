@@ -1,6 +1,7 @@
 """
 A module to store PSG config models.
 """
+from typing import Union
 from astropy import units as u
 from astropy.units import cds
 from astropy.units import imperial
@@ -45,7 +46,53 @@ class Target(Model):
     obs_velocity = QuantityField('object-obs-velocity', u.Unit('km s-1'))
     period = QuantityField('object-period', u.day)
     orbit = CharField('object-orbit', max_length=100)
-
+    def __init__(
+        self,
+        object: str=None,
+        name: str=None,
+        date: str=None,
+        diameter: u.Quantity['length']=None,
+        gravity: Union[u.Quantity['acceleration'],u.Quantity['mass density'],u.Quantity['mass']]=None,
+        star_distance: u.Quantity['length']=None,
+        star_velocity: u.Quantity['velocity']=None,
+        solar_longitude: u.Quantity['angle']=None,
+        solar_latitude: u.Quantity['angle']=None,
+        season: u.Quantity['angle']=None,
+        inclination: u.Quantity['angle']=None,
+        position_angle: u.Quantity['angle']=None,
+        star_type: str=None,
+        star_temperature: u.Quantity['temperature']=None,
+        star_radius: u.Quantity['length']=None,
+        star_metallicity: float=None,
+        obs_longitude: u.Quantity['angle']=None,
+        obs_latitude: u.Quantity['angle']=None,
+        obs_velocity: u.Quantity['velocity']=None,
+        period: u.Quantity['time']=None,
+        orbit: str=None
+    ):
+        super().__init__(
+            object=object,
+            name=name,
+            date=date,
+            diameter=diameter,
+            gravity=gravity,
+            star_distance=star_distance,
+            star_velocity=star_velocity,
+            solar_longitude=solar_longitude,
+            solar_latitude=solar_latitude,
+            season=season,
+            inclination=inclination,
+            position_angle=position_angle,
+            star_type=star_type,
+            star_temperature=star_temperature,
+            star_radius=star_radius,
+            star_metallicity=star_metallicity,
+            obs_longitude=obs_longitude,
+            obs_latitude=obs_latitude,
+            obs_velocity=obs_velocity,
+            period=period,
+            orbit=orbit
+    )
 
 class Geometry(Model):
     """
