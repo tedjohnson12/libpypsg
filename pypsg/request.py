@@ -215,6 +215,47 @@ class APICall:
                 except TypeError as err:
                     msg = f'APICall output type must be None, a string or a list of strings. Got {self._type}.'
                     raise TypeError(msg) from err
+    @staticmethod
+    def call(
+        cfg: Union[BinConfig, PyConfig],
+        output_type: str | None,
+        app: str | None,
+        api_key: str | None,
+        url: str,
+        timeout: float = 30
+    )->requests.Response:
+        """
+        Call the PSG API and return the raw response.
+
+        Parameters
+        ----------
+        cfg : Config
+            The PSG configuration.
+        output_type : str or None
+            The type of output to ask for.
+        app : str or None
+            The app to use.
+        url : str
+            The URL to send the request to.
+
+        Returns
+        -------
+        requests.Response
+            The reply from PSG.
+        """
+        data = dict(file=cfg.content)
+        if output_type is not None:
+            data['type'] = output_type
+        if app is not None:
+            data['app'] = app
+        if api_key is not None:
+            data['key'] = api_key
+        reply: requests.Response = requests.post(
+            url=url,
+            data=data,
+            timeout=timeout
+        )
+        return reply
 
     def __call__(self) -> PSGResponse:
         """
@@ -225,24 +266,23 @@ class APICall:
         bytes
             The reply from PSG.
         """
-        data = dict(file=self.cfg.content)
-        if self.type is not None:
-            data['type'] = self.type
-        if self.app is not None:
-            data['app'] = self.app
         api_key = settings.get_setting('api_key')
-        if api_key is not None:
-            data['key'] = api_key
         url = self.url
         if '/api.php' not in url:
             url = f'{url}/api.php'
-        reply = requests.post(
+        
+        reply = self.call(
+            cfg=self.cfg,
+            output_type=self.type,
+            app=self.app,
+            api_key=api_key,
             url=url,
-            data=data,
-            timeout=settings.REQUEST_TIMEOUT
+            timeout=settings.get_setting('timeout')
         )
-        if reply.status_code != 200:
-            raise requests.exceptions.HTTPError(reply.content)
+        try:
+            reply.raise_for_status()
+        except requests.HTTPError as err:
+            raise exceptions.PSGConnectionError(reply.content) from err
         parse_exceptions(reply.content)
         if self._type in ['upd', 'set']:
             return PSGResponse.null()

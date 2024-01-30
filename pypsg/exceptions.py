@@ -22,6 +22,11 @@ class UnknownPSGError(PSGError):
     Unknown PSG Error. If encountered in production submit an issue.
     """
 
+class PSGConnectionError(PSGError):
+    """
+    PSG Connection Error
+    """
+
 class PSGMultiError(PSGError):
     """
     Multiple PSG Errors.
