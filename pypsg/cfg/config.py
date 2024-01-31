@@ -1,7 +1,7 @@
 """
 Methods to parse config files.
 """
-from typing import Union, Type
+from typing import Union, Dict, Any
 from pathlib import Path
 
 import warnings
@@ -111,6 +111,25 @@ class BinConfig:
 class PyConfig:
     """
     A configuration in the form of a python object.
+    
+    Parameters
+    ----------
+    target : models.Target, optional
+        Target model, by default None
+    geometry : models.Geometry, optional
+        Geometry model, by default None
+    atmosphere : models.Atmosphere, optional
+        Atmosphere model, by default None
+    surface : models.Surface, optional
+        Surface model, by default None
+    generator : models.Generator, optional
+        Generator model, by default None
+    telescope : models.Telescope, optional
+        Telescope model, by default None
+    noise : models.Noise, optional
+        Noise model, by default None
+    gcm : globes.GCM, optional
+        GCM model, by default None
     """
     def __init__(
         self,
@@ -163,7 +182,28 @@ class PyConfig:
         self.gcm:globes.GCM | None = gcm
         
     @classmethod
-    def from_dict(cls,d:dict):
+    def from_dict(cls,d:Dict[str,Any]):
+        """
+        Construct a PyConfig from a dictionary.
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary representation of a PSG config file,
+            in the format `{'OBJECT-NAME':'Earth'}`. Note that the
+            keys must all be captial letters.
+        
+        Notes
+        -----
+        * Missing keys, provided they are all uppercase, are ignored.
+        * Some fields require more than one key. In the case that only one
+          is provided, it will be ignored.
+        * The actual parsing of the dictionary is done by each field.
+        """
+        for key in d:
+            if not key.isupper():
+                raise ValueError(f'Invalid config key: {key}')
+        
         return cls(
             target=models.Target.from_cfg(d),
             geometry=models.Geometry.from_cfg(d),
@@ -176,15 +216,42 @@ class PyConfig:
         )
     @classmethod
     def from_binaryconfig(cls,config:BinConfig):
+        """
+        Construct a PyConfig from a BinConfig object.
+        
+        Parameters
+        ----------
+        config : BinConfig
+            A BinConfig object.
+        """
         return cls.from_dict(config.dict)
     @classmethod
     def from_bytes(cls,config:bytes):
+        """
+        Construct a PyConfig from bytes.
+        
+        Parameters
+        ----------
+        config : bytes
+            The bytes representation of a config file.
+        """
         return cls.from_binaryconfig(BinConfig(config))
     @classmethod
-    def from_file(cls,path:Path):
+    def from_file(cls,path:Path | str):
+        """
+        Construct a PyConfig from a file.
+        
+        Parameters
+        ----------
+        path : pathlib.Path | str
+            The path to the file.
+        """
         return cls.from_binaryconfig(BinConfig.from_file(path))
     @property
     def content(self)->bytes:
+        """
+        Get the config content as a bytes string.
+        """
         lines = []
         for model in [
             self.target,
@@ -195,19 +262,20 @@ class PyConfig:
             self.telescope,
             self.noise
         ]:
+            model:models.Model
             c = model.content
             if c != b'':
                 lines.append(c)
         if self.gcm is not None:
             lines.append(self.gcm.content)
         return b'\n'.join(lines)
-    def to_file(self,path:Path):
+    def to_file(self,path:Path | str):
         """
         Write the config to a file.
         
         Parameters
         ----------
-        path : pathlib.Path
+        path : pathlib.Path | str
             The path to the file.
         """
         with open(path,'wb') as f:

@@ -32,7 +32,7 @@ def parse_exceptions(content:bytes):
         'PUMAS': exceptions.PUMASError
     }
     warning_dict = {
-        'Generator': exceptions.GeneratorWarning,
+        'GENERATOR': exceptions.GeneratorWarning,
         'PUMAS': exceptions.PUMASWarning
     }
     

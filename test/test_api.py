@@ -1,11 +1,12 @@
 """
 Test the user interface
 """
+from pathlib import Path
 import pytest
 import requests
-from pathlib import Path
+from astropy import units as u
 
-from pypsg.cfg import PyConfig, BinConfig, models
+from pypsg.cfg import PyConfig, BinConfig, models, globes
 from pypsg import settings
 from pypsg.exceptions import GlobESError, PSGMultiError
 from pypsg.settings import INTERNAL_PSG_URL, PSG_URL
@@ -16,11 +17,24 @@ TR1e_PATH = Path(__file__).parent / 'test_cfg' / 'data' / 'TR1e_mirecle.cfg'
 
 @pytest.fixture
 def keep_psg_settings():
+    """
+    Make sure my PSG settings don't change after running tests.
+    Otherwise I could not test different settings.
+    """
     orginal_url = settings.get_setting('url')
     yield None
     settings.save_settings(url=orginal_url)
+    
+@pytest.fixture
+def temp_file():
+    """
+    Get a temporary file name and make sure it gets deleted.
+    """
+    file_path = Path(__file__).parent / 'temp.txt'
+    yield file_path
+    file_path.unlink(missing_ok=True)
 
-
+@pytest.mark.slow
 def test_apicall(keep_psg_settings):
     """
     Test user interaction with the APICall class
@@ -221,7 +235,173 @@ class TestPyConfig:
         assert cfg.target.date.value is None
         
         # Case with Geometry
-        # TODO: Add more tests
+        cfg = PyConfig(geometry=models.Observatory(stellar_type='M'))
+        assert isinstance(cfg.geometry, models.Geometry), f'Geometry is {type(cfg.geometry)}'
+        assert cfg.geometry.stellar_type.value == 'M'
+        assert cfg.geometry.geometry.value == 'Observatory'
+        assert cfg.geometry.ref.value is None
+        
+        # Case with Atmosphere
+        cfg = PyConfig(atmosphere=models.EquilibriumAtmosphere(pressure=1*u.bar))
+        assert isinstance(cfg.atmosphere, models.Atmosphere), f'Atmosphere is {type(cfg.atmosphere)}'
+        assert cfg.atmosphere.structure.value == 'Equilibrium'
+        assert cfg.atmosphere.pressure.value == 1*u.bar
+        assert cfg.atmosphere.temperature.value is None
+        
+        # Case with Surface
+        cfg = PyConfig(surface=models.Surface(temperature=100*u.K))
+        assert isinstance(cfg.surface, models.Surface), f'Surface is {type(cfg.surface)}'
+        assert cfg.surface.temperature.value == 100*u.K
+        assert cfg.surface.albedo.value is None
+        assert cfg.surface.emissivity.value is None
+        
+        # Case with Generator
+        cfg = PyConfig(generator=models.Generator(gas_model=True))
+        assert isinstance(cfg.generator, models.Generator), f'Generator is {type(cfg.generator)}'
+        assert cfg.generator.gas_model.value is True
+        assert cfg.generator.continuum_model.value is None
+        
+        # Case with Telescope
+        cfg = PyConfig(telescope=models.SingleTelescope(apperture=10*u.m))
+        assert isinstance(cfg.telescope, models.Telescope), f'Telescope is {type(cfg.telescope)}'
+        assert cfg.telescope.telescope.value == 'SINGLE'
+        assert cfg.telescope.apperture.value == 10*u.m
+        assert cfg.telescope.zodi.value is None
+        
+        # Case with Noise
+        cfg = PyConfig(noise=models.CCD(temperature=35*u.K))
+        assert isinstance(cfg.noise, models.Noise), f'Noise is {type(cfg.noise)}'
+        assert cfg.noise.noise_type.value == 'CCD'
+        assert cfg.noise.temperature.value == 35*u.K
+        assert cfg.noise.read_noise.value is None
+        
+        # Case with GCM
+        cfg = PyConfig(gcm=globes.GCM('header',[1,2,3]))
+        assert isinstance(cfg.gcm, globes.GCM), f'GCM is {type(cfg.gcm)}'
+    
+    def test_from_dict(self):
+        """
+        Test initalization from a dictionary.
+        
+        Parameters
+        ----------
+        d : dict
+            A dictionary representation of a PSG config file.
+            Under the hood, the actual dictionary is parsed
+            by each field individually, but the user does not
+            know or care about that.
+        
+        Considerations
+        --------------
+        * The dictionary has a single level of nesting.
+        * Additional keys are ignored.
+        * The dictionary is not validated.
+        * Some fields use more than one key.
+        * Any key that is lowercase will raise an error.
+        """
+        
+        # Nominal case
+        d = {'OBJECT-NAME': 'Earth', 'GEOMETRY': 'Observatory', 'GEOMETRY-OBS-ALTITUDE': 1.3, 'GEOMETRY-ALTITUDE-UNIT': 'pc'}
+        cfg = PyConfig.from_dict(d)
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.name.value == 'Earth'
+        assert isinstance(cfg.geometry, models.Geometry), f'Geometry is {type(cfg.geometry)}'
+        assert cfg.geometry.geometry.value == 'Observatory'
+        assert cfg.geometry.observer_altitude.value == 1.3*u.pc
+        
+        # Extra key
+        d = {'OBJECT-NAME': 'Earth', 'EXTRA': 'foo'}
+        cfg = PyConfig.from_dict(d)
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.name.value == 'Earth'
+        
+        # Missing key
+        d = {'OBJECT-NAME': 'Earth', 'GEOMETRY': 'Observatory', 'GEOMETRY-OBS-ALTITUDE': 1.3}
+        cfg = PyConfig.from_dict(d)
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.name.value == 'Earth'
+        assert isinstance(cfg.geometry, models.Geometry), f'Geometry is {type(cfg.geometry)}'
+        assert cfg.geometry.geometry.value == 'Observatory'
+        assert cfg.geometry.observer_altitude.value is None
+        
+        # Lowercase key
+        d = {'object-name': 'Earth'}
+        with pytest.raises(ValueError):
+            _ = PyConfig.from_dict(d)
+    
+    def test_from_binaryconfig(self):
+        """
+        Test initalization from a binary config object.
+        
+        Parameters
+        ----------
+        bcfg : BinConfig
+            A binary config object.
+        """
+        b = b'<OBJECT-NAME>Earth'
+        cfg = PyConfig.from_binaryconfig(BinConfig(b))
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.name.value == 'Earth'
+    
+    def test_from_bytes(self):
+        """
+        Test initalization from a bytes object.
+        
+        Parameters
+        ----------
+        b : bytes
+            A bytes object.
+        
+        Considerations
+        --------------
+        * The bytes object is not validated.
+        * The bytes object is first read as a BinConfig, so it should
+          be responsible for handling any errors.
+        """
+        b = b'<OBJECT-NAME>Earth'
+        cfg = PyConfig.from_bytes(b)
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.name.value == 'Earth'
+    
+    def test_from_file(self):
+        """
+        Test initalization from a file path.
+        
+        Parameters
+        ----------
+        path : Path | str
+            A file path.
+        """
+        # pathlib.Path
+        path = Path(__file__).parent / 'test_cfg' / 'data' / 'object_gj1214b.cfg'
+        cfg = PyConfig.from_file(path)
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.name.value == 'GJ 1214b'
+        
+        # str
+        path = str(Path(__file__).parent / 'test_cfg' / 'data' / 'object_gj1214b.cfg')
+        cfg = PyConfig.from_file(path)
+        assert isinstance(cfg.target, models.Target), f'Target is {type(cfg.target)}'
+        assert cfg.target.name.value == 'GJ 1214b'
+    
+    def test_content(self):
+        """
+        Test the `content` property.
+        """
+        
+        cfg = PyConfig(target=models.Target(name='Earth'))
+        assert cfg.content == b'<OBJECT-NAME>Earth'
+        
+    def test_tofile(self, temp_file:Path):
+        """
+        Test writing the config to a file.
+        """
+        
+        cfg = PyConfig(target=models.Target(name='Earth'))
+        cfg.to_file(temp_file)
+        assert temp_file.read_text() == '<OBJECT-NAME>Earth'
+        
+        
         
 
 if __name__ in '__main__':
