@@ -1139,7 +1139,7 @@ class Molecule:
         PSG also allows the `m-3`, `molec`, `s-1`, and `tau` unit types.
         These should be implemented eventually.
     """
-    _allowed_units = (u.pct, u_psg.ppmv, u_psg.ppbv, u_psg.pptv,
+    _allowed_units = (u.pct, u_psg.ppm, u_psg.ppb, u_psg.ppt,
                       u.Unit('m-2'), u.dimensionless_unscaled)
     _unit_codes = ('%', 'ppmv', 'ppbv', 'pptv', 'm2', 'scl')
     _fmt = '.2e'

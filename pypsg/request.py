@@ -7,9 +7,11 @@ Direct access to the PSG API
 from typing import Union, Dict
 import re
 import requests
+import warnings
 
 from pypsg.cfg import PyConfig, BinConfig
 from pypsg import settings
+from pypsg import exceptions
 from pypsg.rad import PyRad
 from pypsg.lyr import PyLyr
 
@@ -20,6 +22,37 @@ typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
     b'noi': PyRad
 }
 
+def parse_exceptions(content:bytes):
+    
+    content = re.sub(b'<BINARY>.*</BINARY>',b'',content)
+    content = str(content,encoding=settings.get_setting('encoding'))
+    
+    exception_dict = {
+        'GlobES': exceptions.GlobESError,
+        'PUMAS': exceptions.PUMASError
+    }
+    warning_dict = {
+        'GENERATOR': exceptions.GeneratorWarning,
+        'PUMAS': exceptions.PUMASWarning
+    }
+    
+    matchs = re.findall(r'WARNING \| ([\w]+) \| (.*)', content)
+    psg_warnings = [
+        warning_dict.get(match[0], exceptions.UnknownPSGWarning)(match[1]) for match in matchs
+    ]
+    for warning in psg_warnings:
+        warnings.warn(warning)
+    
+    
+    matchs = re.findall(r'ERROR \| ([\w]+) \| (.*)', content)
+    if len(matchs) == 0:
+        return None
+    errors = [
+        exception_dict.get(match[0], exceptions.UnknownPSGError)(match[1]) for match in matchs
+    ]
+    if len(errors) == 1:
+        raise errors[0]
+    raise exceptions.PSGMultiError(errors)
 
 class PSGResponse:
     """
@@ -171,10 +204,58 @@ class APICall:
 
         :type: str
         """
-        if isinstance(self._type,str):
-            return self._type
-        else:
-            return ','.join(self._type)
+        match self._type:
+            case None:
+                return None
+            case str():
+                return self._type
+            case _:
+                try:
+                    return ','.join(self._type)
+                except TypeError as err:
+                    msg = f'APICall output type must be None, a string or a list of strings. Got {self._type}.'
+                    raise TypeError(msg) from err
+    @staticmethod
+    def call(
+        cfg: Union[BinConfig, PyConfig],
+        output_type: str | None,
+        app: str | None,
+        api_key: str | None,
+        url: str,
+        timeout: float = 30
+    )->requests.Response:
+        """
+        Call the PSG API and return the raw response.
+
+        Parameters
+        ----------
+        cfg : Config
+            The PSG configuration.
+        output_type : str or None
+            The type of output to ask for.
+        app : str or None
+            The app to use.
+        url : str
+            The URL to send the request to.
+
+        Returns
+        -------
+        requests.Response
+            The reply from PSG.
+        """
+        data = dict(file=cfg.content)
+        if output_type is not None:
+            data['type'] = output_type
+        if app is not None:
+            data['app'] = app
+        if api_key is not None:
+            data['key'] = api_key
+        reply: requests.Response = requests.post(
+            url=url,
+            data=data,
+            timeout=timeout
+        )
+        return reply
 
     def __call__(self) -> PSGResponse:
         """
@@ -185,28 +266,30 @@ class APICall:
         bytes
             The reply from PSG.
         """
-        data = dict(file=self.cfg.content)
-        if self.type is not None:
-            data['type'] = self.type
-        if self.app is not None:
-            data['app'] = self.app
         api_key = settings.get_setting('api_key')
-        if api_key is not None:
-            data['key'] = api_key
         url = self.url
         if '/api.php' not in url:
             url = f'{url}/api.php'
-        reply = requests.post(
+        
+        reply = self.call(
+            cfg=self.cfg,
+            output_type=self.type,
+            app=self.app,
+            api_key=api_key,
             url=url,
-            data=data,
-            timeout=settings.REQUEST_TIMEOUT
+            timeout=settings.get_setting('timeout')
         )
-        if reply.status_code != 200:
-            raise requests.exceptions.HTTPError(reply.content)
+        try:
+            reply.raise_for_status()
+        except requests.HTTPError as err:
+            raise exceptions.PSGConnectionError(reply.content) from err
+        parse_exceptions(reply.content)
         if self._type in ['upd', 'set']:
             return PSGResponse.null()
         elif not self.is_single_file:
             return PSGResponse.from_bytes(reply.content)
+        elif self._type is None:
+            return PSGResponse(rad=PyRad.from_bytes(reply.content))
         else:
             returntype = typedict[self._type.encode(settings.get_setting('encoding'))]
             return PSGResponse(**{self._type:returntype.from_bytes(reply.content)})
