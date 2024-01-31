@@ -46,29 +46,30 @@ class Target(Model):
     obs_velocity = QuantityField('object-obs-velocity', u.Unit('km s-1'))
     period = QuantityField('object-period', u.day)
     orbit = CharField('object-orbit', max_length=100)
+
     def __init__(
         self,
-        object: str=None,
-        name: str=None,
-        date: str=None,
-        diameter: u.Quantity['length']=None,
-        gravity: Union[u.Quantity['acceleration'],u.Quantity['mass density'],u.Quantity['mass']]=None,
-        star_distance: u.Quantity['length']=None,
-        star_velocity: u.Quantity['velocity']=None,
-        solar_longitude: u.Quantity['angle']=None,
-        solar_latitude: u.Quantity['angle']=None,
-        season: u.Quantity['angle']=None,
-        inclination: u.Quantity['angle']=None,
-        position_angle: u.Quantity['angle']=None,
-        star_type: str=None,
-        star_temperature: u.Quantity['temperature']=None,
-        star_radius: u.Quantity['length']=None,
-        star_metallicity: float=None,
-        obs_longitude: u.Quantity['angle']=None,
-        obs_latitude: u.Quantity['angle']=None,
-        obs_velocity: u.Quantity['velocity']=None,
-        period: u.Quantity['time']=None,
-        orbit: str=None
+        object: str = None,
+        name: str = None,
+        date: str = None,
+        diameter: u.Quantity = None,
+        gravity: u.Quantity = None,
+        star_distance: u.Quantity = None,
+        star_velocity: u.Quantity = None,
+        solar_longitude: u.Quantity = None,
+        solar_latitude: u.Quantity = None,
+        season: u.Quantity = None,
+        inclination: u.Quantity = None,
+        position_angle: u.Quantity = None,
+        star_type: str = None,
+        star_temperature: u.Quantity = None,
+        star_radius: u.Quantity = None,
+        star_metallicity: float = None,
+        obs_longitude: u.Quantity = None,
+        obs_latitude: u.Quantity = None,
+        obs_velocity: u.Quantity = None,
+        period: u.Quantity = None,
+        orbit: str = None
     ):
         super().__init__(
             object=object,
@@ -92,7 +93,8 @@ class Target(Model):
             obs_velocity=obs_velocity,
             period=period,
             orbit=orbit
-    )
+        )
+
 
 class Geometry(Model):
     """
@@ -219,6 +221,7 @@ class NoAtmosphere(Atmosphere):
     """
     No Atmosphere
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.structure.value = 'None'
@@ -296,7 +299,7 @@ class Generator(Model):
     rad_units = UnitChoicesField(
         'generator-radunits',
         options=tuple(value for value in u_psg.radiance_units.values()),
-        codes = tuple(key for key in u_psg.radiance_units)
+        codes=tuple(key for key in u_psg.radiance_units)
     )
     log_rad = BooleanField('generator-lograd')
     gcm_binning = IntegerField('generator-gcm-binning')
@@ -401,7 +404,7 @@ class Noise(Model):
 class SingleTelescope(Telescope):
     """
     A simple telescope with a single apperture.
-    
+
     Handbook
     --------
     This mode is the classical observatory / instrument
@@ -409,6 +412,7 @@ class SingleTelescope(Telescope):
     effective collecting area of the main mirror :math:`A_{Tele}`
     and its corresponding solid angle :math:`\\Omega`.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.telescope.value = 'SINGLE'
@@ -446,6 +450,7 @@ class AOTF(Telescope):
     """
     Acousto-Optical-Tunable-Filter (AOTF)
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.telescope.value = 'AOTF'
@@ -455,6 +460,7 @@ class LIDAR(Telescope):
     """
     A laser source is injected into the FOV.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.telescope.value = 'LIDAR'
@@ -464,6 +470,7 @@ class Noiseless(Noise):
     """
     No noise. This is not the same as a `null` value.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.noise_type.value = 'NO'
