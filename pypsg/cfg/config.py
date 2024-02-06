@@ -6,8 +6,9 @@ from pathlib import Path
 
 import warnings
 
-from pypsg.cfg import models, globes
+from pypsg.cfg import models
 from pypsg import settings
+from pypsg.globes import globes
 
 
 class ConfigTooLongWarning(UserWarning):

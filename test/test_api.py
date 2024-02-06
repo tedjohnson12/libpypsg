@@ -6,8 +6,9 @@ import pytest
 import requests
 from astropy import units as u
 
-from pypsg.cfg import PyConfig, BinConfig, models, globes
+from pypsg.cfg import PyConfig, BinConfig, models
 from pypsg import settings
+from pypsg.globes import globes
 from pypsg.exceptions import GlobESError, PSGMultiError
 from pypsg.settings import INTERNAL_PSG_URL, PSG_URL
 from pypsg.docker import start_psg, stop_psg, is_psg_installed
