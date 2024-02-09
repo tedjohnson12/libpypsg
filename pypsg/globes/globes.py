@@ -3,7 +3,7 @@ Handling of PSG's Global Emission Spectra (GlobES) application
 """
 from typing import Any, Tuple, List
 import numpy as np
-from astropy import units as u
+from astropy import units as u, constants as c
 
 from . import structure
 from ..cfg.models import EquilibriumAtmosphere
@@ -222,16 +222,17 @@ class PyGCM:
 
         _, _, nlat = self.shape
         return 180*u.deg / nlat
+
     @property
-    def lons(self)-> u.Quantity:
+    def lons(self) -> u.Quantity:
         """
         Get the longitude values.
         """
         _, nlon, _ = self.shape
         return self.lon_start*u.deg + np.arange(nlon) * self.dlon
-    
+
     @property
-    def lats(self)-> u.Quantity:
+    def lats(self) -> u.Quantity:
         """
         Get the latitude values.
         """
@@ -386,3 +387,153 @@ class PyGCM:
         header = d['ATMOSPHERE-GCM-PARAMETERS']
         dat = d['BINARY']
         return cls.from_bytes(header, dat)
+
+    def altitude(self, mass: u.Quantity, radius: u.Quantity, mean_molecular_mass: float) -> u.Quantity:
+        """
+        Use the equation of hydrostatic equilibrium to calculate the
+        altitude of each grid point.
+
+        Parameters
+        ----------
+        mass : u.Quantity
+            The mass of the planet.
+        radius : u.Quantity
+            The radius of the planet's surface (the bottom layer).
+        mean_molecular_mass : float
+            The mean molecular mass of the atmosphere.
+
+        Returns
+        -------
+        z : u.Quantity
+            The altitude of each grid point.
+        """
+        pressure = self.pressure
+        temperature = self.temperature
+        nlayer, nlon, nlat = self.shape
+        z_unit = u.km
+        z = np.zeros(shape=(nlayer, nlon, nlat))
+        for i in range(nlayer-1):
+            pressure_bottom = pressure.dat[i, :, :].to(u.bar)
+            pressure_top = pressure.dat[i+1, :, :].to(u.bar)
+            dP = pressure_top - pressure_bottom
+            # pylint: disable-next=no-member
+            rho = mean_molecular_mass * \
+                (pressure_bottom + 0.5*dP) / c.R / temperature.dat[i, :, :]
+            distance_from_planet_center = radius + z[i, :, :]*z_unit
+            # pylint: disable-next=no-member
+            accel_due_to_gravity = c.G * mass / distance_from_planet_center**2
+            dz = -dP / rho / accel_due_to_gravity
+            z[i+1, :, :] = z[i, :, :] + dz.to_value(z_unit)
+        return z*z_unit
+
+    @staticmethod
+    def _column_gas(
+        molecule: structure.Molecule,
+        pressure: u.Quantity,
+        temperature: u.Quantity,
+        altitude: u.Quantity
+    ) -> u.Quantity:
+        """
+        Get the column density of a gas.
+
+        Parameters
+        ----------
+        molecule : structure.Molecule
+            The molecule to get the column density of.
+        pressure : u.Quantity
+            The pressure at each grid point.
+        temperature : u.Quantity
+            The temperature at each grid point.
+        altitude : u.Quantity
+            The altitude at each grid point.
+
+        Returns
+        -------
+        u.Quantity
+            The column density of the gas.
+        """
+        abundance = molecule.dat.to(u.dimensionless_unscaled)
+        partial_pressure = pressure * abundance
+        heights = np.diff(altitude, axis=0)
+        # pylint: disable-next=no-member
+        surface_density: u.Quantity = partial_pressure[:-
+                                                       1] * heights / c.R / temperature[:-1]
+        return surface_density.sum(axis=0).to(u.mol/u.cm**2)
+
+    @staticmethod
+    def _column_aerosol(
+        aerosol: structure.Aerosol,
+        pressure: u.Quantity,
+        temperature: u.Quantity,
+        altitude: u.Quantity,
+        mean_molecular_mass: float
+    ):
+        """
+        Get the column density of an aerosol.
+
+        Parameters
+        ----------
+        aerosol : structure.Aerosol
+            The aerosol to get the column density of.
+        pressure : u.Quantity
+            The pressure at each grid point.
+        temperature : u.Quantity
+            The temperature at each grid point.
+        altitude : u.Quantity
+            The altitude at each grid point.
+        mean_molecular_mass : float
+            The mean molecular mass of the atmosphere.
+
+        Returns
+        -------
+        u.Quantity
+            The column density of the aerosol.
+        """
+        mass_frac = aerosol.dat.to_value(u.dimensionless_unscaled)
+        heights = np.diff(altitude, axis=0)
+        mean_molecular_mass = mean_molecular_mass * u.g/u.mol
+        # pylint: disable-next=no-member
+        moles_of_gas_per_cm2 = pressure[:-1]*heights / c.R / temperature[:-1]
+        mass_of_gas_per_cm2 = moles_of_gas_per_cm2 * mean_molecular_mass
+        mass_of_aero_per_cm2 = mass_of_gas_per_cm2 * mass_frac
+        return mass_of_aero_per_cm2.sum(axis=0).to(u.kg/u.cm**2)
+
+    def column(
+        self,
+        var: str,
+        mass: u.Quantity,
+        radius: u.Quantity,
+        mean_molecular_mass: float
+    ):
+        """
+        Get a 2D column density map of a GCM variable.
+
+        Parameters
+        ----------
+        var : str
+            The name of the variable to get the column density of.
+        mass : u.Quantity
+            The mass of the planet.
+        radius : u.Quantity
+            The radius of the planet.
+        mean_molecular_mass : float
+            The mean molecular mass of the atmosphere.
+
+        Returns
+        -------
+        u.Quantity
+            The column density of the variable. The unit depends on the type of variable.
+        """
+        variable = self.__getattribute__(var)
+        if not isinstance(variable, structure.Variable3D):
+            raise ValueError(f'{var} is not a 3D variable.')
+
+        pressure = self.pressure.dat.to(u.bar)
+        altitude = self.altitude(mass, radius, mean_molecular_mass)
+        temperature = self.temperature.dat.to(u.K)
+        if isinstance(variable, structure.Molecule):
+            return self._column_gas(variable, pressure, temperature, altitude)
+        elif isinstance(variable, structure.Aerosol):
+            return self._column_aerosol(variable, pressure, temperature, altitude, mean_molecular_mass)
+        else:
+            raise ValueError(f'{var} is not a molecule or aerosol.')

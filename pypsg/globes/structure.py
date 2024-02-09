@@ -142,7 +142,7 @@ class Wind(Variable3D):
         if name not in ['wind_u', 'wind_v']:
             msg = f'Wind variable name must be either "wind_u" or "wind_v", not {name}. '
             msg += 'This is to prevent confusion by the PyGCM `__setattr__` method, which assigns unknown variables based on name.'
-            warnings.warn(msg,RuntimeWarning)
+            warnings.warn(msg, RuntimeWarning)
         super().__init__(name, u.Unit('m s-1'), dat)
 
     @classmethod
