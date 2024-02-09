@@ -9,6 +9,7 @@ from . import structure
 from ..cfg.models import EquilibriumAtmosphere
 from ..cfg.base import Molecule, Aerosol
 from ..settings import atmosphere_type_dict as mtype, aerosol_type_dict as atype
+from .decoder import GCMdecoder, sep_header
 
 ANGLE_UNIT = u.deg
 DTYPE = np.float32
@@ -124,7 +125,6 @@ class PyGCM:
         lon_start: float = -180.,
         lat_start: float = -90.,
         desc: str = None,
-        
     ):
         self.pressure = pressure
         self.wind_u = structure.Wind.zero(
@@ -222,6 +222,21 @@ class PyGCM:
 
         _, _, nlat = self.shape
         return 180*u.deg / nlat
+    @property
+    def lons(self)-> u.Quantity:
+        """
+        Get the longitude values.
+        """
+        _, nlon, _ = self.shape
+        return self.lon_start*u.deg + np.arange(nlon) * self.dlon
+    
+    @property
+    def lats(self)-> u.Quantity:
+        """
+        Get the latitude values.
+        """
+        _, _, nlat = self.shape
+        return self.lat_start*u.deg + np.arange(nlat) * self.dlat
 
     @property
     def header(self):
@@ -295,3 +310,79 @@ class PyGCM:
         atmosphere.aerosols = tuple(aerosols)
         atmosphere.profile = None
         return atmosphere
+
+    @classmethod
+    def from_decoder(cls, decoder: GCMdecoder):
+        """
+        Read a GCM from a decoder.
+        """
+        coords, variables = sep_header(decoder.header)
+        kwargs = {}
+        if 'Wind' in variables:
+            wind = decoder['Wind']
+            wind_u = wind[0, :, :, :] * u.m / u.s
+            wind_v = wind[1, :, :, :] * u.m / u.s
+            kwargs['wind_u'] = structure.Wind('wind_u', wind_u)
+            kwargs['wind_v'] = structure.Wind('wind_v', wind_v)
+        if 'Pressure' in variables:
+            pressure = decoder['Pressure']
+            kwargs['pressure'] = structure.Pressure(10**pressure * u.bar)
+        if 'Temperature' in variables:
+            temperature = decoder['Temperature']
+            kwargs['temperature'] = structure.Temperature(temperature * u.K)
+        if 'Tsurf' in variables:
+            tsurf = decoder['Tsurf']
+            kwargs['tsurf'] = structure.SurfaceTemperature(tsurf * u.K)
+        if 'Psurf' in variables:
+            psurf = decoder['Psurf']
+            kwargs['psurf'] = structure.SurfacePressure(10**psurf * u.bar)
+        if 'Albedo' in variables:
+            albedo = decoder['Albedo']
+            kwargs['albedo'] = structure.Albedo(albedo)
+        if 'Emissivity' in variables:
+            emissivity = decoder['Emissivity']
+            kwargs['emissivity'] = structure.Emissivity(emissivity)
+
+        molecules = decoder.get_molecules()
+        for molecule in molecules:
+            kwargs[molecule] = structure.Molecule(molecule, decoder[molecule])
+        aerosols, aerosol_sizes = decoder.get_aerosols()
+        for aerosol, aerosol_size in zip(aerosols, aerosol_sizes):
+            kwargs[aerosol] = structure.Aerosol(aerosol, decoder[aerosol])
+            kwargs[aerosol_size] = structure.AerosolSize(
+                aerosol_size, decoder[aerosol_size]*u.m)
+
+        _, _, _, lon_start, lat_start, _, _ = coords
+        kwargs['lon_start'] = lon_start
+        kwargs['lat_start'] = lat_start
+
+        return cls(**kwargs)
+
+    @classmethod
+    def from_bytes(cls, header: str, binary: bytes):
+        """
+        Read a GCM from bytes.
+
+        Parameters
+        ----------
+        header : str
+            The header of the GCM.
+        binary : bytes
+            The binary data of the GCM.
+        """
+        decoder = GCMdecoder(header, binary)
+        return cls.from_decoder(decoder)
+
+    @classmethod
+    def from_cfg(cls, d: dict):
+        """
+        Read a GCM from a config dict.
+
+        Parameters
+        ----------
+        d : dict
+            A dictionary read from a PSG config file.
+        """
+        header = d['ATMOSPHERE-GCM-PARAMETERS']
+        dat = d['BINARY']
+        return cls.from_bytes(header, dat)

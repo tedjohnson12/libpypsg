@@ -11,12 +11,13 @@ written by Geronimo Villanueva
 
 """
 import warnings
+import requests
 from typing import Tuple, Type
 from netCDF4 import Dataset
 from astropy import units as u
 import numpy as np
 
-from ...settings import psg_aerosol_size_unit
+from ...settings import psg_aerosol_size_unit, USER_DATA_PATH
 from .. import structure
 from ..globes import PyGCM
 
@@ -24,6 +25,8 @@ TIME_UNIT = u.day
 ALBEDO_DEFAULT = 0.3
 EMISSIVITY_DEFAULT = 1.0
 DEFAULT_DESCRIPTION = 'Whole Atmosphere Community Climate Model (WACCM)'
+TEST_URL = 'https://zenodo.org/records/10426886/files/vspec_waccm_test.nc?#mode=bytes'
+TEST_PATH = USER_DATA_PATH / 'data' / 'waccm_test.nc'
 
 REQUIRED_VARIABLES = [
     "hyam",
@@ -251,13 +254,13 @@ def get_tsurf(data: Dataset, itime: int) -> structure.SurfaceTemperature:
     """
     try:
         tsurf = np.array(data.variables['TS'][itime, :, :])
-        tsurf = u.Unit(data.variables['TS'].unit) * tsurf
+        tsurf = u.Unit(data.variables['TS'].units) * tsurf
     except KeyError:
         msg = 'Surface Temperature not explicitly stated. '
         msg += 'Using the value from the lowest layer.'
         warnings.warn(msg, VariableAssumptionWarning)
         temp = get_temperature(data, itime).dat
-        tsurf = temp[0, :, :] * u.Unit(data.variables['T'].unit)
+        tsurf = temp[0, :, :] * u.Unit(data.variables['T'].units)
     return structure.SurfaceTemperature(temp[0, :, :])
 
 
@@ -281,7 +284,7 @@ def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind
     """
     try:
         wind_u = np.flip(np.array(data.variables['U'][itime, :, :, :]), axis=0)
-        wind_u = u.Unit(data.variables['U'].unit) * wind_u
+        wind_u = u.Unit(data.variables['U'].units) * wind_u
     except KeyError:
         msg = 'Wind Speed U not explicitly stated. Assuming zero.'
         warnings.warn(msg, VariableAssumptionWarning)
@@ -289,34 +292,13 @@ def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind
         wind_u = np.zeros((nlayers, nlat, nlon)) * u.m / u.s
     try:
         wind_v = np.flip(np.array(data.variables['V'][itime, :, :, :]), axis=0)
-        wind_v = u.Unit(data.variables['V'].unit) * wind_v
+        wind_v = u.Unit(data.variables['V'].units) * wind_v
     except KeyError:
         msg = 'Wind Speed V not explicitly stated. Assuming zero.'
         warnings.warn(msg, VariableAssumptionWarning)
         _, nlayers, nlat, nlon = get_shape(data)
         wind_v = np.zeros((nlayers, nlat, nlon)) * u.m / u.s
     return structure.Wind('wind_u', wind_u), structure.Wind('wind_v', wind_v)
-
-
-def get_coords(data: Dataset):
-    """
-    Get latitude and longitude coordinates.
-
-    Parameters
-    ----------
-    data : netCDF4.Dataset
-        The dataset to use.
-
-    Returns
-    -------
-    lat : np.ndarray
-        The latitude coordinates in degrees (N_lat,)
-    lon : np.ndarray
-        The longitude coodinates in degrees (N_lon,)
-    """
-    lat = np.array(data.variables['lat'][:])
-    lon = np.array(data.variables['lon'][:])
-    return lat, lon
 
 
 def get_albedo(data: Dataset, itime: int) -> structure.Albedo:
@@ -467,7 +449,7 @@ def get_molecule_suite(data: Dataset, itime: int, names: list, background: str =
     molec : tuple of structure.Molecule
         The molecules in the GCM
     """
-    molecs = (get_molecule(data, itime, name) for name in names)
+    molecs = tuple(get_molecule(data, itime, name) for name in names)
     if background is not None:
         if background in names:
             raise ValueError(
@@ -482,7 +464,7 @@ def get_molecule_suite(data: Dataset, itime: int, names: list, background: str =
                 background_abn -= molec.dat
             if np.any(background_abn < 0):
                 raise ValueError('Cannot have negative abundance.')
-            molecs += tuple(structure.Molecule(background, background_abn))
+            molecs += (structure.Molecule(background, background_abn),)
     return molecs
 
 def to_pygcm(
@@ -492,7 +474,7 @@ def to_pygcm(
     aerosols:list,
     background=None,
     lon_start:float=-180.,
-    lon_end:float=-90.,
+    lat_start:float=-90.,
     desc:str=DEFAULT_DESCRIPTION
 )->PyGCM:
     """
@@ -511,18 +493,16 @@ def to_pygcm(
     background : str, optional
         The optional background gas to assume.
     """
-    molecules:tuple = get_molecule_suite(data,itime,molecules,background)
+    molecules:tuple = () if molecules is None else get_molecule_suite(data,itime,molecules,background)
     
-    aerosols:tuple = (get_aerosol(data,itime,name) for name in aerosols)
-    aerosol_sizes:tuple = (get_aerosol_size(data,itime,name) for name in aerosols)
+    _aerosols:tuple = () if aerosols is None else (get_aerosol(data,itime,name) for name in aerosols)
+    aerosol_sizes:tuple = () if aerosols is None else (get_aerosol_size(data,itime,name) for name in aerosols)
     
     wind_u, wind_v = get_winds(data,itime)
     
     return PyGCM(
-        pressure=get_pressure(data,itime),
-        *molecules,
-        *aerosols,
-        *aerosol_sizes,
+        get_pressure(data,itime),
+        *(molecules + _aerosols + aerosol_sizes),
         wind_u=wind_u,
         wind_v=wind_v,
         temperature=get_temperature(data,itime),
@@ -531,6 +511,24 @@ def to_pygcm(
         albedo=get_albedo(data,itime),
         emissivity=get_emissivity(data,itime),
         lon_start=lon_start,
-        lon_end=lon_end,
-        description=desc
+        lat_start=lat_start,
+        desc=desc
     )
+
+def download_test_data(rewrite=False):
+    """
+    Download the WACCM test data.
+    """
+    
+    
+    TEST_PATH.parent.mkdir(exist_ok=True)
+    if TEST_PATH.exists() and not rewrite:
+        return TEST_PATH
+    else:
+        TEST_PATH.unlink(missing_ok=True)
+        with requests.get(TEST_URL,stream=True,timeout=20) as req:
+            req.raise_for_status()
+            with TEST_PATH.open('wb') as f:
+                for chunk in req.iter_content(chunk_size=8192):
+                    f.write(chunk)
+        return TEST_PATH
