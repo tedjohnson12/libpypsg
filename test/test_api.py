@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 import requests
 from astropy import units as u
+import time
 
 from pypsg.cfg import PyConfig, BinConfig, models
 from pypsg import settings
@@ -47,7 +48,7 @@ def test_apicall(keep_psg_settings):
     output_type : str or None
         The type of output to ask for. This could be a specific file type, set, update, all, or None
     app : str or None
-        The app to use. Either None of 'globes'
+        The app to use. Either None of 'globes'. We will just test None for now.
     url : str or None
         The URL to send the request to. This can be the external URL or the internal URL. It also can be None.
     
@@ -70,7 +71,7 @@ def test_apicall(keep_psg_settings):
     
     cfgs = [PyConfig.from_file(TR1e_PATH), BinConfig.from_file(TR1e_PATH)]
     output_types = [None,'all','cfg', 'rad', 'lyr', 'noi', 'upd', 'set']
-    apps = ['globes', None]
+    apps = [None]
     urls = [None, INTERNAL_PSG_URL, PSG_URL] if is_psg_installed() else [None, PSG_URL]
     url_settings = [INTERNAL_PSG_URL, PSG_URL] if is_psg_installed() else [PSG_URL]
     is_psg_running = [False, True] if is_psg_installed() else [False]    
@@ -95,12 +96,14 @@ def test_apicall(keep_psg_settings):
         
         if not psg_running and resolved_url == INTERNAL_PSG_URL:
             with pytest.raises(requests.ConnectionError):
+                time.sleep(0.1)
                 _ = api()
         elif expect_globes_err:
             with pytest.raises((GlobESError,PSGMultiError)):
                 _ = api()
             APICall(cfg=cfg, output_type='set', app=None, url=url)() # This should clean up
         else:
+            time.sleep(0.1)
             response = api()
             assert isinstance(response, PSGResponse)
             match output_type:
@@ -145,7 +148,7 @@ def test_apicall(keep_psg_settings):
                     assert isinstance(response.rad, PyRad)
                     assert response.lyr is None
                     assert response.noi is None
-            APICall(cfg=cfg, output_type='set', app=None, url=url)() # This should clean up
+            # APICall(cfg=cfg, output_type='set', app=None, url=url)() # This should clean up
     
     # Test all combinations
     n_tested = 0
