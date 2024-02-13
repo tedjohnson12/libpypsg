@@ -24,11 +24,10 @@ chdir(Path(__file__).parent)
 
 @pytest.fixture()
 def data_path():
-    return rw.TEST_PATH
-    # if rw.TEST_PATH.exists():
-    #     return rw.TEST_PATH
-    # else:
-    #     return rw.TEST_URL
+    if rw.TEST_PATH.exists():
+        return rw.TEST_PATH
+    else:
+        return rw.TEST_URL
 
 def test_validate_vars(data_path):
     with nc.Dataset(data_path,'r',format='NETCDF4') as data:

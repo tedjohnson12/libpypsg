@@ -11,7 +11,6 @@ from os import chdir
 from pathlib import Path
 import pytest
 import numpy as np
-import matplotlib.pyplot as plt
 
 import netCDF4 as nc
 

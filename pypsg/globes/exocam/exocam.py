@@ -21,9 +21,8 @@ TIME_UNIT = u.day
 ALBEDO_DEFAULT = 0.3
 EMISSIVITY_DEFAULT = 1.0
 DEFAULT_DESCRIPTION = 'exoCAM Atmosphere Model'
-# TEST_URL = 'https://zenodo.org/records/10426886/files/vspec_waccm_test.nc?#mode=bytes'
-# TEST_PATH = USER_DATA_PATH / 'data' / 'waccm_test.nc'
-TEST_PATH = Path.home() / 'gcms' / 'exocam' / 't3000_s1550_p7.74511.cam.h0.avg_n68.nc'
+TEST_URL = 'https://archive.org/download/SimulatedPhaseDependentSpectraOfTerrestrialAquaplanetsInMdwarfSystems/t3000_s1550_p7.74511.cam.h0.avg_n68.nc?#mode=bytes'
+TEST_PATH = USER_DATA_PATH / 'data' / 'exocam_test.nc'
 
 REQUIRED_VARIABLES = [
     "hyam",
@@ -524,20 +523,20 @@ def to_pygcm(
         desc=desc
     )
 
-# def download_test_data(rewrite=False):
-#     """
-#     Download the WACCM test data.
-#     """
+def download_test_data(rewrite=False):
+    """
+    Download the WACCM test data.
+    """
     
     
-#     TEST_PATH.parent.mkdir(exist_ok=True)
-#     if TEST_PATH.exists() and not rewrite:
-#         return TEST_PATH
-#     else:
-#         TEST_PATH.unlink(missing_ok=True)
-#         with requests.get(TEST_URL,stream=True,timeout=20) as req:
-#             req.raise_for_status()
-#             with TEST_PATH.open('wb') as f:
-#                 for chunk in req.iter_content(chunk_size=8192):
-#                     f.write(chunk)
-#         return TEST_PATH
+    TEST_PATH.parent.mkdir(exist_ok=True)
+    if TEST_PATH.exists() and not rewrite:
+        return TEST_PATH
+    else:
+        TEST_PATH.unlink(missing_ok=True)
+        with requests.get(TEST_URL,stream=True,timeout=20) as req:
+            req.raise_for_status()
+            with TEST_PATH.open('wb') as f:
+                for chunk in req.iter_content(chunk_size=8192):
+                    f.write(chunk)
+        return TEST_PATH
