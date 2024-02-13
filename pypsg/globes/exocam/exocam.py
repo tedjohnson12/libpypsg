@@ -1,10 +1,5 @@
 """
-This module is designed to read output files from the
-Whole Atmosphere Community Climate Model (WACCM) code
-and convert it from netCDF to PSG file types.
-
-The WACCM models used in writing this were produced by 
-Howard Chen in 2023
+This module is designed to read output files from exoCAM.
 
 This code is based on PSG conversion scripts for exoCAM
 written by Geronimo Villanueva
@@ -12,6 +7,7 @@ written by Geronimo Villanueva
 """
 import warnings
 import requests
+from pathlib import Path
 from typing import Tuple, Type
 from netCDF4 import Dataset
 from astropy import units as u
@@ -24,9 +20,10 @@ from ..globes import PyGCM
 TIME_UNIT = u.day
 ALBEDO_DEFAULT = 0.3
 EMISSIVITY_DEFAULT = 1.0
-DEFAULT_DESCRIPTION = 'Whole Atmosphere Community Climate Model (WACCM)'
-TEST_URL = 'https://zenodo.org/records/10426886/files/vspec_waccm_test.nc?#mode=bytes'
-TEST_PATH = USER_DATA_PATH / 'data' / 'waccm_test.nc'
+DEFAULT_DESCRIPTION = 'exoCAM Atmosphere Model'
+# TEST_URL = 'https://zenodo.org/records/10426886/files/vspec_waccm_test.nc?#mode=bytes'
+# TEST_PATH = USER_DATA_PATH / 'data' / 'waccm_test.nc'
+TEST_PATH = Path.home() / 'gcms' / 'exocam' / 't3000_s1550_p7.74511.cam.h0.avg_n68.nc'
 
 REQUIRED_VARIABLES = [
     "hyam",
@@ -49,7 +46,10 @@ OPTIONAL_VARIABLES = [
 
 MOLEC_TRANSLATOR = {
     # "PSG" : "WACCM",
-    'NO2': 'NOX'
+    'CO2': 'co2vmr',
+    'CH4': 'ch4vmr',
+    'N2O': 'n2ovmr',
+    'H2O': 'Q'
 }
 """
 Translate molecule names to WACCM
@@ -356,17 +356,22 @@ def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
     return structure.Emissivity(emissivity)
 
 
-def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill_value: float, unit: u.Unit, cls: Type):
+def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill_value: float, unit: u.Unit, cls: Type, mean_molec_mass:float=None):
     """
     Generic getter for a variable.
     """
     dat = np.flip(
         np.array(data.variables[translator.get(name, name)][itime, :, :, :]), axis=0)
     dat = np.where((dat > 0) & (np.isfinite(dat)), dat, fill_value) * unit
+    if name == 'H2O':
+        if mean_molec_mass is None:
+            raise ValueError('Mean molecular mass must be specified for H2O.')
+        dat = dat/ (1 - dat)
+        dat = dat * (mean_molec_mass/18.0)
     return cls(name, dat)
 
 
-def get_molecule(data: Dataset, itime: int, name: str) -> structure.Molecule:
+def get_molecule(data: Dataset, itime: int, name: str, mean_molecular_mass: float=None) -> structure.Molecule:
     """
     Get the abundance of a molecule.
 
@@ -378,13 +383,16 @@ def get_molecule(data: Dataset, itime: int, name: str) -> structure.Molecule:
         The timestep to use.
     name : str
         The variable name of the molecule.
+    mean_molecular_mass : float, optional
+        The mean molecular mass of the atmosphere. This is required to extract
+        the water abundance from the specific humidity variable.
 
     Returns
     -------
     molec : structure.Molecule
         The concentration of the molecule.
     """
-    return _generic_getter(data, itime, name, MOLEC_TRANSLATOR, MOLEC_FILL_VALUE, u.dimensionless_unscaled, structure.Molecule)
+    return _generic_getter(data, itime, name, MOLEC_TRANSLATOR, MOLEC_FILL_VALUE, u.dimensionless_unscaled, structure.Molecule, mean_molecular_mass)
 
 
 def get_aerosol(data: Dataset, itime: int, name: str) -> structure.Aerosol:
@@ -429,7 +437,7 @@ def get_aerosol_size(data: Dataset, itime: int, name: str) -> structure.AerosolS
     return _generic_getter(data, itime, name, AERO_SIZE_TRANSLATOR, AERO_SIZE_FILL_VALUE, psg_aerosol_size_unit, structure.AerosolSize)
 
 
-def get_molecule_suite(data: Dataset, itime: int, names: list, background: str = None) -> Tuple[structure.Molecule]:
+def get_molecule_suite(data: Dataset, itime: int, names: list, background: str = None, mean_molecular_mass: float=None) -> Tuple[structure.Molecule]:
     """
     Get the abundance of a suite of molecules.
 
@@ -449,7 +457,7 @@ def get_molecule_suite(data: Dataset, itime: int, names: list, background: str =
     molec : tuple of structure.Molecule
         The molecules in the GCM
     """
-    molecs = tuple(get_molecule(data, itime, name) for name in names)
+    molecs = tuple(get_molecule(data, itime, name, mean_molecular_mass) for name in names)
     if background is not None:
         if background in names:
             raise ValueError(
@@ -475,7 +483,8 @@ def to_pygcm(
     background=None,
     lon_start:float=-180.,
     lat_start:float=-90.,
-    desc:str=DEFAULT_DESCRIPTION
+    desc:str=DEFAULT_DESCRIPTION,
+    mean_molecular_mass:float=None
 )->PyGCM:
     """
     Covert a WACCM dataset to a Planet object.
@@ -493,7 +502,7 @@ def to_pygcm(
     background : str, optional
         The optional background gas to assume.
     """
-    molecules:tuple = () if molecules is None else get_molecule_suite(data,itime,molecules,background)
+    molecules:tuple = () if molecules is None else get_molecule_suite(data,itime,molecules,background,mean_molecular_mass)
     
     _aerosols:tuple = () if aerosols is None else (get_aerosol(data,itime,name) for name in aerosols)
     aerosol_sizes:tuple = () if aerosols is None else (get_aerosol_size(data,itime,name) for name in aerosols)
@@ -515,20 +524,20 @@ def to_pygcm(
         desc=desc
     )
 
-def download_test_data(rewrite=False):
-    """
-    Download the WACCM test data.
-    """
+# def download_test_data(rewrite=False):
+#     """
+#     Download the WACCM test data.
+#     """
     
     
-    TEST_PATH.parent.mkdir(exist_ok=True)
-    if TEST_PATH.exists() and not rewrite:
-        return TEST_PATH
-    else:
-        TEST_PATH.unlink(missing_ok=True)
-        with requests.get(TEST_URL,stream=True,timeout=20) as req:
-            req.raise_for_status()
-            with TEST_PATH.open('wb') as f:
-                for chunk in req.iter_content(chunk_size=8192):
-                    f.write(chunk)
-        return TEST_PATH
+#     TEST_PATH.parent.mkdir(exist_ok=True)
+#     if TEST_PATH.exists() and not rewrite:
+#         return TEST_PATH
+#     else:
+#         TEST_PATH.unlink(missing_ok=True)
+#         with requests.get(TEST_URL,stream=True,timeout=20) as req:
+#             req.raise_for_status()
+#             with TEST_PATH.open('wb') as f:
+#                 for chunk in req.iter_content(chunk_size=8192):
+#                     f.write(chunk)
+#         return TEST_PATH
