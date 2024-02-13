@@ -41,5 +41,6 @@ jobs:
         conda install pytest
         pip install coveralls
         python -c "import pypsg; pypsg.settings.save_settings(api_key='$PSG_KEY')"
-        coverage run --source=pypsg -m pytest test --external
+        python -c "from pypsg.globes.waccm.waccm import download_test_data; download_test_data()"
+        coverage run --source=pypsg -m pytest test --slow
         coveralls

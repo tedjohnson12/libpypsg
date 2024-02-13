@@ -67,11 +67,11 @@ def test_api_call_multiple(default_cfg):
         _ = APICall(default_cfg, ('rad', 'cfg'))
 
 
-def test_api_call_advanced(advanced_cfg):
+def test_api_call_advanced(advanced_cfg, psg_url):
     """
     Test api call.
     """
-    api = APICall(advanced_cfg, 'all')
+    api = APICall(advanced_cfg, 'all',url=psg_url)
     response = api()
     assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.rad, PyRad)
@@ -82,4 +82,4 @@ def test_api_call_advanced(advanced_cfg):
 
 
 if __name__ == '__main__':
-    pytest.main(args=[__file__,'--external'])
+    pytest.main(args=[__file__])

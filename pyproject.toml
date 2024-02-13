@@ -31,6 +31,7 @@ dependencies = [
     "requests",
     "docker",
     "python-dateutil",
+    "netCDF4",
 ]
 [project.optional-dependencies]
 plot = [
@@ -51,3 +52,11 @@ dev = [
 [project.urls]
 Repository = "https://github.com/tedjohnson12/pypsg"
 Issues = "https://github.com/tedjohnson12/pypsg/issues"
+
+[tool.pytest.ini_options]
+markers = [
+    "local: marks tests as expecting a local PSG insallation (select with '--local')",
+    "slow: marks tests as slow (select with '--slow')",]
+
+[tool.setuptools.package-data]
+"*" = ["*.json","*.yaml"]

@@ -1139,7 +1139,7 @@ class Molecule:
         PSG also allows the `m-3`, `molec`, `s-1`, and `tau` unit types.
         These should be implemented eventually.
     """
-    _allowed_units = (u.pct, u_psg.ppmv, u_psg.ppbv, u_psg.pptv,
+    _allowed_units = (u.pct, u_psg.ppm, u_psg.ppb, u_psg.ppt,
                       u.Unit('m-2'), u.dimensionless_unscaled)
     _unit_codes = ('%', 'ppmv', 'ppbv', 'pptv', 'm2', 'scl')
     _fmt = '.2e'
@@ -1918,22 +1918,38 @@ class BooleanField(Field):
         The default value of the field. Default is None.
     null : bool, optional
         If false, the field cannot be empty. Default is True.
-    true : str
-        The string representation of true. Default is 'Y'.
-    false : str
-        The string representation of false. Default is 'N'.
+    true : str or list of str
+        The string representation of true. Default is ['Y', 'YES'].
+    false : str or list of str
+        The string representation of false. Default is ['N', 'NO'].
+    
+    Notes
+    -----
+    As of `v0.2.0`, a list of strings is allowed as the true and false values.
+    However, only the zeroth element will ever be passed to the `content` method.
+    The other values, however, allow the program to catch aliases of the true and
+    false codes.
     """
     _value: bool
 
-    def __init__(self, name: str, default: Any = None, null: bool = True, true: str = 'Y', false: str = 'N'):
+    def __init__(
+        self,
+        name: str,
+        default: Any = None,
+        null: bool = True,
+        true: str | List[str] = ['Y', 'YES'],
+        false: str | List[str] = ['N', 'NO']
+    ):
         super().__init__(name, default, null)
         self._true = true
         self._false = false
 
     @property
     def _str_property(self):
-        return self._true if self._value else self._false
-
+        value = self._true if self._value else self._false
+        if isinstance(value, list):
+            value = value[0]
+        return value
     @Field.value.setter
     def value(self, value_to_set: bool):
         if value_to_set is not None and not isinstance(value_to_set, bool):
@@ -1960,13 +1976,23 @@ class BooleanField(Field):
             value = str(d[key])
         except KeyError:
             return None
-        if value == self._true:
-            return True
-        elif value == self._false:
-            return False
-        else:
-            raise ValueError(
-                f'Value must be one of {self._true} or {self._false}.')
+        match self._true:
+            case str():
+                if value == self._true:
+                    return True
+            case list():
+                if value in self._true:
+                    return True
+        match self._false:
+            case str():
+                if value == self._false:
+                    return False
+            case list():
+                if value in self._false:
+                    return False
+        raise ValueError(
+            f'Value must be one of {self._true} or {self._false}, found {value}.'
+        )
 
 
 class Model(ABC):
