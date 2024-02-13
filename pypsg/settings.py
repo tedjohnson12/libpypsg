@@ -7,6 +7,7 @@ This module allows users to configure PyPSG.
 from pathlib import Path
 import warnings
 import json
+from astropy import units as u
 
 REQUEST_TIMEOUT = 120
 
@@ -88,3 +89,73 @@ def get_setting(key):
         return user_settings[key]
     else:
         raise KeyError(f'Unknown setting {key}.')
+    
+
+
+
+################################
+# Some settings related to PSG #
+################################
+
+psg_pressure_unit = u.bar
+"""
+PSG atmospheric pressure unit.
+
+This unit is determined by PSG and used to standardize
+the atmospheric pressure of planets in VSPEC.
+
+:type: astropy.units.Unit
+"""
+psg_aerosol_size_unit = u.m
+"""
+PSG aerosol size unit.
+
+This unit is determined by PSG and used to
+standardize aerosol size in VSPEC.
+
+:type: astropy.units.Unit
+"""
+
+atmosphere_type_dict = {'H2':45,'He':0,'H2O':1,'CO2':2,'O3':3,'N2O':4,'CO':5,'CH4':6,'O2':7,
+                        'NO':8,'SO2':9,'NO2':10,'N2':22,'HNO3':12,'HO2NO2':'SEC[26404-66-0] Peroxynitric acid',
+                        'N2O5':'XSEC[10102-03-1] Dinitrogen pentoxide','O':'KZ[08] Oxygen',
+                        'OH':'EXO[OH]'}
+"""
+A dictionary mapping molecular species to the default
+database to use to create opacities. These are all
+internal to PSG, but must be set by ``VSPEC``.
+
+Integers mean that we want to use data from the HITRAN database, which for a number ``N``
+is represented in PSG by ``HIT[N]``. Strings are sent straight to PSG as is.
+
+:type: dict
+"""
+
+aerosol_name_dict = {
+    'Water':{
+        'name':'CLDLIQ',
+        'size':'REL'
+    },
+    'WaterIce':{
+        'name':'CLDICE',
+        'size':'REI'
+    }
+}
+"""
+A dictionary mapping aerosol species from their PSG name
+to their name in the WACCM NetCDF format.
+
+:type: dict
+"""
+
+aerosol_type_dict = {
+    'Water': 'AFCRL_Water_HRI',
+    'WaterIce': 'Warren_ice_HRI'
+}
+"""
+A dictionary mapping aerosol species to the default
+database to use. These are all
+internal to PSG, but must be set by ``VSPEC``.
+
+:type: dict
+"""
