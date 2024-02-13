@@ -492,6 +492,12 @@ def to_pygcm(
         The variable names of the aerosols.
     background : str, optional
         The optional background gas to assume.
+    lon_start : float, optional
+        The starting longitude of the GCM. Defaults to -180.
+    lat_start : float, optional
+        The starting latitude of the GCM. Defaults to -90.
+    desc : str, optional
+        A description of the GCM.
     """
     molecules:tuple = () if molecules is None else get_molecule_suite(data,itime,molecules,background)
     
