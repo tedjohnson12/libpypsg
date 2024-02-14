@@ -208,9 +208,10 @@ def get_pressure(data: Dataset, itime: int) -> structure.Pressure:
     """
     hyam = np.flipud(data.variables['hyam'][:])
     hybm = np.flipud(data.variables['hybm'][:])
+    p0 = data.variables['P0'][:] * u.Unit(data.variables['P0'].units)
     ps = get_psurf(data, itime)
-    pressure = hyam[:, np.newaxis, np.newaxis] + \
-        hybm[:, np.newaxis, np.newaxis] * ps.dat[np.newaxis, :, :]
+    pressure = p0 * hyam[:, np.newaxis, np.newaxis] + \
+        ps.dat[np.newaxis, :, :] * hybm[:, np.newaxis, np.newaxis]
     return structure.Pressure(pressure)
 
 
@@ -260,7 +261,7 @@ def get_tsurf(data: Dataset, itime: int) -> structure.SurfaceTemperature:
         msg += 'Using the value from the lowest layer.'
         warnings.warn(msg, VariableAssumptionWarning)
         temp = get_temperature(data, itime).dat
-        tsurf = temp[0, :, :] * u.Unit(data.variables['T'].units)
+        tsurf = temp[0, :, :]
     return structure.SurfaceTemperature(tsurf[:, :])
 
 
@@ -326,7 +327,7 @@ def get_albedo(data: Dataset, itime: int) -> structure.Albedo:
         warnings.warn(msg, VariableAssumptionWarning)
         _, _, nlat, nlon = get_shape(data)
         albedo = np.ones((nlat, nlon)) * ALBEDO_DEFAULT
-    return structure.Albedo(albedo)
+    return structure.Albedo(albedo*u.dimensionless_unscaled)
 
 def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
     """
@@ -353,7 +354,7 @@ def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
         warnings.warn(msg, VariableAssumptionWarning)
         _, _, nlat, nlon = get_shape(data)
         emissivity = np.ones((nlat, nlon)) * EMISSIVITY_DEFAULT
-    return structure.Emissivity(emissivity)
+    return structure.Emissivity(emissivity*u.dimensionless_unscaled)
 
 
 def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill_value: float, unit: u.Unit, cls: Type):
@@ -499,10 +500,10 @@ def to_pygcm(
     desc : str, optional
         A description of the GCM.
     """
-    molecules:tuple = () if molecules is None else get_molecule_suite(data,itime,molecules,background)
+    molecules:tuple = tuple() if molecules is None else get_molecule_suite(data,itime,molecules,background)
     
-    _aerosols:tuple = () if aerosols is None else (get_aerosol(data,itime,name) for name in aerosols)
-    aerosol_sizes:tuple = () if aerosols is None else (get_aerosol_size(data,itime,name) for name in aerosols)
+    _aerosols:tuple = tuple() if aerosols is None else tuple(get_aerosol(data,itime,name) for name in aerosols)
+    aerosol_sizes:tuple = tuple() if aerosols is None else tuple(get_aerosol_size(data,itime,name) for name in aerosols)
     
     wind_u, wind_v = get_winds(data,itime)
     
