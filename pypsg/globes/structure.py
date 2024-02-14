@@ -150,7 +150,7 @@ class Wind(Variable3D):
         super().__init__(name, u.Unit('m s-1'), dat)
 
     @classmethod
-    def contant(
+    def constant(
         cls,
         name: str,
         value: u.Quantity,
@@ -478,6 +478,7 @@ class Molecule(Variable3D):
     """
 
     def __init__(self, name: str, dat: u.Quantity):
+        dat = u.Quantity(dat)
         super().__init__(name, u.LogUnit(u.Unit('mol mol-1')), dat)
 
     @classmethod
@@ -500,7 +501,7 @@ class Molecule(Variable3D):
             A Molecule object with constant concentration values specified by the given name, value, and shape.
         """
 
-        dat = np.ones(shape=shape) * val
+        dat = val * np.ones(shape=shape)
         return cls(name, dat)
 
 
@@ -650,6 +651,7 @@ class Albedo(Variable2D):
     """
 
     def __init__(self, dat: u.Quantity):
+        dat = u.Quantity(dat)
         super().__init__('Albedo', u.dimensionless_unscaled, dat)
 
     @classmethod

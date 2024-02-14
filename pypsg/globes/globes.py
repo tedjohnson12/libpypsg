@@ -7,7 +7,7 @@ from astropy import units as u, constants as c
 
 from . import structure
 from ..cfg.models import EquilibriumAtmosphere
-from ..cfg.base import Molecule, Aerosol
+from ..cfg.base import Molecule, Aerosol, Profile
 from ..settings import atmosphere_type_dict as mtype, aerosol_type_dict as atype, get_setting
 from .decoder import GCMdecoder, sep_header
 
@@ -114,10 +114,10 @@ class PyGCM:
     def __init__(
         self,
         pressure: structure.Pressure,
+        temperature: structure.Temperature,
         *args: structure.Molecule | structure.Aerosol | structure.AerosolSize | structure.Surface,
         wind_u: structure.Wind = None,
         wind_v: structure.Wind = None,
-        temperature: structure.Temperature = None,
         tsurf: structure.SurfaceTemperature = None,
         psurf: structure.SurfacePressure = None,
         albedo: structure.Albedo = None,
@@ -127,11 +127,11 @@ class PyGCM:
         desc: str = None,
     ):
         self.pressure = pressure
+        self.temperature = temperature
         self.wind_u = structure.Wind.zero(
             'wind_u', pressure.shape) if wind_u is None else wind_u
         self.wind_v = structure.Wind.zero(
             'wind_v', pressure.shape) if wind_v is None else wind_v
-        self.temperature = temperature
         self.tsurf = tsurf
         self.psurf = psurf
         self.albedo = albedo
@@ -141,6 +141,7 @@ class PyGCM:
         self.lon_start = lon_start
         self.lat_start = lat_start
         self.desc = desc
+        self.variables = self._variables
 
     def __setattr__(self, __name: str, __value: Any) -> None:
         """
@@ -251,8 +252,8 @@ class PyGCM:
         """
         nlayer, nlon, nlat = self.shape
         coords = f'{nlon},{nlat},{nlayer},{self.lon_start:.1f},{self.lat_start:.1f},{self.dlon.to_value(ANGLE_UNIT):.2f},{self.dlat.to_value(ANGLE_UNIT):.2f}'
-        variables = self._variables[2:]  # Skip both winds.
-        var_names = ['Wind'] + [v.name for v in variables]
+        variables = self.variables[2:]  # Skip both winds.
+        var_names = ['Winds'] + [v.name for v in variables]
         return f'{coords},{",".join(var_names)}'
 
     @property
@@ -265,7 +266,7 @@ class PyGCM:
         np.ndarray
             The flattened array.
         """
-        return np.concatenate([v.flat.astype(DTYPE) for v in self._variables]).astype(DTYPE)
+        return np.concatenate([v.flat.astype(DTYPE) for v in self.variables]).astype(DTYPE)
 
     @property
     def molecules(self):
@@ -292,7 +293,7 @@ class PyGCM:
         """
         Update the config.
         """
-        if atmosphere is None:
+        if not isinstance(atmosphere, EquilibriumAtmosphere):
             atmosphere = EquilibriumAtmosphere()
 
         gases = [molec.name for molec in self.molecules]
@@ -305,11 +306,17 @@ class PyGCM:
                      for gas, gas_type in zip(gases, gas_types)]
         aerosols = [Aerosol(aerosol, aerosol_type, 1, 1)
                     for aerosol, aerosol_type in zip(aeros, aerosol_types)]
+        
+        pressure_dat = self.pressure.dat[:, 0, 0].to_value(self.pressure.psg_unit)
+        temperature_dat = self.temperature.dat[:, 0, 0].to_value(self.temperature.psg_unit)
+        pressure = Profile('Pressure', pressure_dat, u.bar)
+        temperature = Profile('Temperature', temperature_dat, u.K)
+        
 
         atmosphere.description = self.desc
-        atmosphere.molecules = tuple(molecules)
-        atmosphere.aerosols = tuple(aerosols)
-        atmosphere.profile = None
+        atmosphere.molecules = tuple(molecules) if len(molecules) > 0 else None
+        atmosphere.aerosols = tuple(aerosols) if len(aerosols) > 0 else None
+        atmosphere.profile = tuple([pressure, temperature])
         return atmosphere
 
     @classmethod
@@ -318,9 +325,10 @@ class PyGCM:
         Read a GCM from a decoder.
         """
         coords, variables = sep_header(decoder.header)
-        if 'Pressure' in variables:
-            pressure = decoder['Pressure']
-            pressure = structure.Pressure(10**pressure * u.bar)
+        pressure = decoder['Pressure']
+        pressure = structure.Pressure(10**pressure * u.bar)
+        temperature = decoder['Temperature']
+        temperature = structure.Temperature(temperature * u.K)            
         
         args = {}
         
@@ -340,9 +348,6 @@ class PyGCM:
             wind_v = wind[1, :, :, :] * u.m / u.s
             kwargs['wind_u'] = structure.Wind('wind_u', wind_u)
             kwargs['wind_v'] = structure.Wind('wind_v', wind_v)
-        if 'Temperature' in variables:
-            temperature = decoder['Temperature']
-            kwargs['temperature'] = structure.Temperature(temperature * u.K)
         if 'Tsurf' in variables:
             tsurf = decoder['Tsurf']
             kwargs['tsurf'] = structure.SurfaceTemperature(tsurf * u.K)
@@ -360,7 +365,7 @@ class PyGCM:
         kwargs['lon_start'] = float(lon_start)
         kwargs['lat_start'] = float(lat_start)
 
-        return cls(pressure, *args.values(), **kwargs)
+        return cls(pressure,temperature, *args.values(), **kwargs)
 
     @classmethod
     def from_bytes(cls, header: str, binary: bytes):
@@ -402,7 +407,7 @@ class PyGCM:
             The content of the GCM.
         """
         gcm_params = b'<ATMOSPHERE-GCM-PARAMETERS>' + self.header.encode(get_setting('encoding'))
-        binary = b'\n<BINARY>' + self.flat.tobytes(order='C') + b'</BINARY>'
+        binary = b'<BINARY>' + self.flat.tobytes(order='C') + b'</BINARY>'
         return gcm_params + b'\n' + binary
     
     def altitude(self, mass: u.Quantity, radius: u.Quantity, mean_molecular_mass: float) -> u.Quantity:

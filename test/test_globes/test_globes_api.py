@@ -4,7 +4,8 @@ API tests for GlobES
 import numpy as np
 import pytest
 from astropy import units as u
-from pypsg.globes import PyGCM, structure
+from pypsg.globes import PyGCM, structure, GCMdecoder
+from pypsg import PyConfig, APICall
 
 class TestPyGCM:
     def test_init(self):
@@ -32,35 +33,36 @@ class TestPyGCM:
         """
         
         pressure = structure.Pressure.from_limits(1*u.bar,1e-5*u.bar,(10,10,10))
-        pygcm = PyGCM(pressure)
+        temperature = structure.Temperature.from_adiabat(
+            1.0, structure.SurfaceTemperature(300*u.K*np.ones((10,10))), pressure
+        )
+        pygcm = PyGCM(pressure,temperature)
         assert pygcm.wind_u.dat.shape == (10,10,10)
         assert pygcm.wind_v.dat.shape == (10,10,10)
         assert 'Wind' in pygcm.header
         assert 'Pressure' in pygcm.header
         assert pygcm.flat.dtype == np.float32
-        assert pygcm.flat.size == 3*10*10*10
+        assert pygcm.flat.size == 4*10*10*10
         assert pygcm.molecules == []
         assert pygcm.aerosols == []
         assert pygcm.aerosol_sizes == []
         
-        wind_u = structure.Wind.contant('wind_u', 0*u.m/u.s, (10,10,10))
-        wind_v = structure.Wind.contant('wind_v', 0*u.m/u.s, (10,10,10))
-        pygcm = PyGCM(pressure, wind_u, wind_v)
+        wind_u = structure.Wind.constant('wind_u', 0*u.m/u.s, (10,10,10))
+        wind_v = structure.Wind.constant('wind_v', 0*u.m/u.s, (10,10,10))
+        pygcm = PyGCM(pressure,temperature, wind_u, wind_v)
         assert 'Wind' in pygcm.header
         assert 'Pressure' in pygcm.header
         assert pygcm.flat.dtype == np.float32
-        assert np.all(pygcm.flat == PyGCM(pressure).flat)
+        assert np.all(pygcm.flat == PyGCM(pressure,temperature).flat)
         with pytest.warns(RuntimeWarning):
-            _ = structure.Wind.contant('U', 0*u.m/u.s, (10,10,10))
+            _ = structure.Wind.constant('U', 0*u.m/u.s, (10,10,10))
         
-        tsurf = structure.SurfaceTemperature(np.ones((10,10))*300*u.K)
-        temperature = structure.Temperature.from_adiabat(1.4, tsurf, pressure)
         pygcm = PyGCM(pressure, temperature)
         assert 'Temperature' in pygcm.header
         assert 'Pressure' in pygcm.header
         assert pygcm.flat.dtype == np.float32
         
-        h2o = structure.Molecule.constant('H2O', 1e-5, (10,10,10))
+        h2o = structure.Molecule.constant('H2O', 1e-5*u.dimensionless_unscaled, (10,10,10))
         pygcm = PyGCM(pressure,temperature, h2o)
         assert 'Pressure' in pygcm.header
         assert 'Temperature' in pygcm.header
@@ -68,6 +70,31 @@ class TestPyGCM:
         assert pygcm.molecules[0].name == 'H2O'
         cfg = pygcm.update_params()
         assert cfg.molecules.value[0].name == 'H2O'
+    
+    def test_to_psg(self):
+        nlayer = 10
+        nlon = 30
+        nlat = 20
+        shape = (nlayer, nlon, nlat)
+        wind_u = structure.Wind.constant('wind_u', 1*u.m/u.s,shape)
+        wind_v = structure.Wind.constant('wind_v', -1*u.m/u.s,shape)
+        pressure = structure.Pressure.from_profile(10.**(-np.arange(nlayer))*u.bar, (nlon,nlat))
+        surface_pressure = structure.SurfacePressure.from_pressure(pressure)
+        surface_temperature = structure.SurfaceTemperature(np.ones((nlon,nlat))*300*u.K)
+        temperature = structure.Temperature.from_adiabat(1.0, surface_temperature, pressure)
+        albedo = structure.Albedo.constant(0.5, (nlon,nlat))
+        co2 = structure.Molecule.constant('CO2', 1e-5, shape)
+        pygcm = PyGCM(pressure, temperature, co2, wind_u=wind_u, wind_v=wind_v,
+                       psurf=surface_pressure, tsurf=surface_temperature,
+                       albedo=albedo)
+        cfg = PyConfig(gcm=pygcm)
+        psg = APICall(cfg,'all','globes')
+        decoder = GCMdecoder.from_psg(cfg.content)
+        assert decoder['Winds'].shape == (2,nlayer, nlon, nlat)
+        response = psg()
+        assert not np.any(np.isnan(response.lyr.prof['CO2']))
+        
+        
         
 
 if __name__ == '__main__':
