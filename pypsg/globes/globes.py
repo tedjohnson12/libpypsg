@@ -8,7 +8,7 @@ from astropy import units as u, constants as c
 from . import structure
 from ..cfg.models import EquilibriumAtmosphere
 from ..cfg.base import Molecule, Aerosol
-from ..settings import atmosphere_type_dict as mtype, aerosol_type_dict as atype
+from ..settings import atmosphere_type_dict as mtype, aerosol_type_dict as atype, get_setting
 from .decoder import GCMdecoder, sep_header
 
 ANGLE_UNIT = u.deg
@@ -265,7 +265,7 @@ class PyGCM:
         np.ndarray
             The flattened array.
         """
-        return np.concatenate([v.flat.astype(DTYPE) for v in self._variables])
+        return np.concatenate([v.flat.astype(DTYPE) for v in self._variables]).astype(DTYPE)
 
     @property
     def molecules(self):
@@ -318,6 +318,21 @@ class PyGCM:
         Read a GCM from a decoder.
         """
         coords, variables = sep_header(decoder.header)
+        if 'Pressure' in variables:
+            pressure = decoder['Pressure']
+            pressure = structure.Pressure(10**pressure * u.bar)
+        
+        args = {}
+        
+        molecules = decoder.get_molecules()
+        for molecule in molecules:
+            args[molecule] = structure.Molecule(molecule, (10**decoder[molecule])*u.dimensionless_unscaled)
+        aerosols, aerosol_sizes = decoder.get_aerosols()
+        for aerosol, aerosol_size in zip(aerosols, aerosol_sizes):
+            args[aerosol] = structure.Aerosol(aerosol, (10**decoder[aerosol])*u.dimensionless_unscaled)
+            args[aerosol_size] = structure.AerosolSize(
+                aerosol_size, 10**(decoder[aerosol_size])*u.m)
+        
         kwargs = {}
         if 'Wind' in variables:
             wind = decoder['Wind']
@@ -325,9 +340,6 @@ class PyGCM:
             wind_v = wind[1, :, :, :] * u.m / u.s
             kwargs['wind_u'] = structure.Wind('wind_u', wind_u)
             kwargs['wind_v'] = structure.Wind('wind_v', wind_v)
-        if 'Pressure' in variables:
-            pressure = decoder['Pressure']
-            kwargs['pressure'] = structure.Pressure(10**pressure * u.bar)
         if 'Temperature' in variables:
             temperature = decoder['Temperature']
             kwargs['temperature'] = structure.Temperature(temperature * u.K)
@@ -339,25 +351,16 @@ class PyGCM:
             kwargs['psurf'] = structure.SurfacePressure(10**psurf * u.bar)
         if 'Albedo' in variables:
             albedo = decoder['Albedo']
-            kwargs['albedo'] = structure.Albedo(albedo)
+            kwargs['albedo'] = structure.Albedo(albedo*u.dimensionless_unscaled)
         if 'Emissivity' in variables:
             emissivity = decoder['Emissivity']
-            kwargs['emissivity'] = structure.Emissivity(emissivity)
-
-        molecules = decoder.get_molecules()
-        for molecule in molecules:
-            kwargs[molecule] = structure.Molecule(molecule, decoder[molecule])
-        aerosols, aerosol_sizes = decoder.get_aerosols()
-        for aerosol, aerosol_size in zip(aerosols, aerosol_sizes):
-            kwargs[aerosol] = structure.Aerosol(aerosol, decoder[aerosol])
-            kwargs[aerosol_size] = structure.AerosolSize(
-                aerosol_size, decoder[aerosol_size]*u.m)
+            kwargs['emissivity'] = structure.Emissivity(emissivity*u.dimensionless_unscaled)
 
         _, _, _, lon_start, lat_start, _, _ = coords
-        kwargs['lon_start'] = lon_start
-        kwargs['lat_start'] = lat_start
+        kwargs['lon_start'] = float(lon_start)
+        kwargs['lat_start'] = float(lat_start)
 
-        return cls(**kwargs)
+        return cls(pressure, *args.values(), **kwargs)
 
     @classmethod
     def from_bytes(cls, header: str, binary: bytes):
@@ -371,7 +374,7 @@ class PyGCM:
         binary : bytes
             The binary data of the GCM.
         """
-        decoder = GCMdecoder(header, binary)
+        decoder = GCMdecoder(header, np.frombuffer(binary,dtype='float32'))
         return cls.from_decoder(decoder)
 
     @classmethod
@@ -388,6 +391,20 @@ class PyGCM:
         dat = d['BINARY']
         return cls.from_bytes(header, dat)
 
+    @property
+    def content(self)-> bytes:
+        """
+        Get the content of the GCM in a format that PSG can read.
+
+        Returns
+        -------
+        bytes
+            The content of the GCM.
+        """
+        gcm_params = b'<ATMOSPHERE-GCM-PARAMETERS>' + self.header.encode(get_setting('encoding'))
+        binary = b'\n<BINARY>' + self.flat.tobytes(order='C') + b'</BINARY>'
+        return gcm_params + b'\n' + binary
+    
     def altitude(self, mass: u.Quantity, radius: u.Quantity, mean_molecular_mass: float) -> u.Quantity:
         """
         Use the equation of hydrostatic equilibrium to calculate the
