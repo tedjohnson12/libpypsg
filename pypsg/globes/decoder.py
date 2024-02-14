@@ -190,13 +190,13 @@ class GCMdecoder:
 
             def package_array(dat, key):
                 if key == 'single':
-                    Nlat, Nlon, Nlayer = self.get_shape()
+                    Nlon, Nlat, Nlayer = self.get_shape()
                     return dat.reshape(Nlayer, Nlon, Nlat)
                 elif key == 'flat':
-                    Nlat, Nlon, Nlayer = self.get_shape()
+                    Nlon, Nlat, Nlayer = self.get_shape()
                     return dat.reshape(Nlon, Nlat)
                 elif key == 'double':
-                    Nlat, Nlon, Nlayer = self.get_shape()
+                    Nlon, Nlat, Nlayer = self.get_shape()
                     return dat.reshape(2, Nlayer, Nlon, Nlat)
                 else:
                     raise ValueError(f'Unknown value {key}')
