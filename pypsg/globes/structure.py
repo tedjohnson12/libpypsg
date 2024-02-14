@@ -12,6 +12,7 @@ from astropy.units.quantity import Quantity
 
 import numpy as np
 
+DTYPE = 'float32'
 
 class Variable(ABC):
     """
@@ -54,6 +55,9 @@ class Variable(ABC):
         psg_unit: u.Unit,
         dat: u.Quantity
     ):
+        if not isinstance(dat, u.Quantity):
+            raise ValueError(f'dat must be a Quantity object, not {type(dat)}.')
+        
         self.name = name
         self.psg_unit = psg_unit
         self.dat = dat
@@ -74,12 +78,12 @@ class Variable(ABC):
             The flattened array.
         """
         if self.dat.ndim == 1:
-            return self.dat.to_value(self.psg_unit).astype('float32').flatten('C')
+            return self.dat.to_value(self.psg_unit).astype(DTYPE).flatten('C')
         if self.dat.ndim == 2:
-            axes = (0, 1)
+            return self.dat.to_value(self.psg_unit).astype(DTYPE).flatten('C')
         else:
             axes = (1, 2)
-        return np.swapaxes(self.dat.to_value(self.psg_unit).astype('float32'), *axes).flatten('C')
+        return np.swapaxes(self.dat.to_value(self.psg_unit).astype(DTYPE), *axes).flatten('C')
 
     @property
     def shape(self) -> tuple:
@@ -218,6 +222,11 @@ class Pressure(Variable3D):
 
     def __init__(self, dat: u.Quantity):
         super().__init__('Pressure', u.LogUnit(u.bar), dat)
+    
+    @property
+    def flat(self):
+        return super().flat
+        
 
     @classmethod
     def from_profile(cls, profile: u.Quantity, shape: tuple):
@@ -320,6 +329,10 @@ class SurfacePressure(Variable2D):
 
     def __init__(self, dat: u.Quantity):
         super().__init__('Psurf', u.LogUnit(u.bar), dat)
+    
+    @property
+    def flat(self):
+        return super().flat
 
     @classmethod
     def constant(cls, value: u.Quantity, shape: tuple):
