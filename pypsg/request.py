@@ -256,6 +256,23 @@ class APICall:
             timeout=timeout
         )
         return reply
+    
+    def reset(self):
+        """
+        Reset PSG to its initial state.
+        """
+        api_key = settings.get_setting('api_key')
+        url = self.url
+        if '/api.php' not in url:
+            url = f'{url}/api.php'
+        _ = self.call(
+            cfg=PyConfig(),
+            output_type='set',
+            app=None,
+            api_key=api_key,
+            url=url,
+            timeout=settings.get_setting('timeout')
+        )
 
     def __call__(self) -> PSGResponse:
         """
