@@ -212,7 +212,7 @@ class PyConfig:
         for key in d:
             if not key.isupper():
                 raise ValueError(f'Invalid config key: {key}')
-        has_gcm = 'ATMOSPHERE-GCM-PARAMETERS' in d
+        has_gcm = 'ATMOSPHERE-GCM-PARAMETERS' in d and 'BINARY' in d
         gcm = PyGCM.from_cfg(d) if has_gcm else None
         atmosphere = models.Atmosphere.from_cfg(d)
         if has_gcm and isinstance(atmosphere, models.EquilibriumAtmosphere):
@@ -274,7 +274,7 @@ class PyConfig:
         for model in [
             self.target,
             self.geometry,
-            self.atmosphere,
+            self.gcm.update_params(self.atmosphere) if self.gcm is not None else self.atmosphere,
             self.surface,
             self.generator,
             self.telescope,
