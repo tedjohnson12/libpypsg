@@ -208,7 +208,7 @@ class PyGCM:
         """
 
         _, nlon, _ = self.shape
-        return 360*u.deg / nlon
+        return 360*u.deg / (nlon - 1)
 
     @property
     def dlat(self) -> u.Quantity:

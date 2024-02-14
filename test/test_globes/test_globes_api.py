@@ -79,8 +79,17 @@ class TestPyGCM:
         wind_u = structure.Wind.constant('wind_u', 1*u.m/u.s,shape)
         wind_v = structure.Wind.constant('wind_v', -1*u.m/u.s,shape)
         pressure = structure.Pressure.from_profile(10.**(-np.arange(nlayer))*u.bar, (nlon,nlat))
+        
+        lat = np.linspace(-90, 90, nlat)
+        near_eq_lat = np.abs(lat) < 10
+        lons = np.linspace(0, 360, nlon)
+        near_int_date_line = np.abs(lons-180) < 30
+        tsurf = np.ones((nlon,nlat))*300*u.K
+        tsurf[:,near_eq_lat] = 280*u.K
+        tsurf[near_int_date_line,:] = 320*u.K
+        
         surface_pressure = structure.SurfacePressure.from_pressure(pressure)
-        surface_temperature = structure.SurfaceTemperature(np.ones((nlon,nlat))*300*u.K)
+        surface_temperature = structure.SurfaceTemperature(tsurf)
         temperature = structure.Temperature.from_adiabat(1.0, surface_temperature, pressure)
         albedo = structure.Albedo.constant(0.5, (nlon,nlat))
         co2 = structure.Molecule.constant('CO2', 1e-5, shape)
@@ -93,8 +102,7 @@ class TestPyGCM:
         assert decoder['Winds'].shape == (2,nlayer, nlon, nlat)
         response = psg()
         assert not np.any(np.isnan(response.lyr.prof['CO2']))
-        
-        
+    
         
 
 if __name__ == '__main__':

@@ -185,7 +185,7 @@ def get_psurf(data: Dataset, itime: int) -> structure.SurfacePressure:
     psurf : structure.SurfacePressure
         The surface pressure
     """
-    psurf = data.variables['PS'][itime, :, :]
+    psurf = data.variables['PS'][itime, :, :].T
     ps_unit = u.Unit(data.variables['PS'].units)
     return structure.SurfacePressure(psurf * ps_unit)
 
@@ -212,6 +212,7 @@ def get_pressure(data: Dataset, itime: int) -> structure.Pressure:
     ps = get_psurf(data, itime)
     pressure = p0 * hyam[:, np.newaxis, np.newaxis] + \
         ps.dat[np.newaxis, :, :] * hybm[:, np.newaxis, np.newaxis]
+    # pressure = np.swapaxes(pressure, 1,2)
     return structure.Pressure(pressure)
 
 
@@ -234,6 +235,7 @@ def get_temperature(data: Dataset, itime: int) -> structure.Temperature:
     temperature = np.flip(
         np.array(data.variables['T'][itime, :, :, :]), axis=0)
     temperature = u.Unit(data.variables['T'].units) * temperature
+    temperature = np.swapaxes(temperature, 1,2)
     return structure.Temperature(temperature)
 
 
@@ -262,7 +264,7 @@ def get_tsurf(data: Dataset, itime: int) -> structure.SurfaceTemperature:
         warnings.warn(msg, VariableAssumptionWarning)
         temp = get_temperature(data, itime).dat
         tsurf = temp[0, :, :]
-    return structure.SurfaceTemperature(tsurf[:, :])
+    return structure.SurfaceTemperature(tsurf[:, :].T)
 
 
 def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind]:
@@ -299,6 +301,8 @@ def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind
         warnings.warn(msg, VariableAssumptionWarning)
         _, nlayers, nlat, nlon = get_shape(data)
         wind_v = np.zeros((nlayers, nlat, nlon)) * u.m / u.s
+    wind_u = np.swapaxes(wind_u, 1, 2)
+    wind_v = np.swapaxes(wind_v, 1, 2)
     return structure.Wind('wind_u', wind_u), structure.Wind('wind_v', wind_v)
 
 
@@ -327,7 +331,7 @@ def get_albedo(data: Dataset, itime: int) -> structure.Albedo:
         warnings.warn(msg, VariableAssumptionWarning)
         _, _, nlat, nlon = get_shape(data)
         albedo = np.ones((nlat, nlon)) * ALBEDO_DEFAULT
-    return structure.Albedo(albedo*u.dimensionless_unscaled)
+    return structure.Albedo(albedo.T*u.dimensionless_unscaled)
 
 def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
     """
@@ -354,7 +358,7 @@ def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
         warnings.warn(msg, VariableAssumptionWarning)
         _, _, nlat, nlon = get_shape(data)
         emissivity = np.ones((nlat, nlon)) * EMISSIVITY_DEFAULT
-    return structure.Emissivity(emissivity*u.dimensionless_unscaled)
+    return structure.Emissivity(emissivity.T*u.dimensionless_unscaled)
 
 
 def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill_value: float, unit: u.Unit, cls: Type):
@@ -364,6 +368,7 @@ def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill
     dat = np.flip(
         np.array(data.variables[translator.get(name, name)][itime, :, :, :]), axis=0)
     dat = np.where((dat > 0) & (np.isfinite(dat)), dat, fill_value) * unit
+    dat = np.swapaxes(dat, 1, 2)
     return cls(name, dat)
 
 
@@ -460,7 +465,7 @@ def get_molecule_suite(data: Dataset, itime: int, names: list, background: str =
         else:
             _, n_layer, n_lat, n_lon = get_shape(data)
             background_abn = np.ones(
-                shape=(n_layer, n_lat, n_lon))*u.dimensionless_unscaled
+                shape=(n_layer, n_lon, n_lat))*u.dimensionless_unscaled
             for molec in molecs:
                 background_abn -= molec.dat
             if np.any(background_abn < 0):
@@ -509,10 +514,10 @@ def to_pygcm(
     
     return PyGCM(
         get_pressure(data,itime),
+        get_temperature(data,itime),
         *(molecules + _aerosols + aerosol_sizes),
         wind_u=wind_u,
         wind_v=wind_v,
-        temperature=get_temperature(data,itime),
         tsurf=get_tsurf(data,itime),
         psurf=get_psurf(data,itime),
         albedo=get_albedo(data,itime),

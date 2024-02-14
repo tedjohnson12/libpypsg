@@ -80,7 +80,9 @@ class Variable(ABC):
         if self.dat.ndim == 1:
             return self.dat.to_value(self.psg_unit).astype(DTYPE).flatten('C')
         if self.dat.ndim == 2:
-            return self.dat.to_value(self.psg_unit).astype(DTYPE).flatten('C')
+            axes = (0, 1)
+            return np.swapaxes(self.dat.to_value(self.psg_unit).astype(DTYPE), *axes).flatten('C')
+            # return self.dat.to_value(self.psg_unit).T[:,::-1].astype(DTYPE).flatten('C')
         else:
             axes = (1, 2)
         return np.swapaxes(self.dat.to_value(self.psg_unit).astype(DTYPE), *axes).flatten('C')
