@@ -70,8 +70,8 @@ Fill in nans and infs
 """
 AERO_SIZE_TRANSLATOR = {
     # "PSG" : "WACCM",
-    'Water': 'REL',
-    'WaterIce': 'REI',
+    'Water_size': 'REL',
+    'WaterIce_size': 'REI',
 }
 AERO_SIZE_FILL_VALUE = 1e-6
 """
@@ -432,7 +432,7 @@ def get_aerosol_size(data: Dataset, itime: int, name: str) -> structure.AerosolS
     aero : structure.Aerosol
         The concentration of the aerosol.
     """
-    return _generic_getter(data, itime, name, AERO_SIZE_TRANSLATOR, AERO_SIZE_FILL_VALUE, psg_aerosol_size_unit, structure.AerosolSize)
+    return _generic_getter(data, itime, f'{name}_size', AERO_SIZE_TRANSLATOR, AERO_SIZE_FILL_VALUE, psg_aerosol_size_unit, structure.AerosolSize)
 
 
 def get_molecule_suite(data: Dataset, itime: int, names: list, background: str = None) -> Tuple[structure.Molecule]:

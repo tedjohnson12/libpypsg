@@ -26,7 +26,6 @@ chdir(Path(__file__).parent)
 @pytest.fixture()
 def data_path():
     if rw.TEST_PATH.exists():
-        return Path('/home/ted/gcms/waccm/10-2o2_90ob_nov.nc')
         return rw.TEST_PATH
     else:
         return rw.TEST_URL
