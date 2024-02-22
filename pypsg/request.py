@@ -14,6 +14,9 @@ from pypsg import settings
 from pypsg import exceptions
 from pypsg.rad import PyRad
 from pypsg.lyr import PyLyr
+from pypsg import docker
+
+docker.set_url_and_run()
 
 typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
     b'cfg': PyConfig,

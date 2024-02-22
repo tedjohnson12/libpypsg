@@ -83,12 +83,12 @@ class PyGCM:
     ----------
     pressure : pypsg.globes.structure.Pressure
         The pressure variable.
+    temperature : pypsg.globes.structure.Temperature
+        The temperature variable.
     wind_u : pypsg.globes.structure.Wind, optional
         The west-to-east wind variable.
     wind_v : pypsg.globes.structure.Wind, optional
         The south-to-north wind variable.
-    temperature : pypsg.globes.structure.Temperature, optional
-        The temperature variable.
     tsurf : pypsg.globes.structure.SurfaceTemperature, optional
         The surface temperature variable.
     psurf : pypsg.globes.structure.SurfacePressure, optional
