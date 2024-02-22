@@ -145,7 +145,7 @@ def test_write_cfg_params(data_path):
     assert b'<ATMOSPHERE-GAS>H2O' in content
     assert b'<ATMOSPHERE-NGAS>1' in content
 
-def test_call_psg(data_path):
+def test_call_psg(data_path,psg_url):
     with nc.Dataset(data_path,'r',format='NETCDF4') as data:
         gcm = exocam_to_pygcm(
             data,
@@ -155,9 +155,9 @@ def test_call_psg(data_path):
             mean_molecular_mass=28.01
         )
         cfg = PyConfig(gcm=gcm)
-        psg = APICall(cfg,'all','globes')
+        psg = APICall(cfg,'all','globes',url=psg_url)
         response = psg()
-        assert not np.any(np.isnan(response.lyr.prof['CO2']))
+        assert not np.any(np.isnan(response.lyr.prof['H2O']))
 
 if __name__ in '__main__':
     pytest.main(args=[__file__])

@@ -143,7 +143,7 @@ def test_write_cfg_params(data_path):
     0
     
 
-def test_call_psg(data_path):
+def test_call_psg(data_path,psg_url):
     with nc.Dataset(data_path,'r',format='NETCDF4') as data:
         gcm = waccm_to_pygcm(
             data,
@@ -152,7 +152,7 @@ def test_call_psg(data_path):
             aerosols=None,
         )
         cfg = PyConfig(gcm=gcm)
-        psg = APICall(cfg,'all','globes')
+        psg = APICall(cfg,'all','globes',url=psg_url)
         response = psg()
         assert not np.any(np.isnan(response.lyr.prof['CO2']))
     

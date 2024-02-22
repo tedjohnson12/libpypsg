@@ -71,7 +71,7 @@ class TestPyGCM:
         cfg = pygcm.update_params()
         assert cfg.molecules.value[0].name == 'H2O'
     
-    def test_to_psg(self):
+    def test_to_psg(self,psg_url):
         nlayer = 10
         nlon = 30
         nlat = 20
@@ -97,7 +97,7 @@ class TestPyGCM:
                        psurf=surface_pressure, tsurf=surface_temperature,
                        albedo=albedo)
         cfg = PyConfig(gcm=pygcm)
-        psg = APICall(cfg,'all','globes')
+        psg = APICall(cfg,'all','globes',url=psg_url)
         decoder = GCMdecoder.from_psg(cfg.content)
         assert decoder['Winds'].shape == (2,nlayer, nlon, nlat)
         response = psg()
