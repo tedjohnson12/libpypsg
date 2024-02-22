@@ -260,7 +260,7 @@ def get_tsurf(data: Dataset, itime: int) -> structure.SurfaceTemperature:
         The surface temperature.
     """
     try:
-        tsurf = np.array(data.variables['TS'][itime, :, :])
+        tsurf = np.array(data.variables['TS'][itime, :, :]).T
         tsurf = u.Unit(data.variables['TS'].units) * tsurf
     except KeyError:
         msg = 'Surface Temperature not explicitly stated. '
