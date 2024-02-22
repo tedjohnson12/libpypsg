@@ -6,6 +6,9 @@ on:
       - main
       - develop
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build-linux:
