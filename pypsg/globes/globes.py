@@ -208,7 +208,7 @@ class PyGCM:
         """
 
         _, nlon, _ = self.shape
-        return 360*u.deg / (nlon - 1)
+        return 360*u.deg / (nlon)
 
     @property
     def dlat(self) -> u.Quantity:
@@ -222,23 +222,23 @@ class PyGCM:
         """
 
         _, _, nlat = self.shape
-        return 180*u.deg / nlat
+        return 180*u.deg / (nlat)
 
     @property
-    def lons(self) -> u.Quantity:
+    def lons(self) -> np.ndarray:
         """
         Get the longitude values.
         """
         _, nlon, _ = self.shape
-        return self.lon_start*u.deg + np.arange(nlon) * self.dlon
+        return self.lon_start + np.arange(nlon+1) * self.dlon.to_value(ANGLE_UNIT)
 
     @property
-    def lats(self) -> u.Quantity:
+    def lats(self) -> np.ndarray:
         """
         Get the latitude values.
         """
         _, _, nlat = self.shape
-        return self.lat_start*u.deg + np.arange(nlat) * self.dlat
+        return self.lat_start + np.arange(nlat+1) * self.dlat.to_value(ANGLE_UNIT)
 
     @property
     def header(self):
