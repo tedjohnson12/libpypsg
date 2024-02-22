@@ -143,8 +143,12 @@ def get_time_index(data: Dataset, time: u.Quantity):
     time_in_days = time.to_value(TIME_UNIT)
     time_left = data.variables['time_bnds'][:, 0]
     time_right = data.variables['time_bnds'][:, 1]
-    itime = np.argwhere((time_in_days > time_left) &
-                        (time_in_days <= time_right))[0][0]
+    try:
+        itime = np.argwhere((time_in_days > time_left) &
+                            (time_in_days <= time_right))[0][0]
+    except IndexError:
+        msg = f'Time must be between {time_left[0]:.1f} and {time_right[-1]:.1f} days.'
+        raise ValueError(msg) from IndexError
     return itime
 
 
@@ -264,7 +268,7 @@ def get_tsurf(data: Dataset, itime: int) -> structure.SurfaceTemperature:
         warnings.warn(msg, VariableAssumptionWarning)
         temp = get_temperature(data, itime).dat
         tsurf = temp[0, :, :]
-    return structure.SurfaceTemperature(tsurf[:, :].T)
+    return structure.SurfaceTemperature(tsurf[:, :])
 
 
 def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind]:
