@@ -6,6 +6,7 @@ import pytest
 from astropy import units as u
 from pypsg.globes import PyGCM, structure, GCMdecoder
 from pypsg import PyConfig, APICall
+from pypsg.cfg import models
 
 class TestPyGCM:
     def test_init(self):
@@ -96,10 +97,17 @@ class TestPyGCM:
         pygcm = PyGCM(pressure, temperature, co2, wind_u=wind_u, wind_v=wind_v,
                        psurf=surface_pressure, tsurf=surface_temperature,
                        albedo=albedo)
+        tele = models.SingleTelescope(
+            fov = 5*u.arcsec
+        )
+        geo = models.Observatory(observer_altitude = 1.3*u.pc,)
+        obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
+        cfg = PyConfig(gcm=pygcm,telescope=tele,geometry=geo,target=obj)
         cfg = PyConfig(gcm=pygcm)
         psg = APICall(cfg,'all','globes',url=psg_url)
         decoder = GCMdecoder.from_psg(cfg.content)
         assert decoder['Winds'].shape == (2,nlayer, nlon, nlat)
+        psg.reset()
         response = psg()
         assert not np.any(np.isnan(response.lyr.prof['CO2']))
     

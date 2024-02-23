@@ -11,6 +11,7 @@ from os import chdir
 from pathlib import Path
 import pytest
 import numpy as np
+from astropy import units as u
 
 import netCDF4 as nc
 
@@ -19,6 +20,7 @@ import pypsg.globes.exocam.exocam as rw
 from pypsg.globes import PyGCM, exocam_to_pygcm
 from pypsg.globes import structure
 from pypsg import PyConfig, APICall
+from pypsg.cfg import models
 
 
 chdir(Path(__file__).parent)
@@ -154,8 +156,14 @@ def test_call_psg(data_path,psg_url):
             aerosols=['Water'],
             mean_molecular_mass=28.01
         )
-        cfg = PyConfig(gcm=gcm)
+        tele = models.SingleTelescope(
+            fov = 5*u.arcsec
+        )
+        geo = models.Observatory(observer_altitude = 1.3*u.pc,)
+        obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
+        cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj)
         psg = APICall(cfg,'all','globes',url=psg_url)
+        psg.reset()
         response = psg()
         assert not np.any(np.isnan(response.lyr.prof['H2O']))
 
