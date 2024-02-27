@@ -6,6 +6,7 @@ from pathlib import Path
 import json
 import numpy as np
 from astropy import units as u, constants as c
+from typing import Tuple, List
 
 MOLEC_DATA_PATH = Path(__file__).parent / 'molec.json'
 
@@ -51,10 +52,29 @@ def sep_header(header):
 
 
 class GCMdecoder:
+    """
+    A container for a PSG GCM binary.
+    
+    This class can read a PSG config containing a GCM and parse the bytes sequence.
+    
+    Parameters
+    ----------
+    header : str
+        The header of the GCM.
+    dat : bytes
+        The binary data of the GCM.
+    """
+    
     DOUBLE = ['Winds']
+    """
+    Keywords with two 3D arrays.
+    """
     FLAT = ['Tsurf', 'Psurf', 'Albedo', 'Emissivity']
+    """
+    Keywords corresponding to 2D arrays.
+    """
 
-    def __init__(self, header, dat):
+    def __init__(self, header:str, dat:bytes):
         self.header = header
         self.dat = dat
 
@@ -72,6 +92,16 @@ class GCMdecoder:
         return cls(head, dat)
 
     def rename_var(self, oldname, newname):
+        """
+        Rename a variable in the GCM.
+        
+        Parameters
+        ----------
+        oldname : str
+            The old name of the variable.
+        newname : str
+            The new name of the variable.
+        """
         coords, vars = sep_header(self.header)
         if oldname in vars:
             vars = [newname if var == oldname else var for var in vars]
@@ -80,37 +110,63 @@ class GCMdecoder:
         new_header = ','.join(coords+vars)
         self.header = new_header
 
-    def get_shape(self):
+    def get_shape(self)->Tuple[int, int, int]:
+        """
+        The shape of the GCM.
+        
+        Returns
+        -------
+        tuple
+            The shape of the GCM (Nlon,Nlat,Nlayer).
+        """
         coord, _ = sep_header(self.header)
         Nlon, Nlat, Nlayer, _, _, _, _ = coord
         return int(Nlon), int(Nlat), int(Nlayer)
 
-    def get_3d_size(self):
+    def get_3d_size(self)->int:
+        """
+        The size of a 3D variable.
+        """
         Nlon, Nlat, Nlayer = self.get_shape()
         return Nlon*Nlat*Nlayer
 
-    def get_2d_size(self):
+    def get_2d_size(self)->int:
+        """
+        The size of a 2D variable.
+        """
         Nlon, Nlat, _ = self.get_shape()
         return Nlon*Nlat
 
-    def get_lats(self):
+    def get_lats(self)->np.ndarray:
+        """
+        Get the latitude points.
+        """
         coord, _ = sep_header(self.header)
         _, Nlat, _, _, lat0, _, dlat = coord
         return np.arange(int(Nlat))*float(dlat) + float(lat0)
 
-    def get_lons(self):
+    def get_lons(self)->np.ndarray:
+        """
+        Get the longitude points.
+        """
         coord, _ = sep_header(self.header)
         Nlon, _, _, lon0, _, dlon, _ = coord
         return np.arange(int(Nlon))*float(dlon) + float(lon0)
 
-    def get_molecules(self):
+    def get_molecules(self)->List[str]:
+        """
+        Get the names of the molecules in the GCM
+        """
         with open(MOLEC_DATA_PATH, 'rt', encoding='UTF-8') as file:
             molec_data = json.loads(file.read())
         _, variables = sep_header(self.header)
         molecs = [var for var in variables if var in molec_data.keys()]
         return molecs
 
-    def get_aerosols(self):
+    def get_aerosols(self)->Tuple[List[str], List[str]]:
+        """
+        Get the names of the aerosols and the aerosol sizes.
+        """
         _, variables = sep_header(self.header)
         aerosols = [var for var in variables if var+'_size' in variables]
         aerosol_sizes = [aero+'_size' for aero in aerosols]
@@ -134,13 +190,13 @@ class GCMdecoder:
 
             def package_array(dat, key):
                 if key == 'single':
-                    Nlat, Nlon, Nlayer = self.get_shape()
+                    Nlon, Nlat, Nlayer = self.get_shape()
                     return dat.reshape(Nlayer, Nlon, Nlat)
                 elif key == 'flat':
-                    Nlat, Nlon, Nlayer = self.get_shape()
+                    Nlon, Nlat, Nlayer = self.get_shape()
                     return dat.reshape(Nlon, Nlat)
                 elif key == 'double':
-                    Nlat, Nlon, Nlayer = self.get_shape()
+                    Nlon, Nlat, Nlayer = self.get_shape()
                     return dat.reshape(2, Nlayer, Nlon, Nlat)
                 else:
                     raise ValueError(f'Unknown value {key}')
@@ -181,7 +237,12 @@ class GCMdecoder:
 
     def remove(self, item):
         """
-        remove an item from the gcm
+        Remove an item from the gcm
+        
+        Parameters
+        ----------
+        item : str
+            The name of the item to remove.
         """
         coords, variables = sep_header(self.header)
         if item not in variables:
@@ -208,6 +269,19 @@ class GCMdecoder:
     def copy_config(self, path_to_copy: Path, path_to_write: Path, NMAX=2, LMAX=2, mean_mass=28):
         """
         Copy a PSG config file but overwrite all GCM parameters and data
+        
+        Parameters
+        ----------
+        path_to_copy : pathlib.Path
+            The path to the config file to copy.
+        path_to_write : pathlib.Path
+            The path to write the new config file.
+        NMAX : int
+            PSG NMAX parameter
+        LMAX : int
+            PSG LMAX parameter
+        mean_mass : float
+            The mean molecular mass of the atmosphere.
         """
         def replace_line(line):
             if b'<ATMOSPHERE-GCM-PARAMETERS>' in line:
@@ -281,7 +355,7 @@ class GCMdecoder:
                 outfile.write(np.asarray(self.dat, dtype='float32', order='C'))
                 outfile.write(b'</BINARY>')
 
-    def get_mean_molec_mass(self):
+    def get_mean_molec_mass(self)->np.ndarray:
         """
         Get the mean molecular mass at every point on the GCM
         """
@@ -298,9 +372,21 @@ class GCMdecoder:
                 pass
         return mean_molec_mass
 
-    def get_alt(self, M: u.Quantity, R: u.Quantity):
+    def get_alt(self, M: u.Quantity, R: u.Quantity)->u.Quantity:
         """
         Get the altitude of each GCM point.
+        
+        Parameters
+        ----------
+        M : astropy.units.Quantity
+            The mass of the planet.
+        R : astropy.units.Quantity
+            The radius of the planet.
+        
+        Returns
+        -------
+        z : astropy.units.Quantity
+            The altitude of each GCM point.
         """
         P = 10**self['Pressure']*u.bar
         T = self['Temperature']*u.K
@@ -317,7 +403,7 @@ class GCMdecoder:
             z.append((z[-1]*z_unit+dz).to(z_unit).value)
         return z*z_unit
 
-    def get_column_density(self, mol: str, M: u.Quantity, R: u.Quantity,):
+    def get_column_density(self, mol: str, M: u.Quantity, R: u.Quantity,)->u.Quantity:
         """
         Get the column density of a gas at each point on the gcm.
         """

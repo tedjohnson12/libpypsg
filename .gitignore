@@ -162,3 +162,5 @@ cython_debug/
 # sphinx stuff
 docs/source/auto_examples
 docs/source/api
+docs/source/sg_execution_times.rst
+examples/output

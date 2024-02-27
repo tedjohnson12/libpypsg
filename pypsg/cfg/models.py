@@ -294,7 +294,7 @@ class Generator(Model):
     continuum_model = BooleanField('generator-cont-model')
     continuum_stellar = BooleanField('generator-cont-stellar')
     apply_telluric_noise = BooleanField('generator-trans-show')
-    apply_telluir_obs = BooleanField('generator-trans-apply')
+    apply_telluric_obs = BooleanField('generator-trans-apply')
     telluric_params = CharField('generator-trans', max_length=20)
     rad_units = UnitChoicesField(
         'generator-radunits',
