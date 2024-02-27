@@ -501,10 +501,10 @@ def to_pygcm(
     background : str, optional
         The optional background gas to assume.
     """
-    molecules:tuple = () if molecules is None else get_molecule_suite(data,itime,molecules,background,mean_molecular_mass)
+    molecules:tuple = tuple() if molecules is None else get_molecule_suite(data,itime,molecules,background,mean_molecular_mass)
     
-    _aerosols:tuple = () if aerosols is None else (get_aerosol(data,itime,name) for name in aerosols)
-    aerosol_sizes:tuple = () if aerosols is None else (get_aerosol_size(data,itime,name) for name in aerosols)
+    _aerosols:tuple = tuple() if aerosols is None else tuple(get_aerosol(data,itime,name) for name in aerosols)
+    aerosol_sizes:tuple = tuple() if aerosols is None else tuple(get_aerosol_size(data,itime,name) for name in aerosols)
     
     wind_u, wind_v = get_winds(data,itime)
     
