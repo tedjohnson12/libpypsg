@@ -3,6 +3,15 @@ Work with an ExoCAM GCM
 =======================
 
 Learn how to use the ``pypsg.globes`` ExoCAM module. 
+
+
+To get started, install ``pypsg``:
+
+.. code-block:: bash
+
+    pip install pypsg
+
+It would also be beneficial to have PSG installed with docker.
 """
 
 from pathlib import Path
@@ -15,6 +24,9 @@ from pypsg import PyConfig, APICall
 from pypsg.cfg import models
 from pypsg.docker import set_url_and_run
 from pypsg.units import resolving_power
+from pypsg import __version__
+
+assert __version__ == '0.2.2'
 
 TEST_PATH = download_exocam_test_data(rewrite=False) # Change this to the path of your dataset
 
