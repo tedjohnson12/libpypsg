@@ -12,7 +12,11 @@ In the simplest use case, users can create a PSG config file from scratch
 using the ``PyConfig`` class.
 """
 
+# sphinx_gallery_thumbnail_path = '_static/pypsg_basic.png'
+
 import pypsg
+
+pypsg.docker.set_url_and_run()
 
 cfg = pypsg.cfg.PyConfig(
     target=pypsg.cfg.Target(object='Exoplanet',name='Proxima Cen b')
