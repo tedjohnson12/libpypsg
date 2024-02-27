@@ -15,3 +15,4 @@ The main submodules are:
     modules/rad
     modules/settings
     modules/docker
+    modules/globes

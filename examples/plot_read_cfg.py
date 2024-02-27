@@ -20,7 +20,7 @@ except NameError:
 
 #%%
 # Read the file
-# ------------
+# -------------
 
 cfg = BinConfig.from_file(CFG_PATH)
 

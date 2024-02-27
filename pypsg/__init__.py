@@ -2,12 +2,13 @@
 PyPSG top-level module
 ======================
 """
-__version__ = '0.1.2'
-from pypsg.request import APICall, PSGResponse
-from pypsg import cfg
-from pypsg.cfg import PyConfig
-from pypsg.rad import PyRad
-from pypsg.lyr import PyLyr
-from pypsg import settings
-from pypsg import units
+__version__ = '0.2.1'
+from .request import APICall, PSGResponse
+from . import cfg
+from .cfg import PyConfig
+from .rad import PyRad
+from .lyr import PyLyr
+from . import settings
+from . import units
 from . import docker
+from . import globes

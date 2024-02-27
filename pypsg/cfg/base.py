@@ -1545,6 +1545,8 @@ class AerosolsField(Field):
 
     @property
     def content(self):
+        if self._naero == 0:
+            return bytes('', encoding=ENCODING)
         s = f'{self.naero}\n{self.aeros}\n{self.type}\n{self.abun}\n{self.unit}\n{self.size}\n{self.size_unit}'
         return bytes(s, encoding=ENCODING)
 
@@ -1625,6 +1627,8 @@ class Profile:
 
     def __init__(self, name: str, dat: np.ndarray, unit: u.Unit = u.dimensionless_unscaled):
         self.name = name
+        if isinstance(dat, u.Quantity):
+            raise TypeError('dat must be a numpy array.')
         self._dat = dat
         self.unit = unit
         self._validate()

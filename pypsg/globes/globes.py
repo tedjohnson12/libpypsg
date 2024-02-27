@@ -7,8 +7,8 @@ from astropy import units as u, constants as c
 
 from . import structure
 from ..cfg.models import EquilibriumAtmosphere
-from ..cfg.base import Molecule, Aerosol
-from ..settings import atmosphere_type_dict as mtype, aerosol_type_dict as atype
+from ..cfg.base import Molecule, Aerosol, Profile
+from ..settings import atmosphere_type_dict as mtype, aerosol_type_dict as atype, get_setting
 from .decoder import GCMdecoder, sep_header
 
 ANGLE_UNIT = u.deg
@@ -83,12 +83,12 @@ class PyGCM:
     ----------
     pressure : pypsg.globes.structure.Pressure
         The pressure variable.
+    temperature : pypsg.globes.structure.Temperature
+        The temperature variable.
     wind_u : pypsg.globes.structure.Wind, optional
         The west-to-east wind variable.
     wind_v : pypsg.globes.structure.Wind, optional
         The south-to-north wind variable.
-    temperature : pypsg.globes.structure.Temperature, optional
-        The temperature variable.
     tsurf : pypsg.globes.structure.SurfaceTemperature, optional
         The surface temperature variable.
     psurf : pypsg.globes.structure.SurfacePressure, optional
@@ -114,10 +114,10 @@ class PyGCM:
     def __init__(
         self,
         pressure: structure.Pressure,
+        temperature: structure.Temperature,
         *args: structure.Molecule | structure.Aerosol | structure.AerosolSize | structure.Surface,
         wind_u: structure.Wind = None,
         wind_v: structure.Wind = None,
-        temperature: structure.Temperature = None,
         tsurf: structure.SurfaceTemperature = None,
         psurf: structure.SurfacePressure = None,
         albedo: structure.Albedo = None,
@@ -127,11 +127,11 @@ class PyGCM:
         desc: str = None,
     ):
         self.pressure = pressure
+        self.temperature = temperature
         self.wind_u = structure.Wind.zero(
             'wind_u', pressure.shape) if wind_u is None else wind_u
         self.wind_v = structure.Wind.zero(
             'wind_v', pressure.shape) if wind_v is None else wind_v
-        self.temperature = temperature
         self.tsurf = tsurf
         self.psurf = psurf
         self.albedo = albedo
@@ -141,6 +141,7 @@ class PyGCM:
         self.lon_start = lon_start
         self.lat_start = lat_start
         self.desc = desc
+        self.variables = self._variables
 
     def __setattr__(self, __name: str, __value: Any) -> None:
         """
@@ -207,7 +208,7 @@ class PyGCM:
         """
 
         _, nlon, _ = self.shape
-        return 360*u.deg / nlon
+        return 360*u.deg / (nlon)
 
     @property
     def dlat(self) -> u.Quantity:
@@ -221,23 +222,23 @@ class PyGCM:
         """
 
         _, _, nlat = self.shape
-        return 180*u.deg / nlat
+        return 180*u.deg / (nlat)
 
     @property
-    def lons(self) -> u.Quantity:
+    def lons(self) -> np.ndarray:
         """
         Get the longitude values.
         """
         _, nlon, _ = self.shape
-        return self.lon_start*u.deg + np.arange(nlon) * self.dlon
+        return self.lon_start + np.arange(nlon+1) * self.dlon.to_value(ANGLE_UNIT)
 
     @property
-    def lats(self) -> u.Quantity:
+    def lats(self) -> np.ndarray:
         """
         Get the latitude values.
         """
         _, _, nlat = self.shape
-        return self.lat_start*u.deg + np.arange(nlat) * self.dlat
+        return self.lat_start + np.arange(nlat+1) * self.dlat.to_value(ANGLE_UNIT)
 
     @property
     def header(self):
@@ -251,8 +252,8 @@ class PyGCM:
         """
         nlayer, nlon, nlat = self.shape
         coords = f'{nlon},{nlat},{nlayer},{self.lon_start:.1f},{self.lat_start:.1f},{self.dlon.to_value(ANGLE_UNIT):.2f},{self.dlat.to_value(ANGLE_UNIT):.2f}'
-        variables = self._variables[2:]  # Skip both winds.
-        var_names = ['Wind'] + [v.name for v in variables]
+        variables = self.variables[2:]  # Skip both winds.
+        var_names = ['Winds'] + [v.name for v in variables]
         return f'{coords},{",".join(var_names)}'
 
     @property
@@ -265,7 +266,7 @@ class PyGCM:
         np.ndarray
             The flattened array.
         """
-        return np.concatenate([v.flat.astype(DTYPE) for v in self._variables])
+        return np.concatenate([v.flat.astype(DTYPE) for v in self.variables]).astype(DTYPE)
 
     @property
     def molecules(self):
@@ -292,7 +293,7 @@ class PyGCM:
         """
         Update the config.
         """
-        if atmosphere is None:
+        if not isinstance(atmosphere, EquilibriumAtmosphere):
             atmosphere = EquilibriumAtmosphere()
 
         gases = [molec.name for molec in self.molecules]
@@ -305,11 +306,17 @@ class PyGCM:
                      for gas, gas_type in zip(gases, gas_types)]
         aerosols = [Aerosol(aerosol, aerosol_type, 1, 1)
                     for aerosol, aerosol_type in zip(aeros, aerosol_types)]
+        
+        pressure_dat = self.pressure.dat[:, 0, 0].to_value(self.pressure.psg_unit)
+        temperature_dat = self.temperature.dat[:, 0, 0].to_value(self.temperature.psg_unit)
+        pressure = Profile('Pressure', pressure_dat, u.bar)
+        temperature = Profile('Temperature', temperature_dat, u.K)
+        
 
         atmosphere.description = self.desc
-        atmosphere.molecules = tuple(molecules)
-        atmosphere.aerosols = tuple(aerosols)
-        atmosphere.profile = None
+        atmosphere.molecules = tuple(molecules) if len(molecules) > 0 else None
+        atmosphere.aerosols = tuple(aerosols) if len(aerosols) > 0 else None
+        atmosphere.profile = tuple([pressure, temperature])
         return atmosphere
 
     @classmethod
@@ -318,6 +325,22 @@ class PyGCM:
         Read a GCM from a decoder.
         """
         coords, variables = sep_header(decoder.header)
+        pressure = decoder['Pressure']
+        pressure = structure.Pressure(10**pressure * u.bar)
+        temperature = decoder['Temperature']
+        temperature = structure.Temperature(temperature * u.K)            
+        
+        args = {}
+        
+        molecules = decoder.get_molecules()
+        for molecule in molecules:
+            args[molecule] = structure.Molecule(molecule, (10**decoder[molecule])*u.dimensionless_unscaled)
+        aerosols, aerosol_sizes = decoder.get_aerosols()
+        for aerosol, aerosol_size in zip(aerosols, aerosol_sizes):
+            args[aerosol] = structure.Aerosol(aerosol, (10**decoder[aerosol])*u.dimensionless_unscaled)
+            args[aerosol_size] = structure.AerosolSize(
+                aerosol_size, 10**(decoder[aerosol_size])*u.m)
+        
         kwargs = {}
         if 'Wind' in variables:
             wind = decoder['Wind']
@@ -325,12 +348,6 @@ class PyGCM:
             wind_v = wind[1, :, :, :] * u.m / u.s
             kwargs['wind_u'] = structure.Wind('wind_u', wind_u)
             kwargs['wind_v'] = structure.Wind('wind_v', wind_v)
-        if 'Pressure' in variables:
-            pressure = decoder['Pressure']
-            kwargs['pressure'] = structure.Pressure(10**pressure * u.bar)
-        if 'Temperature' in variables:
-            temperature = decoder['Temperature']
-            kwargs['temperature'] = structure.Temperature(temperature * u.K)
         if 'Tsurf' in variables:
             tsurf = decoder['Tsurf']
             kwargs['tsurf'] = structure.SurfaceTemperature(tsurf * u.K)
@@ -339,25 +356,16 @@ class PyGCM:
             kwargs['psurf'] = structure.SurfacePressure(10**psurf * u.bar)
         if 'Albedo' in variables:
             albedo = decoder['Albedo']
-            kwargs['albedo'] = structure.Albedo(albedo)
+            kwargs['albedo'] = structure.Albedo(albedo*u.dimensionless_unscaled)
         if 'Emissivity' in variables:
             emissivity = decoder['Emissivity']
-            kwargs['emissivity'] = structure.Emissivity(emissivity)
-
-        molecules = decoder.get_molecules()
-        for molecule in molecules:
-            kwargs[molecule] = structure.Molecule(molecule, decoder[molecule])
-        aerosols, aerosol_sizes = decoder.get_aerosols()
-        for aerosol, aerosol_size in zip(aerosols, aerosol_sizes):
-            kwargs[aerosol] = structure.Aerosol(aerosol, decoder[aerosol])
-            kwargs[aerosol_size] = structure.AerosolSize(
-                aerosol_size, decoder[aerosol_size]*u.m)
+            kwargs['emissivity'] = structure.Emissivity(emissivity*u.dimensionless_unscaled)
 
         _, _, _, lon_start, lat_start, _, _ = coords
-        kwargs['lon_start'] = lon_start
-        kwargs['lat_start'] = lat_start
+        kwargs['lon_start'] = float(lon_start)
+        kwargs['lat_start'] = float(lat_start)
 
-        return cls(**kwargs)
+        return cls(pressure,temperature, *args.values(), **kwargs)
 
     @classmethod
     def from_bytes(cls, header: str, binary: bytes):
@@ -371,7 +379,7 @@ class PyGCM:
         binary : bytes
             The binary data of the GCM.
         """
-        decoder = GCMdecoder(header, binary)
+        decoder = GCMdecoder(header, np.frombuffer(binary,dtype='float32'))
         return cls.from_decoder(decoder)
 
     @classmethod
@@ -388,6 +396,20 @@ class PyGCM:
         dat = d['BINARY']
         return cls.from_bytes(header, dat)
 
+    @property
+    def content(self)-> bytes:
+        """
+        Get the content of the GCM in a format that PSG can read.
+
+        Returns
+        -------
+        bytes
+            The content of the GCM.
+        """
+        gcm_params = b'<ATMOSPHERE-GCM-PARAMETERS>' + self.header.encode(get_setting('encoding'))
+        binary = b'<BINARY>' + self.flat.tobytes(order='C') + b'</BINARY>'
+        return gcm_params + b'\n' + binary
+    
     def altitude(self, mass: u.Quantity, radius: u.Quantity, mean_molecular_mass: float) -> u.Quantity:
         """
         Use the equation of hydrostatic equilibrium to calculate the
@@ -417,7 +439,7 @@ class PyGCM:
             pressure_top = pressure.dat[i+1, :, :].to(u.bar)
             dP = pressure_top - pressure_bottom
             # pylint: disable-next=no-member
-            rho = mean_molecular_mass * \
+            rho = mean_molecular_mass*u.Unit('g mol-1') * \
                 (pressure_bottom + 0.5*dP) / c.R / temperature.dat[i, :, :]
             distance_from_planet_center = radius + z[i, :, :]*z_unit
             # pylint: disable-next=no-member
@@ -489,7 +511,7 @@ class PyGCM:
         u.Quantity
             The column density of the aerosol.
         """
-        mass_frac = aerosol.dat.to_value(u.dimensionless_unscaled)
+        mass_frac = aerosol.dat.to_value(u.dimensionless_unscaled)[:-1,:,:]
         heights = np.diff(altitude, axis=0)
         mean_molecular_mass = mean_molecular_mass * u.g/u.mol
         # pylint: disable-next=no-member
