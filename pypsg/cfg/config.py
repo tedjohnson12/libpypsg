@@ -297,5 +297,7 @@ class PyConfig:
         path : pathlib.Path | str
             The path to the file.
         """
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, 'wb') as f:
             f.write(self.content)

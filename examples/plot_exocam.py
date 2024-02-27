@@ -5,6 +5,7 @@ Work with an ExoCAM GCM
 Learn how to use the ``pypsg.globes`` ExoCAM module. 
 """
 
+from pathlib import Path
 from netCDF4 import Dataset
 from cartopy import crs as ccrs
 from astropy import units as u
@@ -35,7 +36,7 @@ gcm = exocam_to_pygcm(
     molecules=['H2O'],          # the molecule names
     aerosols=['Water'],         # the aerosol names
     background='N2',            # the background gas
-    lon_start=-180.,            # the longitude of the first pixel, optional
+    lon_start=0.,               # the longitude of the first pixel, optional
     lat_start=-90.,             # the latitude of the first pixel, optional (probably should never change)
     mean_molecular_mass=28.     # the mean molecular mass of the atmosphere. This is necessary if you have water.
 )
@@ -52,8 +53,8 @@ proj = ccrs.Mollweide(
                 central_longitude=180)
 fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1, projection=proj)
-lats = gcm.lats.to_value(u.deg)
-lons = gcm.lons.to_value(u.deg)
+lats = gcm.lats
+lons = gcm.lons
 temperature = gcm.tsurf.dat.to_value(u.K).T
 im = ax.pcolormesh(lons, lats, temperature, transform=ccrs.PlateCarree(),cmap='viridis')
 fig.colorbar(im,ax=ax,label='T (K)',orientation='vertical')
@@ -144,7 +145,10 @@ config = PyConfig(
 #
 # This is optional. But it is nice if you want to use the GUI.
 
-config.to_file('exocam.cfg')
+try:
+    config.to_file(Path(__file__).parent / 'output' / 'psg_cfg.txt')
+except NameError: # in case we are not in a notebook
+    config.to_file(Path('output/psg_cfg.txt'))
 
 #%%
 # Run PSG
@@ -165,7 +169,7 @@ print(type(result))
 
 fig, ax = plt.subplots(1,1)
 
-ax.plot(result.rad.wl,result.rad['Proxima-Cen-b'])
-ax.set_xlabel(f'Wavelength ({result.rad.wl.unit: latex})')
-ax.set_ylabel(f'Flux ({result.rad.wl.unit: latex})')
+ax.plot(result.rad.wl,(result.rad['Proxima-Cen-b']/result.rad['Total']).to_value(u.dimensionless_unscaled)*1e6)
+ax.set_xlabel(f'Wavelength ({result.rad.wl.unit})')
+ax.set_ylabel(f'Flux (ppm)')
 
