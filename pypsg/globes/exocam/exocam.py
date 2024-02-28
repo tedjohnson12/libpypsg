@@ -15,7 +15,7 @@ import numpy as np
 from ...settings import psg_aerosol_size_unit, USER_DATA_PATH
 from .. import structure
 from ..globes import PyGCM
-from .. import waccm as waccm
+from .. import waccm
 
 TIME_UNIT = u.day
 ALBEDO_DEFAULT = 0.3
@@ -303,20 +303,17 @@ def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
     """
     return waccm.waccm.get_emissivity(data, itime)
 
-
 def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill_value: float, unit: u.Unit, cls: Type, mean_molec_mass:float=None):
     """
     Generic getter for a variable.
     """
-    dat = np.flip(
-        np.array(data.variables[translator.get(name, name)][itime, :, :, :]), axis=0)
-    dat = np.where((dat > 0) & (np.isfinite(dat)), dat, fill_value) * unit
+    dat = waccm.waccm.generic_get_dat(data, itime, name, translator, fill_value, unit)
     if name == 'H2O':
         if mean_molec_mass is None:
             raise ValueError('Mean molecular mass must be specified for H2O.')
         dat = dat/ (1 - dat)
         dat = dat * (mean_molec_mass/18.0)
-    dat = np.swapaxes(dat, 1, 2)
+    dat = np.where(dat < 1e-30*unit, 1e-30*unit, dat)
     return cls(name, dat)
 
 

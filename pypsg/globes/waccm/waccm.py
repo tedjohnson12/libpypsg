@@ -365,14 +365,41 @@ def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
     return structure.Emissivity(emissivity.T*u.dimensionless_unscaled)
 
 
+def generic_get_dat(
+    data: Dataset,
+    itime: int,
+    name: str,
+    translator: dict,
+    fill_value: float,
+    unit: u.Unit,
+):
+    try:
+        dat = np.flip(
+            np.array(data.variables[translator.get(name, name)][itime, :, :, :]), axis=0)
+        _unit = u.Unit(data.variables[translator.get(name, name)].units)
+        dat = np.where((dat > 0) & (np.isfinite(dat)), dat, fill_value) * _unit
+    except ValueError as err:
+        if 'slicing expression exceeds the number of dimensions of the variable' not in str(err):
+            raise err
+        val = data.variables[translator.get(name, name)][:]
+        try:
+            _unit = u.Unit(data.variables[translator.get(name, name)].units)
+        except AttributeError:
+            _unit = unit
+        if val.shape != (1,):
+            raise err
+        _,nlayer,nlat,nlon = data.variables['T'].shape
+        dat = np.ones((nlayer, nlat, nlon)) * val[0] * _unit
+    dat = np.swapaxes(dat, 1, 2)
+    return dat
+
+
 def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill_value: float, unit: u.Unit, cls: Type):
     """
     Generic getter for a variable.
     """
-    dat = np.flip(
-        np.array(data.variables[translator.get(name, name)][itime, :, :, :]), axis=0)
-    dat = np.where((dat > 0) & (np.isfinite(dat)), dat, fill_value) * unit
-    dat = np.swapaxes(dat, 1, 2)
+    dat = generic_get_dat(data, itime, name, translator, fill_value, unit)
+    dat = np.where(dat < 1e-30*unit, 1e-30*unit, dat)
     return cls(name, dat)
 
 
