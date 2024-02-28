@@ -152,7 +152,7 @@ def test_call_psg(data_path,psg_url):
         gcm = exocam_to_pygcm(
             data,
             itime=0,
-            molecules=['H2O'],
+            molecules=['H2O','CO2'],
             aerosols=['Water'],
             mean_molecular_mass=28.01
         )
@@ -161,11 +161,14 @@ def test_call_psg(data_path,psg_url):
         )
         geo = models.Observatory(observer_altitude = 1.3*u.pc,)
         obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
-        cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj)
+        gen = models.Generator(gcm_binning=200)
+        cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj,generator=gen)
         psg = APICall(cfg,'all','globes',url=psg_url)
         psg.reset()
         response = psg()
         assert not np.any(np.isnan(response.lyr.prof['H2O']))
+        assert not np.any(np.isnan(response.lyr.prof['CO2']))
+        assert np.all(response.lyr.prof['CO2']==response.lyr.prof['CO2'][0])
 
 if __name__ in '__main__':
     pytest.main(args=[__file__])

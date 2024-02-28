@@ -8,6 +8,7 @@ You can download it by running ``VSPEC.builtins.download_waccm_test_data()``, fo
     python -c "from pypsg.globes.waccm.waccm import download_test_data; download_test_data()"
 """
 from os import chdir
+import time
 from pathlib import Path
 import pytest
 import numpy as np
@@ -158,12 +159,14 @@ def test_call_psg(data_path,psg_url):
         )
         geo = models.Observatory(observer_altitude = 1.3*u.pc,)
         obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
-        cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj)
+        gen = models.Generator(gcm_binning=200)
+        cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj,generator=gen)
         psg = APICall(cfg,'all','globes',url=psg_url)
         psg.reset()
+        time.sleep(0.1)
         response = psg()
         assert not np.any(np.isnan(response.lyr.prof['CO2']))
     
 
 if __name__ in '__main__':
-    pytest.main(args=[__file__])
+    pytest.main(args=[__file__,'--local'])
