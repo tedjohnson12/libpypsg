@@ -5,14 +5,20 @@ from abc import ABC
 import warnings
 from astropy import units as u
 from astropy.units.core import Unit
-# from astropy.units.photometric import Unit
 from astropy.units.quantity import Quantity
-# from astropy.units.si import Unit
 
 
 import numpy as np
 
 DTYPE = 'float32'
+
+
+class VariableAssumptionWarning(UserWarning):
+    """
+    A warning raised when a variable
+    is not found in the netCDF file.
+    """
+
 
 class Variable(ABC):
     """
@@ -56,8 +62,9 @@ class Variable(ABC):
         dat: u.Quantity
     ):
         if not isinstance(dat, u.Quantity):
-            raise ValueError(f'dat must be a Quantity object, not {type(dat)}.')
-        
+            raise ValueError(
+                f'dat must be a Quantity object, not {type(dat)}.')
+
         self.name = name
         self.psg_unit = psg_unit
         self.dat = dat
@@ -224,11 +231,10 @@ class Pressure(Variable3D):
 
     def __init__(self, dat: u.Quantity):
         super().__init__('Pressure', u.LogUnit(u.bar), dat)
-    
+
     @property
     def flat(self):
         return super().flat
-        
 
     @classmethod
     def from_profile(cls, profile: u.Quantity, shape: tuple):
@@ -331,7 +337,7 @@ class SurfacePressure(Variable2D):
 
     def __init__(self, dat: u.Quantity):
         super().__init__('Psurf', u.LogUnit(u.bar), dat)
-    
+
     @property
     def flat(self):
         return super().flat

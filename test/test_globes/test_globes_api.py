@@ -1,6 +1,7 @@
 """
 API tests for GlobES
 """
+import time
 import numpy as np
 import pytest
 from astropy import units as u
@@ -101,13 +102,13 @@ class TestPyGCM:
             fov = 5*u.arcsec
         )
         geo = models.Observatory(observer_altitude = 1.3*u.pc,)
-        obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
+        obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg,star_distance=0.05*u.AU)
         cfg = PyConfig(gcm=pygcm,telescope=tele,geometry=geo,target=obj)
-        cfg = PyConfig(gcm=pygcm)
         psg = APICall(cfg,'all','globes',url=psg_url)
         decoder = GCMdecoder.from_psg(cfg.content)
         assert decoder['Winds'].shape == (2,nlayer, nlon, nlat)
         psg.reset()
+        time.sleep(0.1)
         response = psg()
         assert not np.any(np.isnan(response.lyr.prof['CO2']))
     

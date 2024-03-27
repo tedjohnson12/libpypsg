@@ -79,13 +79,6 @@ Fill in nans and infs
 """
 
 
-class VariableAssumptionWarning(UserWarning):
-    """
-    A warning raised when a variable
-    is not found in the netCDF file.
-    """
-
-
 def validate_variables(data: Dataset):
     """
     Check to make sure that the file
@@ -120,7 +113,7 @@ def validate_variables(data: Dataset):
     else:
         warnings.warn(
             f'Dataset is missing optional variables: {",".join(missing_vars)}',
-            VariableAssumptionWarning
+            structure.VariableAssumptionWarning
         )
 
 
@@ -239,7 +232,7 @@ def get_temperature(data: Dataset, itime: int) -> structure.Temperature:
     temperature = np.flip(
         np.array(data.variables['T'][itime, :, :, :]), axis=0)
     temperature = u.Unit(data.variables['T'].units) * temperature
-    temperature = np.swapaxes(temperature, 1,2)
+    temperature = np.swapaxes(temperature, 1, 2)
     return structure.Temperature(temperature)
 
 
@@ -265,7 +258,7 @@ def get_tsurf(data: Dataset, itime: int) -> structure.SurfaceTemperature:
     except KeyError:
         msg = 'Surface Temperature not explicitly stated. '
         msg += 'Using the value from the lowest layer.'
-        warnings.warn(msg, VariableAssumptionWarning)
+        warnings.warn(msg, structure.VariableAssumptionWarning)
         temp = get_temperature(data, itime).dat
         tsurf = temp[0, :, :]
     return structure.SurfaceTemperature(tsurf[:, :])
@@ -294,7 +287,7 @@ def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind
         wind_u = u.Unit(data.variables['U'].units) * wind_u
     except KeyError:
         msg = 'Wind Speed U not explicitly stated. Assuming zero.'
-        warnings.warn(msg, VariableAssumptionWarning)
+        warnings.warn(msg, structure.VariableAssumptionWarning)
         _, nlayers, nlat, nlon = get_shape(data)
         wind_u = np.zeros((nlayers, nlat, nlon)) * u.m / u.s
     try:
@@ -302,7 +295,7 @@ def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind
         wind_v = u.Unit(data.variables['V'].units) * wind_v
     except KeyError:
         msg = 'Wind Speed V not explicitly stated. Assuming zero.'
-        warnings.warn(msg, VariableAssumptionWarning)
+        warnings.warn(msg, structure.VariableAssumptionWarning)
         _, nlayers, nlat, nlon = get_shape(data)
         wind_v = np.zeros((nlayers, nlat, nlon)) * u.m / u.s
     wind_u = np.swapaxes(wind_u, 1, 2)
@@ -332,10 +325,11 @@ def get_albedo(data: Dataset, itime: int) -> structure.Albedo:
             np.isfinite(albedo)), albedo, ALBEDO_DEFAULT)
     except KeyError:
         msg = f'Albedo not explicitly stated. Using {ALBEDO_DEFAULT}.'
-        warnings.warn(msg, VariableAssumptionWarning)
+        warnings.warn(msg, structure.VariableAssumptionWarning)
         _, _, nlat, nlon = get_shape(data)
         albedo = np.ones((nlat, nlon)) * ALBEDO_DEFAULT
     return structure.Albedo(albedo.T*u.dimensionless_unscaled)
+
 
 def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
     """
@@ -359,20 +353,47 @@ def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
             np.isfinite(emissivity)), emissivity, EMISSIVITY_DEFAULT)
     except KeyError:
         msg = f'Emissivity not explicitly stated. Using {EMISSIVITY_DEFAULT}.'
-        warnings.warn(msg, VariableAssumptionWarning)
+        warnings.warn(msg, structure.VariableAssumptionWarning)
         _, _, nlat, nlon = get_shape(data)
         emissivity = np.ones((nlat, nlon)) * EMISSIVITY_DEFAULT
     return structure.Emissivity(emissivity.T*u.dimensionless_unscaled)
+
+
+def generic_get_dat(
+    data: Dataset,
+    itime: int,
+    name: str,
+    translator: dict,
+    fill_value: float,
+    unit: u.Unit,
+):
+    try:
+        dat = np.flip(
+            np.array(data.variables[translator.get(name, name)][itime, :, :, :]), axis=0)
+        _unit = u.Unit(data.variables[translator.get(name, name)].units)
+        dat = np.where((dat > 0) & (np.isfinite(dat)), dat, fill_value) * _unit
+    except ValueError as err:
+        if 'slicing expression exceeds the number of dimensions of the variable' not in str(err):
+            raise err
+        val = data.variables[translator.get(name, name)][:]
+        try:
+            _unit = u.Unit(data.variables[translator.get(name, name)].units)
+        except AttributeError:
+            _unit = unit
+        if val.shape != (1,):
+            raise err
+        _,nlayer,nlat,nlon = data.variables['T'].shape
+        dat = np.ones((nlayer, nlat, nlon)) * val[0] * _unit
+    dat = np.swapaxes(dat, 1, 2)
+    return dat
 
 
 def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill_value: float, unit: u.Unit, cls: Type):
     """
     Generic getter for a variable.
     """
-    dat = np.flip(
-        np.array(data.variables[translator.get(name, name)][itime, :, :, :]), axis=0)
-    dat = np.where((dat > 0) & (np.isfinite(dat)), dat, fill_value) * unit
-    dat = np.swapaxes(dat, 1, 2)
+    dat = generic_get_dat(data, itime, name, translator, fill_value, unit)
+    dat = np.where(dat < 1e-30*unit, 1e-30*unit, dat)
     return cls(name, dat)
 
 
@@ -477,19 +498,20 @@ def get_molecule_suite(data: Dataset, itime: int, names: list, background: str =
             molecs += (structure.Molecule(background, background_abn),)
     return molecs
 
+
 def to_pygcm(
-    data:Dataset,
-    itime:int,
-    molecules:list,
-    aerosols:list,
+    data: Dataset,
+    itime: int,
+    molecules: list,
+    aerosols: list,
     background=None,
-    lon_start:float=-180.,
-    lat_start:float=-90.,
-    desc:str=DEFAULT_DESCRIPTION
-)->PyGCM:
+    lon_start: float = -180.,
+    lat_start: float = -90.,
+    desc: str = DEFAULT_DESCRIPTION
+) -> PyGCM:
     """
     Covert a WACCM dataset to a Planet object.
-    
+
     Parameters
     ----------
     data : netCDF4.Dataset
@@ -509,40 +531,43 @@ def to_pygcm(
     desc : str, optional
         A description of the GCM.
     """
-    molecules:tuple = tuple() if molecules is None else get_molecule_suite(data,itime,molecules,background)
-    
-    _aerosols:tuple = tuple() if aerosols is None else tuple(get_aerosol(data,itime,name) for name in aerosols)
-    aerosol_sizes:tuple = tuple() if aerosols is None else tuple(get_aerosol_size(data,itime,name) for name in aerosols)
-    
-    wind_u, wind_v = get_winds(data,itime)
-    
+    molecules: tuple = tuple() if molecules is None else get_molecule_suite(
+        data, itime, molecules, background)
+
+    _aerosols: tuple = tuple() if aerosols is None else tuple(
+        get_aerosol(data, itime, name) for name in aerosols)
+    aerosol_sizes: tuple = tuple() if aerosols is None else tuple(
+        get_aerosol_size(data, itime, name) for name in aerosols)
+
+    wind_u, wind_v = get_winds(data, itime)
+
     return PyGCM(
-        get_pressure(data,itime),
-        get_temperature(data,itime),
+        get_pressure(data, itime),
+        get_temperature(data, itime),
         *(molecules + _aerosols + aerosol_sizes),
         wind_u=wind_u,
         wind_v=wind_v,
-        tsurf=get_tsurf(data,itime),
-        psurf=get_psurf(data,itime),
-        albedo=get_albedo(data,itime),
-        emissivity=get_emissivity(data,itime),
+        tsurf=get_tsurf(data, itime),
+        psurf=get_psurf(data, itime),
+        albedo=get_albedo(data, itime),
+        emissivity=get_emissivity(data, itime),
         lon_start=lon_start,
         lat_start=lat_start,
         desc=desc
     )
 
+
 def download_test_data(rewrite=False):
     """
     Download the WACCM test data.
     """
-    
-    
+
     TEST_PATH.parent.mkdir(exist_ok=True)
     if TEST_PATH.exists() and not rewrite:
         return TEST_PATH
     else:
         TEST_PATH.unlink(missing_ok=True)
-        with requests.get(TEST_URL,stream=True,timeout=20) as req:
+        with requests.get(TEST_URL, stream=True, timeout=20) as req:
             req.raise_for_status()
             with TEST_PATH.open('wb') as f:
                 for chunk in req.iter_content(chunk_size=8192):
