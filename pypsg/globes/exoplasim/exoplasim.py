@@ -1,10 +1,7 @@
 """
-This module is designed to read output files from exoCAM.
-
-This code is based on PSG conversion scripts for exoCAM
-written by Geronimo Villanueva
-
+Convert `exoplasim` outputs to the `pypsg` format.
 """
+
 import warnings
 import requests
 from typing import Tuple, Type
@@ -15,40 +12,17 @@ import numpy as np
 from ...settings import psg_aerosol_size_unit, USER_DATA_PATH
 from .. import structure
 from ..globes import PyGCM
-from .. import waccm as waccm
+from ..exocam.exocam import _generic_getter
 
-TIME_UNIT = u.day
+
+DEFAULT_DESCRIPTION = 'exoplasim model'
+TEST_URL = 'https://borealisdata.ca/api/access/datafile/712946'
+TEST_PATH = USER_DATA_PATH / 'data' / 'exoplasim_test.nc'
+
 ALBEDO_DEFAULT = 0.3
-EMISSIVITY_DEFAULT = 1.0
-DEFAULT_DESCRIPTION = 'exoCAM Atmosphere Model'
-TEST_URL = 'https://archive.org/download/SimulatedPhaseDependentSpectraOfTerrestrialAquaplanetsInMdwarfSystems/t3000_s1550_p7.74511.cam.h0.avg_n68.nc?#mode=bytes'
-TEST_PATH = USER_DATA_PATH / 'data' / 'exocam_test.nc'
-
-REQUIRED_VARIABLES = [
-    "hyam",
-    "hybm",
-    "P0",
-    "PS",
-    "T",
-    "lat",
-    "lon",
-    "PS",
-    "time",
-    "time_bnds"
-]
-OPTIONAL_VARIABLES = [
-    "TS",
-    "ASDIR",
-    "U",
-    "V",
-]
-
 MOLEC_TRANSLATOR = {
     # "PSG" : "WACCM",
-    'CO2': 'co2vmr',
-    'CH4': 'ch4vmr',
-    'N2O': 'n2ovmr',
-    'H2O': 'Q'
+    'H2O': 'hus',
 }
 """
 Translate molecule names to WACCM
@@ -60,8 +34,7 @@ Fill in nans and infs
 
 AERO_TRANSLATOR = {
     # "PSG" : "WACCM",
-    'Water': 'CLDLIQ',
-    'WaterIce': 'CLDICE',
+    'Water': 'clw',
 }
 AERO_FILL_VALUE = 1e-30
 """
@@ -69,74 +42,11 @@ Fill in nans and infs
 """
 AERO_SIZE_TRANSLATOR = {
     # "PSG" : "WACCM",
-    'Water_size': 'REL',
-    'WaterIce_size': 'REI',
 }
 AERO_SIZE_FILL_VALUE = 1e-6
 """
 Fill in nans and infs
 """
-
-def validate_variables(data: Dataset):
-    """
-    Check to make sure that the file
-    contains all necessary variables.
-
-    Parameters
-    ----------
-    data : netCDF4.Dataset
-        The data to be checked
-    """
-    missing_vars = []
-    for var in REQUIRED_VARIABLES:
-        try:
-            data.variables[var]
-        except KeyError:
-            missing_vars.append(var)
-    if len(missing_vars) == 0:
-        pass
-    else:
-        raise KeyError(
-            f'Dataset is missing required variables: {",".join(missing_vars)}'
-        )
-
-    missing_vars = []
-    for var in OPTIONAL_VARIABLES:
-        try:
-            data.variables[var]
-        except KeyError:
-            missing_vars.append(var)
-    if len(missing_vars) == 0:
-        pass
-    else:
-        warnings.warn(
-            f'Dataset is missing optional variables: {",".join(missing_vars)}',
-            structure.VariableAssumptionWarning
-        )
-
-
-def get_time_index(data: Dataset, time: u.Quantity):
-    """
-    Get the index `itime` given a time quantity.
-
-    Parameters
-    ----------
-    data : netCDF4.Dataset
-        The dataset to use.
-    time : astropy.units.Quantity
-        The time Quantity.
-
-    Returns
-    -------
-    itime : int
-        The time index of `time`.
-    """
-    time_in_days = time.to_value(TIME_UNIT)
-    time_left = data.variables['time_bnds'][:, 0]
-    time_right = data.variables['time_bnds'][:, 1]
-    itime = np.argwhere((time_in_days > time_left) &
-                        (time_in_days <= time_right))[0][0]
-    return itime
 
 
 def get_shape(data: Dataset):
@@ -153,12 +63,11 @@ def get_shape(data: Dataset):
     tuple
         The shape of `data`, (N_time,N_layers,N_lat,N_lon)
     """
-    n_time = data.variables['T'].shape[0]
-    n_layers = data.variables['T'].shape[1]
-    n_lat = data.variables['T'].shape[2]
-    n_lon = data.variables['T'].shape[3]
+    n_time = data.variables['time'].shape[0]
+    n_layers = data.variables['lev'].shape[0]
+    n_lat = data.variables['lat'].shape[0]
+    n_lon = data.variables['lon'].shape[0]
     return n_time, n_layers, n_lat, n_lon
-
 
 def get_psurf(data: Dataset, itime: int) -> structure.SurfacePressure:
     """
@@ -176,8 +85,9 @@ def get_psurf(data: Dataset, itime: int) -> structure.SurfacePressure:
     psurf : structure.SurfacePressure
         The surface pressure
     """
-    return waccm.waccm.get_psurf(data, itime)
-
+    psurf = data.variables['ps'][itime, :, :].T
+    ps_unit = u.Unit(data.variables['ps'].units)
+    return structure.SurfacePressure(psurf * ps_unit)
 
 def get_pressure(data: Dataset, itime: int) -> structure.Pressure:
     """
@@ -195,9 +105,12 @@ def get_pressure(data: Dataset, itime: int) -> structure.Pressure:
     pressure : structure.Pressure
         The pressure.
     """
-    return waccm.waccm.get_pressure(data, itime)
+    press = data.variables['flpr'][itime, :, :, :]
+    press = np.swapaxes(press, 1, 2)
+    press = np.flip(press, axis=0)
+    unit = u.Unit(data.variables['flpr'].units)
     
-
+    return structure.Pressure(press*unit) 
 
 def get_temperature(data: Dataset, itime: int) -> structure.Temperature:
     """
@@ -215,8 +128,11 @@ def get_temperature(data: Dataset, itime: int) -> structure.Temperature:
     temperature : structure.Temperature
         The temperature.
     """
-    return waccm.waccm.get_temperature(data, itime)
-
+    temperature = np.flip(
+        np.array(data.variables['ta'][itime, :, :, :]), axis=0)
+    temperature = u.Unit(data.variables['ta'].units) * temperature
+    temperature = np.swapaxes(temperature, 1,2)
+    return structure.Temperature(temperature)
 
 def get_tsurf(data: Dataset, itime: int) -> structure.SurfaceTemperature:
     """
@@ -234,9 +150,16 @@ def get_tsurf(data: Dataset, itime: int) -> structure.SurfaceTemperature:
     tsurf : structure.SurfaceTemperature
         The surface temperature.
     """
-    return waccm.waccm.get_tsurf(data, itime)
-    
-
+    try:
+        tsurf = np.array(data.variables['ts'][itime, :, :]).T
+        tsurf = u.Unit(data.variables['ts'].units) * tsurf
+    except KeyError:
+        msg = 'Surface Temperature not explicitly stated. '
+        msg += 'Using the value from the lowest layer.'
+        warnings.warn(msg, structure.VariableAssumptionWarning)
+        temp = get_temperature(data, itime).dat
+        tsurf = temp[0, :, :]
+    return structure.SurfaceTemperature(tsurf[:, :])
 
 def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind]:
     """
@@ -256,8 +179,25 @@ def get_winds(data: Dataset, itime: int) -> Tuple[structure.Wind, structure.Wind
     V : structure.Wind
         The wind speed in the V direction.
     """
-    return waccm.waccm.get_winds(data, itime)
-
+    try:
+        wind_u = np.flip(np.array(data.variables['ua'][itime, :, :, :]), axis=0)
+        wind_u = u.Unit(data.variables['ua'].units) * wind_u
+    except KeyError:
+        msg = 'Wind Speed U not explicitly stated. Assuming zero.'
+        warnings.warn(msg, structure.VariableAssumptionWarning)
+        _, nlayers, nlat, nlon = get_shape(data)
+        wind_u = np.zeros((nlayers, nlat, nlon)) * u.m / u.s
+    try:
+        wind_v = np.flip(np.array(data.variables['va'][itime, :, :, :]), axis=0)
+        wind_v = u.Unit(data.variables['va'].units) * wind_v
+    except KeyError:
+        msg = 'Wind Speed V not explicitly stated. Assuming zero.'
+        warnings.warn(msg, structure.VariableAssumptionWarning)
+        _, nlayers, nlat, nlon = get_shape(data)
+        wind_v = np.zeros((nlayers, nlat, nlon)) * u.m / u.s
+    wind_u = np.swapaxes(wind_u, 1, 2)
+    wind_v = np.swapaxes(wind_v, 1, 2)
+    return structure.Wind('wind_u', wind_u), structure.Wind('wind_v', wind_v)
 
 def get_albedo(data: Dataset, itime: int) -> structure.Albedo:
     """
@@ -275,7 +215,16 @@ def get_albedo(data: Dataset, itime: int) -> structure.Albedo:
     albedo : structure.Albedo
         The albedo.
     """
-    return waccm.waccm.get_albedo(data, itime)
+    try:
+        albedo = np.array(data.variables['alb'][itime, :, :])
+        albedo = np.where((albedo >= 0) & (albedo <= 1.0) & (
+            np.isfinite(albedo)), albedo, ALBEDO_DEFAULT)
+    except KeyError:
+        msg = f'Albedo not explicitly stated. Using {ALBEDO_DEFAULT}.'
+        warnings.warn(msg, structure.VariableAssumptionWarning)
+        _, _, nlat, nlon = get_shape(data)
+        albedo = np.ones((nlat, nlon)) * ALBEDO_DEFAULT
+    return structure.Albedo(albedo.T*u.dimensionless_unscaled)
 
 def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
     """
@@ -292,25 +241,12 @@ def get_emissivity(data: Dataset, itime: int) -> structure.Emissivity:
     -------
     emissivity : structure.Emissivity
         The Emissivity.
+    
+    Notes
+    -----
+    As far as I can tell there is no emissivity variable in the test dataset.
     """
-    return waccm.waccm.get_emissivity(data, itime)
-
-
-def _generic_getter(data: Dataset, itime: int, name: str, translator: dict, fill_value: float, unit: u.Unit, cls: Type, mean_molec_mass:float=None):
-    """
-    Generic getter for a variable.
-    """
-    dat = np.flip(
-        np.array(data.variables[translator.get(name, name)][itime, :, :, :]), axis=0)
-    dat = np.where((dat > 0) & (np.isfinite(dat)), dat, fill_value) * unit
-    if name == 'H2O':
-        if mean_molec_mass is None:
-            raise ValueError('Mean molecular mass must be specified for H2O.')
-        dat = dat/ (1 - dat)
-        dat = dat * (mean_molec_mass/18.0)
-    dat = np.swapaxes(dat, 1, 2)
-    return cls(name, dat)
-
+    raise NotImplementedError('I don\'t know if exoplasim supports emissivity.')
 
 def get_molecule(data: Dataset, itime: int, name: str, mean_molecular_mass: float=None) -> structure.Molecule:
     """
@@ -335,7 +271,6 @@ def get_molecule(data: Dataset, itime: int, name: str, mean_molecular_mass: floa
     """
     return _generic_getter(data, itime, name, MOLEC_TRANSLATOR, MOLEC_FILL_VALUE, u.dimensionless_unscaled, structure.Molecule, mean_molecular_mass)
 
-
 def get_aerosol(data: Dataset, itime: int, name: str) -> structure.Aerosol:
     """
     Get the abundance of an aerosol.
@@ -356,7 +291,6 @@ def get_aerosol(data: Dataset, itime: int, name: str) -> structure.Aerosol:
     """
     return _generic_getter(data, itime, name, AERO_TRANSLATOR, MOLEC_FILL_VALUE, u.dimensionless_unscaled, structure.Aerosol)
 
-
 def get_aerosol_size(data: Dataset, itime: int, name: str) -> structure.AerosolSize:
     """
     Get the size of an aerosol.
@@ -366,7 +300,7 @@ def get_aerosol_size(data: Dataset, itime: int, name: str) -> structure.AerosolS
     data : netCDF4.Dataset
         The dataset to use.
     itime : int
-        The timestep to use.
+        The timestep to use. This is included for consistency with other modules.
     name : str
         The variable name of the aerosol.
 
@@ -375,8 +309,12 @@ def get_aerosol_size(data: Dataset, itime: int, name: str) -> structure.AerosolS
     aero : structure.Aerosol
         The concentration of the aerosol.
     """
-    return _generic_getter(data, itime, f'{name}_size', AERO_SIZE_TRANSLATOR, AERO_SIZE_FILL_VALUE, psg_aerosol_size_unit, structure.AerosolSize)
-
+    _ = itime
+    _, n_layer, n_lat, n_lon = get_shape(data)
+    return structure.AerosolSize(
+        f'{name}_size',
+        AERO_SIZE_FILL_VALUE * np.ones((n_layer,n_lon,n_lat)) * psg_aerosol_size_unit
+    )
 
 def get_molecule_suite(data: Dataset, itime: int, names: list, background: str = None, mean_molecular_mass: float=None) -> Tuple[structure.Molecule]:
     """
@@ -428,7 +366,7 @@ def to_pygcm(
     mean_molecular_mass:float=None
 )->PyGCM:
     """
-    Covert a WACCM dataset to a Planet object.
+    Covert an exoplasim dataset to a Planet object.
     
     Parameters
     ----------
@@ -467,7 +405,7 @@ def to_pygcm(
         tsurf=get_tsurf(data,itime),
         psurf=get_psurf(data,itime),
         albedo=get_albedo(data,itime),
-        emissivity=get_emissivity(data,itime),
+        emissivity=None,
         lon_start=lon_start,
         lat_start=lat_start,
         desc=desc
@@ -477,8 +415,6 @@ def download_test_data(rewrite=False):
     """
     Download the WACCM test data.
     """
-    
-    
     TEST_PATH.parent.mkdir(exist_ok=True)
     if TEST_PATH.exists() and not rewrite:
         return TEST_PATH
