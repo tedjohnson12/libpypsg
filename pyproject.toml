@@ -29,7 +29,6 @@ dependencies = [
     "astropy",
     "numpy",
     "requests",
-    "docker",
     "python-dateutil",
     "netCDF4",
 ]
