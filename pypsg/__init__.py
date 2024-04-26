@@ -2,7 +2,7 @@
 PyPSG top-level module
 ======================
 """
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 from .request import APICall, PSGResponse
 from . import cfg
 from .cfg import PyConfig
