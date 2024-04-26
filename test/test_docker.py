@@ -43,4 +43,4 @@ def test_psg_start_stop(psg_url):
     time.sleep(1)
 
 if __name__ in '__main__':
-    pytest.main(args=[__file__])
+    pytest.main(args=[__file__, '--local'])

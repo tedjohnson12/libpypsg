@@ -1,31 +1,42 @@
 """
 Helpers for running psg locally
 """
-import docker
+import json
+import subprocess
 
 from . import settings
 
 PSG_LATEST = 'psg:latest'
 PSG_CONTAINER_NAME = 'psg'
 
-def is_psg_installed()->bool:
+
+def _get_containers_json() -> dict:
+    raw_output = subprocess.check_output(
+        ['docker', 'ps', '-a', '--format', 'json']).strip().decode('utf-8')
+    ls_output = raw_output.split('\n')
+    json_output = '[\n' + ',\n'.join(ls_output) + ']'
+    containers_info = json.loads(json_output)
+    return containers_info
+
+
+def is_psg_installed() -> bool:
     """
     Determine if a local version of PSG is installed.
-    
+
     This function checks all docker containers and compares their
     `RepoTags` attribute to the string `psg:latest`.
-    
+
     Returns
     -------
     bool
         True if a local version of PSG is installed.
-    
+
     Notes
     -----
     This function also checks the name of the image. This is important
     because the name is used to start/stop the container. The expected
     name is `psg`.
-    
+
     Warning
     -------
     Prior to `v0.1.2`, this function would throw an error if the
@@ -33,54 +44,70 @@ def is_psg_installed()->bool:
     returns `False` if the docker engine is not installed.
     """
     try:
-        installed_containers = docker.from_env().containers.list(all=True)
-        for container in installed_containers:
-            image = container.image
-            if PSG_LATEST in image.attrs['RepoTags']:
-                if container.name == PSG_CONTAINER_NAME:
-                    return True
+        containers_info = _get_containers_json()
+
+        for info in containers_info:
+            image = info["Image"]
+            name = info["Names"]
+            if isinstance(name, list):
+                named_psg = 'psg' in name
+            else:
+                named_psg = 'psg' == name
+            if image == 'psg' and named_psg:
+                return True
         return False
-    except docker.errors.DockerException:
+    except json.JSONDecodeError:
         return False
 
-def get_psg_container()->docker.models.containers.Container:
+
+def get_psg_container_info() -> dict:
     """
     Get the psg container.
-    
+
     Returns
     -------
-    docker.models.containers.Container
-        The psg container.
+    dict
+        The info for the PSG container.
     """
-    return docker.from_env().containers.get(PSG_CONTAINER_NAME)
+    try:
+        containers_info = _get_containers_json()
+        for info in containers_info:
+            image = info["Image"]
+            name = info["Names"]
+            if isinstance(name, list):
+                named_psg = 'psg' in name
+            else:
+                named_psg = 'psg' == name
+            if image == 'psg' and named_psg:
+                return info
+    except json.JSONDecodeError as e:
+        raise RuntimeError(
+            'Could not parse json output from `docker ps -a --format json`. Is docker installed?') from e
+
 
 class PSGNotInstalledError(Exception):
     """
     Exception raised when a local version of PSG is not installed.
     """
 
-def is_psg_running()->bool:
+
+def is_psg_running() -> bool:
     """
     Determine if a local version of PSG is running.
-    
+
     Returns
     -------
     bool
         True if a local version of PSG is running.
     """
-    try:
-        container = get_psg_container()
-    except docker.errors.NotFound as e:
-        msg = 'PSG is not installed. '
-        url = 'https://psg.gsfc.nasa.gov/helpapi.php#installation'
-        msg += f'Visit {url} for installation instructions.'
-        raise PSGNotInstalledError(msg) from e
-    return container.status == 'running'
+    container = get_psg_container_info()
+    return container['State'] == 'running'
+
 
 def start_psg(strict=True):
     """
     Start the psg container.
-    
+
     Parameters
     ----------
     strict : bool, optional
@@ -95,12 +122,13 @@ def start_psg(strict=True):
         else:
             return None
     if not is_psg_running():
-        get_psg_container().start()
+        subprocess.call(['docker', 'start', 'psg'])
+
 
 def stop_psg(strict=True):
     """
     Stop the psg container.
-    
+
     Parameters
     ----------
     strict : bool, optional
@@ -115,12 +143,13 @@ def stop_psg(strict=True):
         else:
             return None
     if is_psg_running():
-        get_psg_container().stop()
+        subprocess.call(['docker', 'stop', 'psg'])
+
 
 def set_psg_url(internal=True):
     """
     Set the psg URL. This checks if PSG is installed locally first.
-    
+
     Parameters
     ----------
     internal : bool, optional
@@ -132,11 +161,12 @@ def set_psg_url(internal=True):
         url = settings.PSG_URL
     settings.save_settings(url=url)
 
+
 def set_url_and_run():
     """
     Set the psg URL and run the container.
     Again, this checks if PSG is installed locally first.
-    
+
     Parameters
     ----------
     url : str
