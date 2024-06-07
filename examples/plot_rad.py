@@ -12,16 +12,16 @@ import astropy.units as u
 
 from pypsg.cfg.config import PyConfig
 from pypsg import APICall
-from pypsg import settings
+from pypsg import docker
 from pypsg.cfg.base import Table
 
 try:
     CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
 except NameError:
     CFG_PATH = Path('psg_cfg.txt')
+    
+docker.set_url_and_run()
 
-settings.save_settings(url=settings.INTERNAL_PSG_URL)
-settings.reload_settings()
 
 #%%
 # Read the file
