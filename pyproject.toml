@@ -34,6 +34,7 @@ dependencies = [
 ]
 [project.optional-dependencies]
 dev = [
+    "cartopy",
     "matplotlib",
     "pytest",
     "pep8",
