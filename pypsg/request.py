@@ -4,10 +4,11 @@ PyPSG Requests
 
 Direct access to the PSG API
 """
+import warnings
 from typing import Union, Dict
 import re
 import requests
-import warnings
+import logging
 
 from pypsg.cfg import PyConfig, BinConfig
 from pypsg import settings
@@ -144,7 +145,8 @@ class APICall:
         cfg: Union[BinConfig, PyConfig],
         output_type: str = None,
         app: str = None,
-        url: str = None
+        url: str = None,
+        logger: logging.Logger = None
     ):
         self.cfg = cfg
         self._type = output_type
@@ -152,6 +154,7 @@ class APICall:
         self.url = url
         if self.url is None:
             self.url = settings.get_setting('url')
+        self.logger = logger
         self._validate()
 
     def _validate(self):
@@ -299,6 +302,17 @@ class APICall:
             url=url,
             timeout=settings.get_setting('timeout')
         )
+        if self.logger is not None:
+            def format_content(content,title):
+                if b'<BINARY>' in content:
+                    content = content.split(b'<BINARY>')[0] + b'<BINARY>...</BINARY>'  + content.split(b'</BINARY>')[1]
+                s = '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n' \
+                    + f'{title}:\n' \
+                    + str(content, encoding=settings.get_setting('encoding')) \
+                        + '\n' + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+                return s
+            self.logger.debug(format_content(self.cfg.content,f'Sent to {self.url} (app: {self.app}) with mode `{self.type}`'))
+            self.logger.debug(format_content(reply.content, 'Received from PSG'))
         try:
             reply.raise_for_status()
         except requests.HTTPError as err:

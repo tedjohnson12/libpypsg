@@ -33,10 +33,9 @@ dependencies = [
     "netCDF4",
 ]
 [project.optional-dependencies]
-plot = [
-    "matplotlib",
-]
 dev = [
+    "cartopy",
+    "matplotlib",
     "pytest",
     "pep8",
     "furo==2023.9.10",

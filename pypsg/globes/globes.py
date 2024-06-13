@@ -307,7 +307,7 @@ class PyGCM:
         aerosols = [Aerosol(aerosol, aerosol_type, 1, 1)
                     for aerosol, aerosol_type in zip(aeros, aerosol_types)]
         
-        pressure_dat = self.pressure.dat[:, 0, 0].to_value(self.pressure.psg_unit)
+        pressure_dat = self.pressure.dat[:, 0, 0].to_value(u.bar)
         temperature_dat = self.temperature.dat[:, 0, 0].to_value(self.temperature.psg_unit)
         pressure = Profile('Pressure', pressure_dat, u.bar)
         temperature = Profile('Temperature', temperature_dat, u.K)
