@@ -9,6 +9,7 @@ from typing import Union, Dict
 import re
 import requests
 import logging
+import platform
 
 from pypsg.cfg import PyConfig, BinConfig
 from pypsg import settings
@@ -29,6 +30,7 @@ typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
 def parse_exceptions(content:bytes):
     
     content = re.sub(b'<BINARY>.*</BINARY>',b'',content)
+    content = content.replace(b'\r',b'')
     content = str(content,encoding=settings.get_setting('encoding'))
     
     exception_dict = {
@@ -95,6 +97,7 @@ class PSGResponse:
         b : bytes
             The response from the PSG. This is the returned file read as bytes.
         """
+        b = b.replace(b'\r',b'')
         pattern = rb'results_([\w]+).txt'
         split_text = re.split(pattern, b)
         names = split_text[1::2]
