@@ -98,6 +98,7 @@ class BinConfig:
                 0] + content.split(b'</BINARY>')[1]
             binary = self.binary
         content = str(content, encoding=self.encoding)
+        content = content.replace('\r', '')
         n_lines = len(content.split('\n'))
         if n_lines > settings.get_setting('cfg_max_lines'):
             warnings.warn('The config is too long.', ConfigTooLongWarning)
