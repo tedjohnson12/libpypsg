@@ -1,0 +1,17 @@
+PowerEquivalentNoise
+====================
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: PowerEquivalentNoise
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~PowerEquivalentNoise.sensitivity
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: sensitivity

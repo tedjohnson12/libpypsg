@@ -1,0 +1,6 @@
+aerosol_name_dict
+=================
+
+.. currentmodule:: pypsg.settings
+
+.. autodata:: aerosol_name_dict

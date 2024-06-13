@@ -1,0 +1,6 @@
+NullFieldComparisonError
+========================
+
+.. currentmodule:: pypsg.cfg.base
+
+.. autoexception:: NullFieldComparisonError

@@ -1,0 +1,6 @@
+REQUEST_TIMEOUT
+===============
+
+.. currentmodule:: pypsg.settings
+
+.. autodata:: REQUEST_TIMEOUT

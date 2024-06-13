@@ -1,0 +1,29 @@
+Telescope
+=========
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: Telescope
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Telescope.apperture
+      ~Telescope.fov
+      ~Telescope.range1
+      ~Telescope.range2
+      ~Telescope.resolution
+      ~Telescope.telescope
+      ~Telescope.zodi
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: apperture
+   .. autoattribute:: fov
+   .. autoattribute:: range1
+   .. autoattribute:: range2
+   .. autoattribute:: resolution
+   .. autoattribute:: telescope
+   .. autoattribute:: zodi

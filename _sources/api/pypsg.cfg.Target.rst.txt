@@ -1,0 +1,57 @@
+Target
+======
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: Target
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Target.date
+      ~Target.diameter
+      ~Target.gravity
+      ~Target.inclination
+      ~Target.name
+      ~Target.object
+      ~Target.obs_latitude
+      ~Target.obs_longitude
+      ~Target.obs_velocity
+      ~Target.orbit
+      ~Target.period
+      ~Target.position_angle
+      ~Target.season
+      ~Target.solar_latitude
+      ~Target.solar_longitude
+      ~Target.star_distance
+      ~Target.star_metallicity
+      ~Target.star_radius
+      ~Target.star_temperature
+      ~Target.star_type
+      ~Target.star_velocity
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: date
+   .. autoattribute:: diameter
+   .. autoattribute:: gravity
+   .. autoattribute:: inclination
+   .. autoattribute:: name
+   .. autoattribute:: object
+   .. autoattribute:: obs_latitude
+   .. autoattribute:: obs_longitude
+   .. autoattribute:: obs_velocity
+   .. autoattribute:: orbit
+   .. autoattribute:: period
+   .. autoattribute:: position_angle
+   .. autoattribute:: season
+   .. autoattribute:: solar_latitude
+   .. autoattribute:: solar_longitude
+   .. autoattribute:: star_distance
+   .. autoattribute:: star_metallicity
+   .. autoattribute:: star_radius
+   .. autoattribute:: star_temperature
+   .. autoattribute:: star_type
+   .. autoattribute:: star_velocity

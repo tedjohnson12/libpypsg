@@ -1,0 +1,6 @@
+user_settings
+=============
+
+.. currentmodule:: pypsg.settings
+
+.. autodata:: user_settings
