@@ -1,0 +1,31 @@
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          conda update conda
+          conda env update --file environment.yml --name base
+          python -m pip install --upgrade pip
+          pip install .[dev]
+      - name: Test
+        run: |
+          pip install pytest
+          python -c "import pypsg; pypsg.settings.save_settings(api_key='$PSG_KEY')"
+          python -c "from pypsg.globes.waccm.waccm import download_test_data; download_test_data()"
+          python -c "from pypsg.globes.exoplasim.exoplasim import download_test_data; download_test_data()"
+          pytest test --slow
