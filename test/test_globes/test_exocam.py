@@ -17,6 +17,7 @@ import netCDF4 as nc
 
 from pypsg.globes.exocam.exocam import validate_variables, get_time_index, TIME_UNIT,get_shape
 import pypsg.globes.exocam.exocam as rw
+from pypsg.globes.exocam import download_exocam_test_data
 from pypsg.globes import PyGCM, exocam_to_pygcm
 from pypsg.globes import structure
 from pypsg import PyConfig, APICall
@@ -28,9 +29,10 @@ chdir(Path(__file__).parent)
 @pytest.fixture()
 def data_path():
     if rw.TEST_PATH.exists():
-        return rw.TEST_PATH
+        pass
     else:
-        return rw.TEST_URL
+        download_exocam_test_data()
+    return rw.TEST_PATH
 
 def test_validate_vars(data_path):
     with nc.Dataset(data_path,'r',format='NETCDF4') as data:
