@@ -320,6 +320,9 @@ class APICall:
             reply.raise_for_status()
         except requests.HTTPError as err:
             raise exceptions.PSGConnectionError(reply.content) from err
+        too_many_calls = 'Your other API call is still running, please let it finish, wait 10 minutes, or consider installing the PSG Docker version'
+        if too_many_calls in reply.text:
+            raise exceptions.PSGConnectionError(reply.text)
         parse_exceptions(reply.content)
         if self._type in ['upd', 'set']:
             return PSGResponse.null()
