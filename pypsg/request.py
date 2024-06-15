@@ -9,13 +9,13 @@ from typing import Union, Dict
 import re
 import requests
 import logging
-import platform
 
 from pypsg.cfg import PyConfig, BinConfig
 from pypsg import settings
 from pypsg import exceptions
 from pypsg.rad import PyRad
 from pypsg.lyr import PyLyr
+from pypsg.trn import PyTrn
 from pypsg import docker
 
 docker.set_url_and_run()
@@ -24,7 +24,8 @@ typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
     b'cfg': PyConfig,
     b'rad': PyRad,
     b'lyr': PyLyr,
-    b'noi': PyRad
+    b'noi': PyRad,
+    b'trn': PyTrn
 }
 
 def parse_exceptions(content:bytes):
@@ -74,18 +75,22 @@ class PSGResponse:
         The PSG .lyr file.
     noi : PyRad
         The PSG .noi file.
+    trn : PyTrn
+        The PSG .trn file.
     """
     def __init__(
         self,
         cfg: PyConfig = None,
         rad: PyRad = None,
         lyr: PyLyr = None,
-        noi: PyRad = None
+        noi: PyRad = None,
+        trn: PyTrn = None
     ):
         self.cfg = cfg
         self.rad = rad
         self.lyr = lyr
         self.noi = noi
+        self.trn = trn
 
     @classmethod
     def from_bytes(cls, b: bytes):
@@ -107,7 +112,7 @@ class PSGResponse:
             data[name] = dat.strip()
         kwargs = {}
         for key, value in typedict.items():
-            value: PyConfig | PyRad | PyLyr
+            value: PyConfig | PyRad | PyLyr | PyTrn
             if key in data:
                 kwargs[key.decode(settings.get_setting('encoding'))] = value.from_bytes(data[key])
         return cls(**kwargs)

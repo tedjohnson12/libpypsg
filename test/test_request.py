@@ -6,7 +6,7 @@ import pytest
 from astropy import units as u
 import logging
 
-from pypsg import PyConfig, APICall, PyRad, PyLyr
+from pypsg import PyConfig, APICall, PyRad, PyLyr, PyTrn
 from pypsg import request as psgrequest
 
 
@@ -54,6 +54,16 @@ def test_api_call_rad(default_cfg,psg_url,logger):
     assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.rad, PyRad)
     assert isinstance(response.rad.wl, u.Quantity)
+
+def test_api_call_trn(advanced_cfg, psg_url,logger):
+    """
+    Test api call to return trn.
+    """
+    api = APICall(advanced_cfg, 'trn',url=psg_url,logger=logger)
+    response = api()
+    assert isinstance(response, psgrequest.PSGResponse)
+    assert response.rad is None
+    assert isinstance(response.trn, PyTrn)
 
 
 def test_api_call_all(default_cfg, psg_url,logger):
