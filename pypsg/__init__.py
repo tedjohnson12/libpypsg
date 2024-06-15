@@ -8,6 +8,7 @@ from . import cfg
 from .cfg import PyConfig
 from .rad import PyRad
 from .lyr import PyLyr
+from .trn import PyTrn
 from . import settings
 from . import units
 from . import docker
