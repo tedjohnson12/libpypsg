@@ -9,6 +9,8 @@ import warnings
 import json
 from astropy import units as u
 
+from pypsg import __version__
+
 REQUEST_TIMEOUT = 120
 
 PSG_URL = 'https://psg.gsfc.nasa.gov/api.php'
@@ -23,7 +25,8 @@ DEFAULT_SETTINGS = {
     'api_key': None,
     'encoding': 'utf-8',
     'cfg_max_lines': 1500,
-    'timeout': REQUEST_TIMEOUT
+    'timeout': REQUEST_TIMEOUT,
+    'header': {'User-Agent': f'pypsg/{__version__}'},
 }
 
 

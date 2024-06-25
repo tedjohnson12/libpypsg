@@ -87,6 +87,7 @@ class PyRad(table.QTable):
         
     @classmethod
     def from_bytes(cls,b:bytes):
+        b = b.replace(b'\r',b'')
         lines = b.split(b'\n')
         header = [line.decode(settings.get_setting('encoding')) for line in lines if line.startswith(b'#')]
         content = [line.decode(settings.get_setting('encoding')) for line in lines if (not line.startswith(b'#') and len(line)>0)]

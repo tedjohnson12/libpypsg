@@ -170,6 +170,7 @@ class PyLyr:
         """
         From a bytes object read from a .lyr file
         """
+        b = b.replace(b'\r',b'')
         s = b.decode(settings.get_setting('encoding'))
         
         metadata, other_data, tab1_raw, tab2_raw, integrated_vals = cls._parse(s)

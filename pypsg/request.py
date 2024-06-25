@@ -15,6 +15,7 @@ from pypsg import settings
 from pypsg import exceptions
 from pypsg.rad import PyRad
 from pypsg.lyr import PyLyr
+from pypsg.trn import PyTrn
 from pypsg import docker
 
 docker.set_url_and_run()
@@ -23,12 +24,14 @@ typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
     b'cfg': PyConfig,
     b'rad': PyRad,
     b'lyr': PyLyr,
-    b'noi': PyRad
+    b'noi': PyRad,
+    b'trn': PyTrn
 }
 
 def parse_exceptions(content:bytes):
     
     content = re.sub(b'<BINARY>.*</BINARY>',b'',content)
+    content = content.replace(b'\r',b'')
     content = str(content,encoding=settings.get_setting('encoding'))
     
     exception_dict = {
@@ -72,18 +75,22 @@ class PSGResponse:
         The PSG .lyr file.
     noi : PyRad
         The PSG .noi file.
+    trn : PyTrn
+        The PSG .trn file.
     """
     def __init__(
         self,
         cfg: PyConfig = None,
         rad: PyRad = None,
         lyr: PyLyr = None,
-        noi: PyRad = None
+        noi: PyRad = None,
+        trn: PyTrn = None
     ):
         self.cfg = cfg
         self.rad = rad
         self.lyr = lyr
         self.noi = noi
+        self.trn = trn
 
     @classmethod
     def from_bytes(cls, b: bytes):
@@ -95,6 +102,7 @@ class PSGResponse:
         b : bytes
             The response from the PSG. This is the returned file read as bytes.
         """
+        b = b.replace(b'\r',b'')
         pattern = rb'results_([\w]+).txt'
         split_text = re.split(pattern, b)
         names = split_text[1::2]
@@ -104,7 +112,7 @@ class PSGResponse:
             data[name] = dat.strip()
         kwargs = {}
         for key, value in typedict.items():
-            value: PyConfig | PyRad | PyLyr
+            value: PyConfig | PyRad | PyLyr | PyTrn
             if key in data:
                 kwargs[key.decode(settings.get_setting('encoding'))] = value.from_bytes(data[key])
         return cls(**kwargs)
@@ -228,6 +236,7 @@ class APICall:
         app: str | None,
         api_key: str | None,
         url: str,
+        header: dict,
         timeout: float = 30
     )->requests.Response:
         """
@@ -259,7 +268,8 @@ class APICall:
         reply: requests.Response = requests.post(
             url=url,
             data=data,
-            timeout=timeout
+            timeout=timeout,
+            headers=header
         )
         return reply
     
@@ -277,6 +287,7 @@ class APICall:
             app=None,
             api_key=api_key,
             url=url,
+            header=settings.get_setting('header'),
             timeout=settings.get_setting('timeout')
         )
 
@@ -300,6 +311,7 @@ class APICall:
             app=self.app,
             api_key=api_key,
             url=url,
+            header=settings.get_setting('header'),
             timeout=settings.get_setting('timeout')
         )
         if self.logger is not None:
@@ -317,6 +329,9 @@ class APICall:
             reply.raise_for_status()
         except requests.HTTPError as err:
             raise exceptions.PSGConnectionError(reply.content) from err
+        too_many_calls = 'Your other API call is still running, please let it finish, wait 10 minutes, or consider installing the PSG Docker version'
+        if too_many_calls in reply.text:
+            raise exceptions.PSGConnectionError(reply.text)
         parse_exceptions(reply.content)
         if self._type in ['upd', 'set']:
             return PSGResponse.null()
