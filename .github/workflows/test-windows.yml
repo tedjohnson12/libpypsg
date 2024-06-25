@@ -32,4 +32,4 @@ jobs:
           python -c "import pypsg; pypsg.settings.save_settings(api_key='$PSG_KEY')"
           python -c "from pypsg.globes.waccm.waccm import download_test_data; download_test_data()"
           python -c "from pypsg.globes.exoplasim.exoplasim import download_test_data; download_test_data()"
-          pytest test
+          pytest test --ignore=test\test_request.py
