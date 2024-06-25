@@ -38,7 +38,7 @@ dev = [
     "matplotlib",
     "pytest",
     "pep8",
-    "furo==2023.9.10",
+    "pydata-sphinx-theme",
     "numpydoc",
     "sphinx",
     "sphinx-automodapi",

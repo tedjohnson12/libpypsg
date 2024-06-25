@@ -6,6 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import os
+
 project = 'pypsg'
 copyright = '2024, Ted Johnson, The PSG Team'
 author = 'Ted Johnson, The PSG Team'
@@ -20,7 +22,8 @@ extensions = [
     'sphinx_automodapi.smart_resolver',
     'numpydoc',
     'sphinx.ext.intersphinx',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'sphinx.ext.todo',
 ]
 
 sphinx_gallery_conf = {
@@ -38,7 +41,18 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'furo'
+doc_version = os.environ.get('DOCNAME','latest')
+
+html_theme = 'pydata_sphinx_theme'
+html_theme_options = {
+    'navbar_start': ['navbar-logo', 'version-switcher'],
+    'switcher': {
+        'json_url': 'https://vspec-collab.github.io/pypsg/versions.json',
+        'version_match': doc_version
+    }
+}
+
+
 html_static_path = ['_static']
 
 intersphinx_mapping = {

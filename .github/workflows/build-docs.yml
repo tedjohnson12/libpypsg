@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - main
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -15,6 +17,9 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    outputs:
+      DOCNAME: ${{ steps.prep.outputs.DOCNAME }}
+      DEST_DIR: ${{ steps.prep.outputs.DEST_DIR }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,6 +30,36 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
           sudo apt-get install graphviz
+      - name: Pre-deploy
+        id: prep
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          RELEASE: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+          RELEASE_VERSION: ${{ github.event.release.tag_name }}
+
+        run: |
+          if [[ $RELEASE == "true" ]]; then
+            echo "This is a release!"
+            echo $RELEASE
+            DOCNAME="${RELEASE_VERSION##*v}"
+          elif [[ $BRANCH_NAME =~ "release" ]]; then
+            echo "This is a release branch!"
+            VERSION="${BRANCH_NAME##*/}"
+            DOCNAME="${VERSION}-beta"
+          elif [[ $BRANCH_NAME == "develop" ]]; then
+            echo "This is the develop branch!"
+            DOCNAME="develop"
+          elif [[ $BRANCH_NAME == "main" ]]; then
+            echo "This is the main branch!"
+            DOCNAME="latest"
+          else
+            DOCNAME="${BRANCH_NAME}"
+            echo "Not sure how to handle $BRANCH_NAME"
+            exit 1
+          fi
+          echo "Using $DOCNAME"
+          echo "DOCNAME=$DOCNAME" >> $GITHUB_OUTPUT
+          echo "DEST_DIR=${DOCNAME%%-*}" >> $GITHUB_OUTPUT
       - name: Setup PSG
         env:
           PSG_KEY: ${{ secrets.PSG_API_KEY }}
@@ -34,14 +69,31 @@ jobs:
           python -c "from pypsg import settings; print('The current PSG URL is',settings.get_setting('url'))"
           python -c "from pypsg.globes.exocam.exocam import download_test_data; download_test_data()"
       - name: Build docs
+        env:
+          DOCNAME: ${{ steps.prep.outputs.DOCNAME }}
+          DEST_DIR: ${{ steps.prep.outputs.DEST_DIR }}
         run: |
           cd docs
           make html
           cd ..
+          cp docs/source/versions.json docs/build/html/versions.json
+          cp docs/source/redirect.html docs/build/html/redirect.html
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
-          publish_branch: gh-pages
-          force_orphan: true
+        env:
+          DOCNAME: ${{ steps.prep.outputs.DOCNAME }}
+          DEST_DIR: ${{ steps.prep.outputs.DEST_DIR }}
+        run : |
+          set -e
+          git fetch origin gh-pages
+          git checkout gh-pages
+          git pull origin gh-pages
+          cp -r docs/build/html ${DEST_DIR}/
+          cp ${DEST_DIR}/versions.json versions.json
+          cp ${DEST_DIR}/redirect.html index.html
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add versions.json
+          git add index.html
+          git add ${DEST_DIR}/
+          git commit -m "Update ${DOCNAME}"
+          git push origin gh-pages
