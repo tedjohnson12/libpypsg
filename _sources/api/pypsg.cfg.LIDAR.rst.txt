@@ -1,7 +1,0 @@
-LIDAR
-=====
-
-.. currentmodule:: pypsg.cfg
-
-.. autoclass:: LIDAR
-   :show-inheritance:

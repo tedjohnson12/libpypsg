@@ -1,9 +1,0 @@
-<map id="inheritancea9da1b90c2" name="inheritancea9da1b90c2">
-<area shape="rect" id="node1" href="api/pypsg.APICall.html#pypsg.APICall" target="_top" title="A class to call the PSG API." alt="" coords="25,203,97,228"/>
-<area shape="rect" id="node2" href="api/pypsg.PSGResponse.html#pypsg.PSGResponse" target="_top" title="A class to parse the response from the PSG API." alt="" coords="5,153,116,179"/>
-<area shape="rect" id="node3" href="api/pypsg.cfg.PyConfig.html#pypsg.cfg.PyConfig" target="_top" title="A configuration in the form of a python object." alt="" coords="21,104,100,129"/>
-<area shape="rect" id="node4" href="api/pypsg.lyr.PyLyr.html#pypsg.lyr.PyLyr" target="_top" title="Python representation of lyr files." alt="" coords="25,55,97,80"/>
-<area shape="rect" id="node5" href="api/pypsg.rad.PyRad.html#pypsg.rad.PyRad" target="_top" title="Python representation of rad files." alt="" coords="284,5,356,31"/>
-<area shape="rect" id="node6" href="https://docs.astropy.org/en/stable/api/astropy.table.QTable.html#astropy.table.QTable" target="_top" title="A class to represent tables of heterogeneous data." alt="" coords="164,5,236,31"/>
-<area shape="rect" id="node7" href="https://docs.astropy.org/en/stable/api/astropy.table.Table.html#astropy.table.Table" target="_top" title="A class to represent tables of heterogeneous data." alt="" coords="25,5,97,31"/>
-</map>

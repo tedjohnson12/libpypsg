@@ -1,6 +1,0 @@
-get_psg_container_info
-======================
-
-.. currentmodule:: pypsg.docker
-
-.. autofunction:: get_psg_container_info
