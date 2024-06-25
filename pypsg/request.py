@@ -236,6 +236,7 @@ class APICall:
         app: str | None,
         api_key: str | None,
         url: str,
+        header: dict,
         timeout: float = 30
     )->requests.Response:
         """
@@ -267,7 +268,8 @@ class APICall:
         reply: requests.Response = requests.post(
             url=url,
             data=data,
-            timeout=timeout
+            timeout=timeout,
+            headers=header
         )
         return reply
     
@@ -285,6 +287,7 @@ class APICall:
             app=None,
             api_key=api_key,
             url=url,
+            header=settings.get_setting('header'),
             timeout=settings.get_setting('timeout')
         )
 
@@ -308,6 +311,7 @@ class APICall:
             app=self.app,
             api_key=api_key,
             url=url,
+            header=settings.get_setting('header'),
             timeout=settings.get_setting('timeout')
         )
         if self.logger is not None:
