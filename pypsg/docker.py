@@ -3,6 +3,8 @@ Helpers for running psg locally
 """
 import json
 import subprocess
+import platform
+import shutil
 
 from . import settings
 
@@ -10,9 +12,18 @@ PSG_LATEST = 'psg:latest'
 PSG_CONTAINER_NAME = 'psg'
 
 
+def _is_docker_installed() -> bool:
+    """
+    True if docker is installed locally.
+    """
+    return shutil.which('docker') is not None
+
+
 def _get_containers_json() -> dict:
+    shell = platform.system() == 'Windows'
     raw_output = subprocess.check_output(
-        ['docker', 'ps', '-a', '--format', 'json']).strip().decode('utf-8')
+        ['docker', 'ps', '-a', '--format', 'json'],
+        shell=shell).strip().decode('utf-8')
     ls_output = raw_output.split('\n')
     json_output = '[\n' + ',\n'.join(ls_output) + ']'
     containers_info = json.loads(json_output)
@@ -43,6 +54,8 @@ def is_psg_installed() -> bool:
     docker engine was not installed. Since `v0.1.2`, this function
     returns `False` if the docker engine is not installed.
     """
+    if not _is_docker_installed():
+        return False
     try:
         containers_info = _get_containers_json()
 

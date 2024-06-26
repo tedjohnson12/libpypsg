@@ -13,7 +13,7 @@ from pypsg.globes import globes
 from pypsg.exceptions import GlobESError, PSGMultiError
 from pypsg.settings import INTERNAL_PSG_URL, PSG_URL
 from pypsg.docker import start_psg, stop_psg, is_psg_installed
-from pypsg import APICall, PSGResponse, PyRad, PyLyr
+from pypsg import APICall, PSGResponse, PyRad, PyLyr, PyTrn
 
 TR1e_PATH = Path(__file__).parent / 'test_cfg' / 'data' / 'TR1e_mirecle.cfg'
 
@@ -70,7 +70,7 @@ def test_apicall(keep_psg_settings):
     """
     
     cfgs = [PyConfig.from_file(TR1e_PATH), BinConfig.from_file(TR1e_PATH)]
-    output_types = [None,'all','cfg', 'rad', 'lyr', 'noi', 'upd', 'set']
+    output_types = [None,'all','cfg', 'rad', 'lyr', 'noi', 'upd', 'set', 'trn']
     apps = [None]
     urls = [None, INTERNAL_PSG_URL, PSG_URL] if is_psg_installed() else [None, PSG_URL]
     url_settings = [INTERNAL_PSG_URL, PSG_URL] if is_psg_installed() else [PSG_URL]
@@ -113,41 +113,55 @@ def test_apicall(keep_psg_settings):
                     assert response.lyr is None
                     assert response.noi is None
                     assert response.cfg.target.object.value == 'Exoplanet'
+                    assert response.trn is None
                 case 'rad':
                     assert isinstance(response.rad, PyRad)
                     assert response.cfg is None
                     assert response.lyr is None
                     assert response.noi is None
+                    assert response.trn is None
                 case 'lyr':
                     assert isinstance(response.lyr, PyLyr)
                     assert response.cfg is None
                     assert response.rad is None
                     assert response.noi is None
+                    assert response.trn is None
                 case 'noi':
                     assert isinstance(response.noi, PyRad)
                     assert response.cfg is None
                     assert response.rad is None
                     assert response.lyr is None
+                    assert response.trn is None
                 case 'all':
                     assert isinstance(response.cfg, PyConfig)
                     assert isinstance(response.rad, PyRad)
                     assert isinstance(response.lyr, PyLyr)
                     assert isinstance(response.noi, PyRad)
+                    assert isinstance(response.trn, PyTrn)
                 case 'upd':
                     assert response.cfg is None
                     assert response.rad is None
                     assert response.lyr is None
                     assert response.noi is None
+                    assert response.trn is None
                 case 'set':
                     assert response.cfg is None
                     assert response.rad is None
                     assert response.lyr is None
                     assert response.noi is None
+                    assert response.trn is None
+                case 'trn':
+                    assert response.cfg is None
+                    assert response.rad is None
+                    assert response.lyr is None
+                    assert response.noi is None
+                    assert isinstance(response.trn, PyTrn)
                 case None:
                     assert response.cfg is None
                     assert isinstance(response.rad, PyRad)
                     assert response.lyr is None
                     assert response.noi is None
+                    assert response.trn is None
             # APICall(cfg=cfg, output_type='set', app=None, url=url)() # This should clean up
     
     # Test all combinations

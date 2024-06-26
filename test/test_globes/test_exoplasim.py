@@ -32,9 +32,12 @@ from pypsg.globes.exoplasim.exoplasim import (
     get_molecule_suite,
     to_pygcm
 )
+from pypsg.globes.exoplasim import download_exoplasim_test_data
 
 @pytest.fixture
 def data()->Dataset:
+    if not TEST_PATH.exists():
+        download_exoplasim_test_data()
     with Dataset(TEST_PATH) as _data:
         yield _data
 

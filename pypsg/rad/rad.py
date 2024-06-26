@@ -87,6 +87,7 @@ class PyRad(table.QTable):
         
     @classmethod
     def from_bytes(cls,b:bytes):
+        b = b.replace(b'\r',b'')
         lines = b.split(b'\n')
         header = [line.decode(settings.get_setting('encoding')) for line in lines if line.startswith(b'#')]
         content = [line.decode(settings.get_setting('encoding')) for line in lines if (not line.startswith(b'#') and len(line)>0)]
@@ -107,5 +108,19 @@ class PyRad(table.QTable):
             data[name] = content[:,i] * (spectral_unit if i==0 else radiance_unit)
         return cls(data=data)
     @property
-    def wl(self):
+    def wl(self)->u.Quantity:
+        """
+        The wavelength column.
+        
+        :type: astropy.units.Quantity
+        """
         return self['Wave/freq']
+    def __getitem__(self, item):
+        """
+        Give a more helpful error message if the item is not in the rad file.
+        """
+        try:
+            return super().__getitem__(item)
+        except KeyError as e:
+            msg = f'{item} not in rad file, acceptable keys are {self.keys()}'
+            raise KeyError(msg) from e
