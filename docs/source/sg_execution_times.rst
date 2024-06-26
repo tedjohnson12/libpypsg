@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.128** total execution time for 4 files **from all galleries**:
+**00:02.718** total execution time for 4 files **from all galleries**:
 
 .. container::
 
@@ -32,15 +32,15 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_plot_rad.py` (``../../examples/plot_rad.py``)
-     - 00:01.128
-     - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_exocam.py` (``../../examples/plot_exocam.py``)
-     - 00:00.000
+     - 00:01.471
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_rad.py` (``../../examples/plot_rad.py``)
+     - 00:00.885
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_read_cfg.py` (``../../examples/plot_read_cfg.py``)
-     - 00:00.000
+     - 00:00.244
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_simple.py` (``../../examples/plot_simple.py``)
-     - 00:00.000
+     - 00:00.117
      - 0.0
