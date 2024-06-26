@@ -1,0 +1,35 @@
+EquilibriumAtmosphere
+=====================
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: EquilibriumAtmosphere
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~EquilibriumAtmosphere.aerosols
+      ~EquilibriumAtmosphere.continuum
+      ~EquilibriumAtmosphere.description
+      ~EquilibriumAtmosphere.lmax
+      ~EquilibriumAtmosphere.molecules
+      ~EquilibriumAtmosphere.nmax
+      ~EquilibriumAtmosphere.pressure
+      ~EquilibriumAtmosphere.profile
+      ~EquilibriumAtmosphere.temperature
+      ~EquilibriumAtmosphere.weight
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: aerosols
+   .. autoattribute:: continuum
+   .. autoattribute:: description
+   .. autoattribute:: lmax
+   .. autoattribute:: molecules
+   .. autoattribute:: nmax
+   .. autoattribute:: pressure
+   .. autoattribute:: profile
+   .. autoattribute:: temperature
+   .. autoattribute:: weight

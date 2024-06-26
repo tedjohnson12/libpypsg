@@ -1,0 +1,27 @@
+CharField
+=========
+
+.. currentmodule:: pypsg.cfg.base
+
+.. autoclass:: CharField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~CharField.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~CharField.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

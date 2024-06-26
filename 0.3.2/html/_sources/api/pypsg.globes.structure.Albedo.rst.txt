@@ -1,0 +1,17 @@
+Albedo
+======
+
+.. currentmodule:: pypsg.globes.structure
+
+.. autoclass:: Albedo
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Albedo.constant
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: constant
