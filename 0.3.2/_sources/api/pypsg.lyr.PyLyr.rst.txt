@@ -1,0 +1,33 @@
+PyLyr
+=====
+
+.. currentmodule:: pypsg.lyr
+
+.. autoclass:: PyLyr
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~PyLyr.CG_EXT
+      ~PyLyr.PROF_EXT
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PyLyr.from_bytes
+      ~PyLyr.from_fits
+      ~PyLyr.to_fits
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: CG_EXT
+   .. autoattribute:: PROF_EXT
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: from_bytes
+   .. automethod:: from_fits
+   .. automethod:: to_fits

@@ -1,0 +1,6 @@
+USER_DATA_PATH
+==============
+
+.. currentmodule:: pypsg.settings
+
+.. autodata:: USER_DATA_PATH

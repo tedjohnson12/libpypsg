@@ -1,0 +1,35 @@
+Generator
+=========
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: Generator
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Generator.apply_telluric_noise
+      ~Generator.apply_telluric_obs
+      ~Generator.continuum_model
+      ~Generator.continuum_stellar
+      ~Generator.gas_model
+      ~Generator.gcm_binning
+      ~Generator.log_rad
+      ~Generator.rad_units
+      ~Generator.resolution_kernel
+      ~Generator.telluric_params
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: apply_telluric_noise
+   .. autoattribute:: apply_telluric_obs
+   .. autoattribute:: continuum_model
+   .. autoattribute:: continuum_stellar
+   .. autoattribute:: gas_model
+   .. autoattribute:: gcm_binning
+   .. autoattribute:: log_rad
+   .. autoattribute:: rad_units
+   .. autoattribute:: resolution_kernel
+   .. autoattribute:: telluric_params
