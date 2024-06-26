@@ -1,0 +1,6 @@
+save_settings
+=============
+
+.. currentmodule:: pypsg.settings
+
+.. autofunction:: save_settings

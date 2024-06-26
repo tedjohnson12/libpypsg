@@ -1,0 +1,1597 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; pypsg 0.3.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=71d9d8e6"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://tedjohnson12.github.io/pypsg/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">pypsg 0.3.2 documentation</p>
+  
+</a></div>
+    
+      <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="intro.html">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    The pypsg API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    pypsg Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="intro.html">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    The pypsg API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    pypsg Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
+ | <a href="#Y"><strong>Y</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
+ 
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.__call__">__call__() (pypsg.APICall method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.CharField.html#pypsg.cfg.base.CharField._name">_name (pypsg.cfg.base.CharField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field._name">(pypsg.cfg.base.Field attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.CharField.html#pypsg.cfg.base.CharField._value">_value (pypsg.cfg.base.CharField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field._value">(pypsg.cfg.base.Field attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.Molecule.html#pypsg.cfg.base.Molecule.abn">abn (pypsg.cfg.base.Molecule attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.abun">abun (pypsg.cfg.base.AerosolsField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField.abun">(pypsg.cfg.base.MoleculesField attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.aeros">aeros (pypsg.cfg.base.AerosolsField attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Aerosol.html#pypsg.cfg.base.Aerosol">Aerosol (class in pypsg.cfg.base)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.structure.Aerosol.html#pypsg.globes.structure.Aerosol">(class in pypsg.globes.structure)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.settings.aerosol_name_dict.html#pypsg.settings.aerosol_name_dict">aerosol_name_dict (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.aerosol_sizes">aerosol_sizes (pypsg.globes.PyGCM attribute)</a>
+</li>
+      <li><a href="api/pypsg.settings.aerosol_type_dict.html#pypsg.settings.aerosol_type_dict">aerosol_type_dict (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.aerosols">aerosols (pypsg.cfg.ComaAtmosphere attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.aerosols">(pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.aerosols">(pypsg.globes.PyGCM attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField">AerosolsField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.AerosolSize.html#pypsg.globes.structure.AerosolSize">AerosolSize (class in pypsg.globes.structure)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.structure.Albedo.html#pypsg.globes.structure.Albedo">Albedo (class in pypsg.globes.structure)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Surface.html#pypsg.cfg.Surface.albedo">albedo (pypsg.cfg.Surface attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.altitude">altitude() (pypsg.globes.PyGCM method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.AOTF.html#pypsg.cfg.AOTF">AOTF (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall">APICall (class in pypsg)</a>
+</li>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.app">app (pypsg.APICall attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Telescope.html#pypsg.cfg.Telescope.apperture">apperture (pypsg.cfg.Telescope attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.apply_telluric_noise">apply_telluric_noise (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.apply_telluric_obs">apply_telluric_obs (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field.asbytes">asbytes (pypsg.cfg.base.Field attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.at_1au">at_1au (pypsg.cfg.ComaAtmosphere attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Atmosphere.html#pypsg.cfg.Atmosphere">Atmosphere (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.settings.atmosphere_type_dict.html#pypsg.settings.atmosphere_type_dict">atmosphere_type_dict (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.azimuth">azimuth (pypsg.cfg.Geometry attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.BinConfig.html#pypsg.cfg.BinConfig.binary">binary (pypsg.cfg.BinConfig attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.BinConfig.html#pypsg.cfg.BinConfig">BinConfig (class in pypsg.cfg)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.BooleanField.html#pypsg.cfg.base.BooleanField">BooleanField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Aerosol.html#pypsg.globes.structure.Aerosol.boyant_exp">boyant_exp() (pypsg.globes.structure.Aerosol class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.call">call() (pypsg.APICall static method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.CCD.html#pypsg.cfg.CCD">CCD (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.cfg">cfg (pypsg.APICall attribute)</a>
+</li>
+      <li><a href="api/pypsg.lyr.PyLyr.html#pypsg.lyr.PyLyr.CG_EXT">CG_EXT (pypsg.lyr.PyLyr attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyLyr.html#pypsg.PyLyr.CG_EXT">(pypsg.PyLyr attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.CharChoicesField.html#pypsg.cfg.base.CharChoicesField">CharChoicesField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.CharField.html#pypsg.cfg.base.CharField">CharField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.CodedQuantityField.html#pypsg.cfg.base.CodedQuantityField">CodedQuantityField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.column">column() (pypsg.globes.PyGCM method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere">ComaAtmosphere (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ConfigTooLongWarning.html#pypsg.cfg.ConfigTooLongWarning">ConfigTooLongWarning</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Aerosol.html#pypsg.globes.structure.Aerosol.constant">constant() (pypsg.globes.structure.Aerosol class method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.structure.AerosolSize.html#pypsg.globes.structure.AerosolSize.constant">(pypsg.globes.structure.AerosolSize class method)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Albedo.html#pypsg.globes.structure.Albedo.constant">(pypsg.globes.structure.Albedo class method)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Emissivity.html#pypsg.globes.structure.Emissivity.constant">(pypsg.globes.structure.Emissivity class method)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Molecule.html#pypsg.globes.structure.Molecule.constant">(pypsg.globes.structure.Molecule class method)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Surface.html#pypsg.globes.structure.Surface.constant">(pypsg.globes.structure.Surface class method)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.SurfacePressure.html#pypsg.globes.structure.SurfacePressure.constant">(pypsg.globes.structure.SurfacePressure class method)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Wind.html#pypsg.globes.structure.Wind.constant">(pypsg.globes.structure.Wind class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.ConstantNoise.html#pypsg.cfg.ConstantNoise">ConstantNoise (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ConstantNoiseWithBackground.html#pypsg.cfg.ConstantNoiseWithBackground">ConstantNoiseWithBackground (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.content">content (pypsg.cfg.base.AerosolsField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.CodedQuantityField.html#pypsg.cfg.base.CodedQuantityField.content">(pypsg.cfg.base.CodedQuantityField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field.content">(pypsg.cfg.base.Field attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.GeometryOffsetField.html#pypsg.cfg.base.GeometryOffsetField.content">(pypsg.cfg.base.GeometryOffsetField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField.content">(pypsg.cfg.base.MoleculesField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.content">(pypsg.cfg.base.ProfileField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.BinConfig.html#pypsg.cfg.BinConfig.content">(pypsg.cfg.BinConfig attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.PyConfig.html#pypsg.cfg.PyConfig.content">(pypsg.cfg.PyConfig attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.content">(pypsg.globes.PyGCM attribute)</a>
+</li>
+        <li><a href="api/pypsg.PyConfig.html#pypsg.PyConfig.content">(pypsg.PyConfig attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.continuum">continuum (pypsg.cfg.ComaAtmosphere attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.continuum">(pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.continuum_model">continuum_model (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.continuum_stellar">continuum_stellar (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Coronagraph.html#pypsg.cfg.Coronagraph.contrast">contrast (pypsg.cfg.Coronagraph attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.copy_config">copy_config() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Coronagraph.html#pypsg.cfg.Coronagraph">Coronagraph (class in pypsg.cfg)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.CCD.html#pypsg.cfg.CCD.dark_current">dark_current (pypsg.cfg.CCD attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.dat">dat (pypsg.cfg.base.Profile attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.structure.Aerosol.html#pypsg.globes.structure.Aerosol.dat">(pypsg.globes.structure.Aerosol attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.AerosolSize.html#pypsg.globes.structure.AerosolSize.dat">(pypsg.globes.structure.AerosolSize attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Albedo.html#pypsg.globes.structure.Albedo.dat">(pypsg.globes.structure.Albedo attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Emissivity.html#pypsg.globes.structure.Emissivity.dat">(pypsg.globes.structure.Emissivity attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Molecule.html#pypsg.globes.structure.Molecule.dat">(pypsg.globes.structure.Molecule attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Pressure.html#pypsg.globes.structure.Pressure.dat">(pypsg.globes.structure.Pressure attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Surface.html#pypsg.globes.structure.Surface.dat">(pypsg.globes.structure.Surface attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.SurfacePressure.html#pypsg.globes.structure.SurfacePressure.dat">(pypsg.globes.structure.SurfacePressure attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.SurfaceTemperature.html#pypsg.globes.structure.SurfaceTemperature.dat">(pypsg.globes.structure.SurfaceTemperature attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Temperature.html#pypsg.globes.structure.Temperature.dat">(pypsg.globes.structure.Temperature attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Variable.html#pypsg.globes.structure.Variable.dat">(pypsg.globes.structure.Variable attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Wind.html#pypsg.globes.structure.Wind.dat">(pypsg.globes.structure.Wind attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.date">date (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.DateField.html#pypsg.cfg.base.DateField">DateField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.CharField.html#pypsg.cfg.base.CharField.default">default (pypsg.cfg.base.CharField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field.default">(pypsg.cfg.base.Field attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.settings.DEFAULT_SETTINGS.html#pypsg.settings.DEFAULT_SETTINGS">DEFAULT_SETTINGS (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Noise.html#pypsg.cfg.Noise.desc">desc (pypsg.cfg.Noise attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.description">description (pypsg.cfg.ComaAtmosphere attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.description">(pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.Detectability.html#pypsg.cfg.Detectability">Detectability (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.diameter">diameter (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.BinConfig.html#pypsg.cfg.BinConfig.dict">dict (pypsg.cfg.BinConfig attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.disk_angles">disk_angles (pypsg.cfg.Geometry attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.dlat">dlat (pypsg.globes.PyGCM attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.dlon">dlon (pypsg.globes.PyGCM attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.DOUBLE">DOUBLE (pypsg.globes.GCMdecoder attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.structure.Emissivity.html#pypsg.globes.structure.Emissivity">Emissivity (class in pypsg.globes.structure)</a>
+</li>
+      <li><a href="api/pypsg.cfg.CCD.html#pypsg.cfg.CCD.emissivity">emissivity (pypsg.cfg.CCD attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.Surface.html#pypsg.cfg.Surface.emissivity">(pypsg.cfg.Surface attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.BinConfig.html#pypsg.cfg.BinConfig.encoding">encoding (pypsg.cfg.BinConfig attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.BinConfig.html#pypsg.cfg.BinConfig.enconding">enconding (pypsg.cfg.BinConfig attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere">EquilibriumAtmosphere (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.globes.exocam_to_pygcm.html#pypsg.globes.exocam_to_pygcm">exocam_to_pygcm() (in module pypsg.globes)</a>
+</li>
+      <li><a href="api/pypsg.globes.exoplasim_to_pygcm.html#pypsg.globes.exoplasim_to_pygcm">exoplasim_to_pygcm() (in module pypsg.globes)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Noise.html#pypsg.cfg.Noise.exp_time">exp_time (pypsg.cfg.Noise attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.expansion_velocity">expansion_velocity (pypsg.cfg.ComaAtmosphere attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.fget_layer">fget_layer() (pypsg.cfg.base.Profile method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field">Field (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.FLAT">FLAT (pypsg.globes.GCMdecoder attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.flat">flat (pypsg.globes.PyGCM attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.structure.Pressure.html#pypsg.globes.structure.Pressure.flat">(pypsg.globes.structure.Pressure attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.SurfacePressure.html#pypsg.globes.structure.SurfacePressure.flat">(pypsg.globes.structure.SurfacePressure attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Variable.html#id0">(pypsg.globes.structure.Variable attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.globes.structure.Variable.html#pypsg.globes.structure.Variable.flat">flat() (pypsg.globes.structure.Variable method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.FloatField.html#pypsg.cfg.base.FloatField">FloatField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.CodedQuantityField.html#pypsg.cfg.base.CodedQuantityField.fmt">fmt (pypsg.cfg.base.CodedQuantityField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.GeometryOffsetField.html#pypsg.cfg.base.GeometryOffsetField.fmt">(pypsg.cfg.base.GeometryOffsetField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.Molecule.html#pypsg.cfg.base.Molecule.fmt">(pypsg.cfg.base.Molecule attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.fmt">(pypsg.cfg.base.ProfileField attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.Aerosol.html#pypsg.cfg.base.Aerosol.fmt_size">fmt_size (pypsg.cfg.base.Aerosol attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Telescope.html#pypsg.cfg.Telescope.fov">fov (pypsg.cfg.Telescope attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Temperature.html#pypsg.globes.structure.Temperature.from_adiabat">from_adiabat() (pypsg.globes.structure.Temperature class method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.PyConfig.html#pypsg.cfg.PyConfig.from_binaryconfig">from_binaryconfig() (pypsg.cfg.PyConfig class method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyConfig.html#pypsg.PyConfig.from_binaryconfig">(pypsg.PyConfig class method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.PyConfig.html#pypsg.cfg.PyConfig.from_bytes">from_bytes() (pypsg.cfg.PyConfig class method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.from_bytes">(pypsg.globes.PyGCM class method)</a>
+</li>
+        <li><a href="api/pypsg.lyr.PyLyr.html#pypsg.lyr.PyLyr.from_bytes">(pypsg.lyr.PyLyr class method)</a>
+</li>
+        <li><a href="api/pypsg.PSGResponse.html#pypsg.PSGResponse.from_bytes">(pypsg.PSGResponse class method)</a>
+</li>
+        <li><a href="api/pypsg.PyConfig.html#pypsg.PyConfig.from_bytes">(pypsg.PyConfig class method)</a>
+</li>
+        <li><a href="api/pypsg.PyLyr.html#pypsg.PyLyr.from_bytes">(pypsg.PyLyr class method)</a>
+</li>
+        <li><a href="api/pypsg.PyRad.html#pypsg.PyRad.from_bytes">(pypsg.PyRad class method)</a>
+</li>
+        <li><a href="api/pypsg.PyTrn.html#pypsg.PyTrn.from_bytes">(pypsg.PyTrn class method)</a>
+</li>
+        <li><a href="api/pypsg.rad.PyRad.html#pypsg.rad.PyRad.from_bytes">(pypsg.rad.PyRad class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.from_cfg">from_cfg() (pypsg.globes.PyGCM class method)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.from_decoder">from_decoder() (pypsg.globes.PyGCM class method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.PyConfig.html#pypsg.cfg.PyConfig.from_dict">from_dict() (pypsg.cfg.PyConfig class method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyConfig.html#pypsg.PyConfig.from_dict">(pypsg.PyConfig class method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.BinConfig.html#pypsg.cfg.BinConfig.from_file">from_file() (pypsg.cfg.BinConfig class method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.PyConfig.html#pypsg.cfg.PyConfig.from_file">(pypsg.cfg.PyConfig class method)</a>
+</li>
+        <li><a href="api/pypsg.PyConfig.html#pypsg.PyConfig.from_file">(pypsg.PyConfig class method)</a>
+</li>
+        <li><a href="api/pypsg.PyTrn.html#pypsg.PyTrn.from_file">(pypsg.PyTrn class method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.lyr.PyLyr.html#pypsg.lyr.PyLyr.from_fits">from_fits() (pypsg.lyr.PyLyr class method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyLyr.html#pypsg.PyLyr.from_fits">(pypsg.PyLyr class method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.globes.structure.Pressure.html#pypsg.globes.structure.Pressure.from_limits">from_limits() (pypsg.globes.structure.Pressure class method)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.SurfacePressure.html#pypsg.globes.structure.SurfacePressure.from_pressure">from_pressure() (pypsg.globes.structure.SurfacePressure class method)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Pressure.html#pypsg.globes.structure.Pressure.from_profile">from_profile() (pypsg.globes.structure.Pressure class method)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.from_psg">from_psg() (pypsg.globes.GCMdecoder class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.RecieverTemperatureNoise.html#pypsg.cfg.RecieverTemperatureNoise.g_factor">g_factor (pypsg.cfg.RecieverTemperatureNoise attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField.gas">gas (pypsg.cfg.base.MoleculesField attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.gas_model">gas_model (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.gas_production">gas_production (pypsg.cfg.ComaAtmosphere attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.gcm_binning">gcm_binning (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder">GCMdecoder (class in pypsg.globes)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator">Generator (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry">Geometry (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.geometry">geometry (pypsg.cfg.Geometry attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.GeometryOffsetField.html#pypsg.cfg.base.GeometryOffsetField">GeometryOffsetField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_2d_size">get_2d_size() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_3d_size">get_3d_size() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Aerosol.html#pypsg.cfg.base.Aerosol.get_abn_unit">get_abn_unit() (pypsg.cfg.base.Aerosol static method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.Molecule.html#pypsg.cfg.base.Molecule.get_abn_unit">(pypsg.cfg.base.Molecule static method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.globes.structure.Pressure.html#pypsg.globes.structure.Pressure.get_adiabatic_scalar">get_adiabatic_scalar() (pypsg.globes.structure.Pressure method)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_aerosols">get_aerosols() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_alt">get_alt() (pypsg.globes.GCMdecoder method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_column_clouds">get_column_clouds() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_column_density">get_column_density() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_lats">get_lats() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.get_layer">get_layer() (pypsg.cfg.base.Profile method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.get_layer">(pypsg.cfg.base.ProfileField method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_lons">get_lons() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_mean_molec_mass">get_mean_molec_mass() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.get_molecules">get_molecules() (pypsg.cfg.base.ProfileField method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_molecules">(pypsg.globes.GCMdecoder method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.get_pressure">get_pressure() (pypsg.cfg.base.ProfileField method)</a>
+</li>
+      <li><a href="api/pypsg.docker.get_psg_container_info.html#pypsg.docker.get_psg_container_info">get_psg_container_info() (in module pypsg.docker)</a>
+</li>
+      <li><a href="api/pypsg.settings.get_setting.html#pypsg.settings.get_setting">get_setting() (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.get_shape">get_shape() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Aerosol.html#pypsg.cfg.base.Aerosol.get_size_unit">get_size_unit() (pypsg.cfg.base.Aerosol static method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.get_temperature">get_temperature() (pypsg.cfg.base.ProfileField method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.get_unit">get_unit() (pypsg.cfg.base.Profile static method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.gravity">gravity (pypsg.cfg.Target attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.BinConfig.html#id0">has_binary (pypsg.cfg.BinConfig attribute)</a>, <a href="api/pypsg.cfg.BinConfig.html#pypsg.cfg.BinConfig.has_binary">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.header">header (pypsg.globes.PyGCM attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.inclination">inclination (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.IntegerField.html#pypsg.cfg.base.IntegerField">IntegerField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Interferometer.html#pypsg.cfg.Interferometer">Interferometer (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.settings.INTERNAL_PSG_URL.html#pypsg.settings.INTERNAL_PSG_URL">INTERNAL_PSG_URL (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.CodedQuantityField.html#pypsg.cfg.base.CodedQuantityField.is_ambiguous">is_ambiguous (pypsg.cfg.base.CodedQuantityField attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field.is_null">is_null (pypsg.cfg.base.Field attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.is_pressure">is_pressure (pypsg.cfg.base.Profile attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.docker.is_psg_installed.html#pypsg.docker.is_psg_installed">is_psg_installed() (in module pypsg.docker)</a>
+</li>
+      <li><a href="api/pypsg.docker.is_psg_running.html#pypsg.docker.is_psg_running">is_psg_running() (in module pypsg.docker)</a>
+</li>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.is_single_file">is_single_file (pypsg.APICall attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.FloatField.html#pypsg.cfg.base.FloatField.is_table">is_table (pypsg.cfg.base.FloatField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.QuantityField.html#pypsg.cfg.base.QuantityField.is_table">(pypsg.cfg.base.QuantityField attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.is_temperature">is_temperature (pypsg.cfg.base.Profile attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Coronagraph.html#pypsg.cfg.Coronagraph.iwa">iwa (pypsg.cfg.Coronagraph attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.lats">lats (pypsg.globes.PyGCM attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.LIDAR.html#pypsg.cfg.LIDAR">LIDAR (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.lmax">lmax (pypsg.cfg.ComaAtmosphere attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.lmax">(pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.settings.load_settings.html#pypsg.settings.load_settings">load_settings() (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.log_rad">log_rad (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.lons">lons (pypsg.globes.PyGCM attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.Molecule.html#pypsg.cfg.base.Molecule">Molecule (class in pypsg.cfg.base)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.structure.Molecule.html#pypsg.globes.structure.Molecule">(class in pypsg.globes.structure)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.molecules">molecules (pypsg.cfg.ComaAtmosphere attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.molecules">(pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.molecules">(pypsg.globes.PyGCM attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField">MoleculesField (class in pypsg.cfg.base)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.Noise.html#pypsg.cfg.Noise.n_frames">n_frames (pypsg.cfg.Noise attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Noise.html#pypsg.cfg.Noise.n_pixels">n_pixels (pypsg.cfg.Noise attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Interferometer.html#pypsg.cfg.Interferometer.n_telescopes">n_telescopes (pypsg.cfg.Interferometer attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.naero">naero (pypsg.cfg.base.AerosolsField attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.CodedQuantityField.html#pypsg.cfg.base.CodedQuantityField.name">name (pypsg.cfg.base.CodedQuantityField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field.name">(pypsg.cfg.base.Field attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.GeometryOffsetField.html#pypsg.cfg.base.GeometryOffsetField.name">(pypsg.cfg.base.GeometryOffsetField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.name">(pypsg.cfg.Target attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Aerosol.html#pypsg.globes.structure.Aerosol.name">(pypsg.globes.structure.Aerosol attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.AerosolSize.html#pypsg.globes.structure.AerosolSize.name">(pypsg.globes.structure.AerosolSize attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Albedo.html#pypsg.globes.structure.Albedo.name">(pypsg.globes.structure.Albedo attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Emissivity.html#pypsg.globes.structure.Emissivity.name">(pypsg.globes.structure.Emissivity attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Molecule.html#pypsg.globes.structure.Molecule.name">(pypsg.globes.structure.Molecule attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Pressure.html#pypsg.globes.structure.Pressure.name">(pypsg.globes.structure.Pressure attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Surface.html#pypsg.globes.structure.Surface.name">(pypsg.globes.structure.Surface attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.SurfacePressure.html#pypsg.globes.structure.SurfacePressure.name">(pypsg.globes.structure.SurfacePressure attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.SurfaceTemperature.html#pypsg.globes.structure.SurfaceTemperature.name">(pypsg.globes.structure.SurfaceTemperature attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Temperature.html#pypsg.globes.structure.Temperature.name">(pypsg.globes.structure.Temperature attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Variable.html#pypsg.globes.structure.Variable.name">(pypsg.globes.structure.Variable attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Wind.html#pypsg.globes.structure.Wind.name">(pypsg.globes.structure.Wind attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.names">names (pypsg.cfg.base.ProfileField attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField.ngas">ngas (pypsg.cfg.base.MoleculesField attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.nlayers">nlayers (pypsg.cfg.base.Profile attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.nlayers">(pypsg.cfg.base.ProfileField attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.nmax">nmax (pypsg.cfg.ComaAtmosphere attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.nmax">(pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.NoAtmosphere.html#pypsg.cfg.NoAtmosphere">NoAtmosphere (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Noise.html#pypsg.cfg.Noise">Noise (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Noise.html#pypsg.cfg.Noise.noise_type">noise_type (pypsg.cfg.Noise attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Noiseless.html#pypsg.cfg.Noiseless">Noiseless (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.CharField.html#pypsg.cfg.base.CharField.null">null (pypsg.cfg.base.CharField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field.null">(pypsg.cfg.base.Field attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.PSGResponse.html#pypsg.PSGResponse.null">null() (pypsg.PSGResponse class method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.NullFieldComparisonError.html#pypsg.cfg.base.NullFieldComparisonError">NullFieldComparisonError</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.object">object (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.obs_latitude">obs_latitude (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.obs_longitude">obs_longitude (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.obs_velocity">obs_velocity (pypsg.cfg.Target attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.observer_altitude">observer_altitude (pypsg.cfg.Geometry attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.offset">offset (pypsg.cfg.Geometry attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.orbit">orbit (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.output_type">output_type (pypsg.APICall attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.CodedQuantityField.html#pypsg.cfg.base.CodedQuantityField.parse_unit">parse_unit() (pypsg.cfg.base.CodedQuantityField method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.period">period (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.CCD.html#pypsg.cfg.CCD.pixel_depth">pixel_depth (pypsg.cfg.CCD attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Detectability.html#pypsg.cfg.Detectability.pixel_size">pixel_size (pypsg.cfg.Detectability attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.position_angle">position_angle (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.PowerEquivalentNoise.html#pypsg.cfg.PowerEquivalentNoise">PowerEquivalentNoise (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Pressure.html#pypsg.globes.structure.Pressure">Pressure (class in pypsg.globes.structure)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.PRESSURE">PRESSURE (pypsg.cfg.base.Profile attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.pressure">pressure (pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+      <li><a href="api/pypsg.lyr.PyLyr.html#pypsg.lyr.PyLyr.PROF_EXT">PROF_EXT (pypsg.lyr.PyLyr attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyLyr.html#pypsg.PyLyr.PROF_EXT">(pypsg.PyLyr attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile">Profile (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.profile">profile (pypsg.cfg.ComaAtmosphere attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.profile">(pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField">ProfileField (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.settings.psg_aerosol_size_unit.html#pypsg.settings.psg_aerosol_size_unit">psg_aerosol_size_unit (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.settings.PSG_PORT.html#pypsg.settings.PSG_PORT">PSG_PORT (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.settings.psg_pressure_unit.html#pypsg.settings.psg_pressure_unit">psg_pressure_unit (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Aerosol.html#pypsg.globes.structure.Aerosol.psg_unit">psg_unit (pypsg.globes.structure.Aerosol attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.structure.AerosolSize.html#pypsg.globes.structure.AerosolSize.psg_unit">(pypsg.globes.structure.AerosolSize attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Albedo.html#pypsg.globes.structure.Albedo.psg_unit">(pypsg.globes.structure.Albedo attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Emissivity.html#pypsg.globes.structure.Emissivity.psg_unit">(pypsg.globes.structure.Emissivity attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Molecule.html#pypsg.globes.structure.Molecule.psg_unit">(pypsg.globes.structure.Molecule attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Pressure.html#pypsg.globes.structure.Pressure.psg_unit">(pypsg.globes.structure.Pressure attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Surface.html#pypsg.globes.structure.Surface.psg_unit">(pypsg.globes.structure.Surface attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.SurfacePressure.html#pypsg.globes.structure.SurfacePressure.psg_unit">(pypsg.globes.structure.SurfacePressure attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.SurfaceTemperature.html#pypsg.globes.structure.SurfaceTemperature.psg_unit">(pypsg.globes.structure.SurfaceTemperature attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Temperature.html#pypsg.globes.structure.Temperature.psg_unit">(pypsg.globes.structure.Temperature attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Variable.html#pypsg.globes.structure.Variable.psg_unit">(pypsg.globes.structure.Variable attribute)</a>
+</li>
+        <li><a href="api/pypsg.globes.structure.Wind.html#pypsg.globes.structure.Wind.psg_unit">(pypsg.globes.structure.Wind attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.settings.PSG_URL.html#pypsg.settings.PSG_URL">PSG_URL (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.docker.PSGNotInstalledError.html#pypsg.docker.PSGNotInstalledError">PSGNotInstalledError</a>
+</li>
+      <li><a href="api/pypsg.PSGResponse.html#pypsg.PSGResponse">PSGResponse (class in pypsg)</a>
+</li>
+      <li><a href="api/pypsg.PyConfig.html#pypsg.PyConfig">PyConfig (class in pypsg)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.PyConfig.html#pypsg.cfg.PyConfig">(class in pypsg.cfg)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM">PyGCM (class in pypsg.globes)</a>
+</li>
+      <li><a href="api/pypsg.PyLyr.html#pypsg.PyLyr">PyLyr (class in pypsg)</a>
+
+      <ul>
+        <li><a href="api/pypsg.lyr.PyLyr.html#pypsg.lyr.PyLyr">(class in pypsg.lyr)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.PyRad.html#pypsg.PyRad">PyRad (class in pypsg)</a>
+
+      <ul>
+        <li><a href="api/pypsg.rad.PyRad.html#pypsg.rad.PyRad">(class in pypsg.rad)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.PyTrn.html#pypsg.PyTrn">PyTrn (class in pypsg)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.QuantityField.html#pypsg.cfg.base.QuantityField">QuantityField (class in pypsg.cfg.base)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.PyRad.html#pypsg.PyRad.RAD_UNIT">RAD_UNIT (pypsg.PyRad attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.rad.PyRad.html#pypsg.rad.PyRad.RAD_UNIT">(pypsg.rad.PyRad attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.rad_units">rad_units (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Telescope.html#pypsg.cfg.Telescope.range1">range1 (pypsg.cfg.Telescope attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Telescope.html#pypsg.cfg.Telescope.range2">range2 (pypsg.cfg.Telescope attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.read">read() (pypsg.cfg.base.AerosolsField method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.BooleanField.html#pypsg.cfg.base.BooleanField.read">(pypsg.cfg.base.BooleanField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.CharField.html#pypsg.cfg.base.CharField.read">(pypsg.cfg.base.CharField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.CodedQuantityField.html#pypsg.cfg.base.CodedQuantityField.read">(pypsg.cfg.base.CodedQuantityField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.DateField.html#pypsg.cfg.base.DateField.read">(pypsg.cfg.base.DateField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field.read">(pypsg.cfg.base.Field method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.FloatField.html#pypsg.cfg.base.FloatField.read">(pypsg.cfg.base.FloatField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.GeometryOffsetField.html#pypsg.cfg.base.GeometryOffsetField.read">(pypsg.cfg.base.GeometryOffsetField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.IntegerField.html#pypsg.cfg.base.IntegerField.read">(pypsg.cfg.base.IntegerField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField.read">(pypsg.cfg.base.MoleculesField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.read">(pypsg.cfg.base.ProfileField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.QuantityField.html#pypsg.cfg.base.QuantityField.read">(pypsg.cfg.base.QuantityField method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.Table.html#pypsg.cfg.base.Table.read">(pypsg.cfg.base.Table static method)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.UnitChoicesField.html#pypsg.cfg.base.UnitChoicesField.read">(pypsg.cfg.base.UnitChoicesField method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.CCD.html#pypsg.cfg.CCD.read_noise">read_noise (pypsg.cfg.CCD attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.RecieverTemperatureNoise.html#pypsg.cfg.RecieverTemperatureNoise">RecieverTemperatureNoise (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.ref">ref (pypsg.cfg.Geometry attribute)</a>
+</li>
+      <li><a href="api/pypsg.settings.reload_settings.html#pypsg.settings.reload_settings">reload_settings() (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.remove">remove() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.globes.GCMdecoder.html#pypsg.globes.GCMdecoder.rename_var">rename_var() (pypsg.globes.GCMdecoder method)</a>
+</li>
+      <li><a href="api/pypsg.settings.REQUEST_TIMEOUT.html#pypsg.settings.REQUEST_TIMEOUT">REQUEST_TIMEOUT (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.reset">reset() (pypsg.APICall method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Telescope.html#pypsg.cfg.Telescope.resolution">resolution (pypsg.cfg.Telescope attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.resolution_kernel">resolution_kernel (pypsg.cfg.Generator attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.settings.save_settings.html#pypsg.settings.save_settings">save_settings() (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.season">season (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Detectability.html#pypsg.cfg.Detectability.sensitivity">sensitivity (pypsg.cfg.Detectability attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.PowerEquivalentNoise.html#pypsg.cfg.PowerEquivalentNoise.sensitivity">(pypsg.cfg.PowerEquivalentNoise attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.docker.set_psg_url.html#pypsg.docker.set_psg_url">set_psg_url() (in module pypsg.docker)</a>
+</li>
+      <li><a href="api/pypsg.docker.set_url_and_run.html#pypsg.docker.set_url_and_run">set_url_and_run() (in module pypsg.docker)</a>
+</li>
+      <li><a href="api/pypsg.settings.settings_need_reload.html#pypsg.settings.settings_need_reload">settings_need_reload (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.shape">shape (pypsg.globes.PyGCM attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.structure.Variable.html#id1">(pypsg.globes.structure.Variable attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.globes.structure.Variable.html#pypsg.globes.structure.Variable.shape">shape() (pypsg.globes.structure.Variable method)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ConstantNoise.html#pypsg.cfg.ConstantNoise.sigma">sigma (pypsg.cfg.ConstantNoise attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.ConstantNoiseWithBackground.html#pypsg.cfg.ConstantNoiseWithBackground.sigma">(pypsg.cfg.ConstantNoiseWithBackground attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.SingleTelescope.html#pypsg.cfg.SingleTelescope">SingleTelescope (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Aerosol.html#pypsg.cfg.base.Aerosol.size">size (pypsg.cfg.base.Aerosol attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.size">(pypsg.cfg.base.AerosolsField attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.size_unit">size_unit (pypsg.cfg.base.AerosolsField attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Aerosol.html#pypsg.cfg.base.Aerosol.size_unit_code">size_unit_code (pypsg.cfg.base.Aerosol attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.solar_latitude">solar_latitude (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.solar_longitude">solar_longitude (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.PyRad.html#pypsg.PyRad.SPEC_UNIT">SPEC_UNIT (pypsg.PyRad attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyTrn.html#pypsg.PyTrn.SPEC_UNIT">(pypsg.PyTrn attribute)</a>
+</li>
+        <li><a href="api/pypsg.rad.PyRad.html#pypsg.rad.PyRad.SPEC_UNIT">(pypsg.rad.PyRad attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.settings.StaleSettingsWarning.html#pypsg.settings.StaleSettingsWarning">StaleSettingsWarning</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.star_distance">star_distance (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.star_metallicity">star_metallicity (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.star_radius">star_radius (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.star_temperature">star_temperature (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.star_type">star_type (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target.star_velocity">star_velocity (pypsg.cfg.Target attribute)</a>
+</li>
+      <li><a href="api/pypsg.docker.start_psg.html#pypsg.docker.start_psg">start_psg() (in module pypsg.docker)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.stellar_magnitude">stellar_magnitude (pypsg.cfg.Geometry attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.stellar_temperature">stellar_temperature (pypsg.cfg.Geometry attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Geometry.html#pypsg.cfg.Geometry.stellar_type">stellar_type (pypsg.cfg.Geometry attribute)</a>
+</li>
+      <li><a href="api/pypsg.docker.stop_psg.html#pypsg.docker.stop_psg">stop_psg() (in module pypsg.docker)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.str_nlayers">str_nlayers (pypsg.cfg.base.ProfileField attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Atmosphere.html#pypsg.cfg.Atmosphere.structure">structure (pypsg.cfg.Atmosphere attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Surface.html#pypsg.cfg.Surface">Surface (class in pypsg.cfg)</a>
+
+      <ul>
+        <li><a href="api/pypsg.globes.structure.Surface.html#pypsg.globes.structure.Surface">(class in pypsg.globes.structure)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.globes.structure.SurfacePressure.html#pypsg.globes.structure.SurfacePressure">SurfacePressure (class in pypsg.globes.structure)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.SurfaceTemperature.html#pypsg.globes.structure.SurfaceTemperature">SurfaceTemperature (class in pypsg.globes.structure)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.Table.html#pypsg.cfg.base.Table">Table (class in pypsg.cfg.base)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Target.html#pypsg.cfg.Target">Target (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.ComaAtmosphere.html#pypsg.cfg.ComaAtmosphere.tau">tau (pypsg.cfg.ComaAtmosphere attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Telescope.html#pypsg.cfg.Telescope">Telescope (class in pypsg.cfg)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Telescope.html#pypsg.cfg.Telescope.telescope">telescope (pypsg.cfg.Telescope attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.Generator.html#pypsg.cfg.Generator.telluric_params">telluric_params (pypsg.cfg.Generator attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Temperature.html#pypsg.globes.structure.Temperature">Temperature (class in pypsg.globes.structure)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.Profile.html#pypsg.cfg.base.Profile.TEMPERATURE">TEMPERATURE (pypsg.cfg.base.Profile attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.CCD.html#pypsg.cfg.CCD.temperature">temperature (pypsg.cfg.CCD attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.temperature">(pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.RecieverTemperatureNoise.html#pypsg.cfg.RecieverTemperatureNoise.temperature">(pypsg.cfg.RecieverTemperatureNoise attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.Surface.html#pypsg.cfg.Surface.temperature">(pypsg.cfg.Surface attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.CCD.html#pypsg.cfg.CCD.thoughput">thoughput (pypsg.cfg.CCD attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.PyConfig.html#pypsg.cfg.PyConfig.to_file">to_file() (pypsg.cfg.PyConfig method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyConfig.html#pypsg.PyConfig.to_file">(pypsg.PyConfig method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.lyr.PyLyr.html#pypsg.lyr.PyLyr.to_fits">to_fits() (pypsg.lyr.PyLyr method)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyLyr.html#pypsg.PyLyr.to_fits">(pypsg.PyLyr method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.Table.html#pypsg.cfg.base.Table.to_string">to_string() (pypsg.cfg.base.Table method)</a>
+</li>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.type">type (pypsg.APICall attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.type">(pypsg.cfg.base.AerosolsField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField.type">(pypsg.cfg.base.MoleculesField attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.unit">unit (pypsg.cfg.base.AerosolsField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField.unit">(pypsg.cfg.base.MoleculesField attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pypsg.cfg.base.Molecule.html#pypsg.cfg.base.Molecule.unit_code">unit_code (pypsg.cfg.base.Molecule attribute)</a>
+</li>
+      <li><a href="api/pypsg.cfg.base.UnitChoicesField.html#pypsg.cfg.base.UnitChoicesField">UnitChoicesField (class in pypsg.cfg.base)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.PyGCM.html#pypsg.globes.PyGCM.update_params">update_params() (pypsg.globes.PyGCM method)</a>
+</li>
+      <li><a href="api/pypsg.APICall.html#pypsg.APICall.url">url (pypsg.APICall attribute)</a>
+</li>
+      <li><a href="api/pypsg.settings.USER_DATA_PATH.html#pypsg.settings.USER_DATA_PATH">USER_DATA_PATH (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.settings.user_settings.html#pypsg.settings.user_settings">user_settings (in module pypsg.settings)</a>
+</li>
+      <li><a href="api/pypsg.settings.USER_SETTINGS_PATH.html#pypsg.settings.USER_SETTINGS_PATH">USER_SETTINGS_PATH (in module pypsg.settings)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.AerosolsField.html#pypsg.cfg.base.AerosolsField.value">value (pypsg.cfg.base.AerosolsField attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.cfg.base.BooleanField.html#pypsg.cfg.base.BooleanField.value">(pypsg.cfg.base.BooleanField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.CharChoicesField.html#pypsg.cfg.base.CharChoicesField.value">(pypsg.cfg.base.CharChoicesField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.CharField.html#pypsg.cfg.base.CharField.value">(pypsg.cfg.base.CharField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.CodedQuantityField.html#pypsg.cfg.base.CodedQuantityField.value">(pypsg.cfg.base.CodedQuantityField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.DateField.html#pypsg.cfg.base.DateField.value">(pypsg.cfg.base.DateField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.Field.html#pypsg.cfg.base.Field.value">(pypsg.cfg.base.Field attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.FloatField.html#pypsg.cfg.base.FloatField.value">(pypsg.cfg.base.FloatField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.GeometryOffsetField.html#pypsg.cfg.base.GeometryOffsetField.value">(pypsg.cfg.base.GeometryOffsetField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.IntegerField.html#pypsg.cfg.base.IntegerField.value">(pypsg.cfg.base.IntegerField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.MoleculesField.html#pypsg.cfg.base.MoleculesField.value">(pypsg.cfg.base.MoleculesField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.ProfileField.html#pypsg.cfg.base.ProfileField.value">(pypsg.cfg.base.ProfileField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.QuantityField.html#pypsg.cfg.base.QuantityField.value">(pypsg.cfg.base.QuantityField attribute)</a>
+</li>
+        <li><a href="api/pypsg.cfg.base.UnitChoicesField.html#pypsg.cfg.base.UnitChoicesField.value">(pypsg.cfg.base.UnitChoicesField attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.structure.Variable.html#pypsg.globes.structure.Variable">Variable (class in pypsg.globes.structure)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Variable2D.html#pypsg.globes.structure.Variable2D">Variable2D (class in pypsg.globes.structure)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Variable3D.html#pypsg.globes.structure.Variable3D">Variable3D (class in pypsg.globes.structure)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.VariableAssumptionWarning.html#pypsg.globes.structure.VariableAssumptionWarning">VariableAssumptionWarning</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.waccm_to_pygcm.html#pypsg.globes.waccm_to_pygcm">waccm_to_pygcm() (in module pypsg.globes)</a>
+</li>
+      <li><a href="api/pypsg.cfg.EquilibriumAtmosphere.html#pypsg.cfg.EquilibriumAtmosphere.weight">weight (pypsg.cfg.EquilibriumAtmosphere attribute)</a>
+</li>
+      <li><a href="api/pypsg.globes.structure.Wind.html#pypsg.globes.structure.Wind">Wind (class in pypsg.globes.structure)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.PyRad.html#pypsg.PyRad.wl">wl (pypsg.PyRad attribute)</a>
+
+      <ul>
+        <li><a href="api/pypsg.PyTrn.html#pypsg.PyTrn.wl">(pypsg.PyTrn attribute)</a>
+</li>
+        <li><a href="api/pypsg.rad.PyRad.html#pypsg.rad.PyRad.wl">(pypsg.rad.PyRad attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.Table.html#pypsg.cfg.base.Table.x">x (pypsg.cfg.base.Table attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Y">Y</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.base.Table.html#pypsg.cfg.base.Table.y">y (pypsg.cfg.base.Table attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.globes.structure.Wind.html#pypsg.globes.structure.Wind.zero">zero() (pypsg.globes.structure.Wind class method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pypsg.cfg.Telescope.html#pypsg.cfg.Telescope.zodi">zodi (pypsg.cfg.Telescope attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Ted Johnson, The PSG Team.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

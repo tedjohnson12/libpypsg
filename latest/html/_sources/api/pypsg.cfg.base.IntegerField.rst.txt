@@ -1,0 +1,27 @@
+IntegerField
+============
+
+.. currentmodule:: pypsg.cfg.base
+
+.. autoclass:: IntegerField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~IntegerField.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~IntegerField.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

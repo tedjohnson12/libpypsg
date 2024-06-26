@@ -1,0 +1,6 @@
+psg_aerosol_size_unit
+=====================
+
+.. currentmodule:: pypsg.settings
+
+.. autodata:: psg_aerosol_size_unit

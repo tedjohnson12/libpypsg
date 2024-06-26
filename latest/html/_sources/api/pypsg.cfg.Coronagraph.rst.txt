@@ -1,0 +1,19 @@
+Coronagraph
+===========
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: Coronagraph
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Coronagraph.contrast
+      ~Coronagraph.iwa
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: contrast
+   .. autoattribute:: iwa

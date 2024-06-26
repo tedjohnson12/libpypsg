@@ -1,0 +1,19 @@
+Aerosol
+=======
+
+.. currentmodule:: pypsg.globes.structure
+
+.. autoclass:: Aerosol
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Aerosol.boyant_exp
+      ~Aerosol.constant
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: boyant_exp
+   .. automethod:: constant
