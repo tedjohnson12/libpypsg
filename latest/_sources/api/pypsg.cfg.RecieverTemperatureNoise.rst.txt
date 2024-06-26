@@ -1,0 +1,19 @@
+RecieverTemperatureNoise
+========================
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: RecieverTemperatureNoise
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~RecieverTemperatureNoise.g_factor
+      ~RecieverTemperatureNoise.temperature
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: g_factor
+   .. autoattribute:: temperature

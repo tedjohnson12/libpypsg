@@ -1,0 +1,17 @@
+ConstantNoiseWithBackground
+===========================
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: ConstantNoiseWithBackground
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ConstantNoiseWithBackground.sigma
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: sigma

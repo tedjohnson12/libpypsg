@@ -1,0 +1,19 @@
+Variable
+========
+
+.. currentmodule:: pypsg.globes.structure
+
+.. autoclass:: Variable
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Variable.flat
+      ~Variable.shape
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: flat
+   .. autoattribute:: shape

@@ -1,0 +1,7 @@
+Noiseless
+=========
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: Noiseless
+   :show-inheritance:

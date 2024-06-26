@@ -1,0 +1,33 @@
+BinConfig
+=========
+
+.. currentmodule:: pypsg.cfg
+
+.. autoclass:: BinConfig
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~BinConfig.binary
+      ~BinConfig.dict
+      ~BinConfig.encoding
+      ~BinConfig.has_binary
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~BinConfig.from_file
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: binary
+   .. autoattribute:: dict
+   .. autoattribute:: encoding
+   .. autoattribute:: has_binary
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: from_file

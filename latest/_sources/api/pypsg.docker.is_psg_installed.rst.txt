@@ -1,0 +1,6 @@
+is_psg_installed
+================
+
+.. currentmodule:: pypsg.docker
+
+.. autofunction:: is_psg_installed

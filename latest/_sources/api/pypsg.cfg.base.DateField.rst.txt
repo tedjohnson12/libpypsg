@@ -1,0 +1,27 @@
+DateField
+=========
+
+.. currentmodule:: pypsg.cfg.base
+
+.. autoclass:: DateField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~DateField.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~DateField.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

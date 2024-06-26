@@ -1,0 +1,31 @@
+Pressure
+========
+
+.. currentmodule:: pypsg.globes.structure
+
+.. autoclass:: Pressure
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Pressure.flat
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Pressure.from_limits
+      ~Pressure.from_profile
+      ~Pressure.get_adiabatic_scalar
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: flat
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: from_limits
+   .. automethod:: from_profile
+   .. automethod:: get_adiabatic_scalar

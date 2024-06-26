@@ -1,0 +1,45 @@
+ProfileField
+============
+
+.. currentmodule:: pypsg.cfg.base
+
+.. autoclass:: ProfileField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ProfileField.content
+      ~ProfileField.fmt
+      ~ProfileField.names
+      ~ProfileField.nlayers
+      ~ProfileField.str_nlayers
+      ~ProfileField.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ProfileField.get_layer
+      ~ProfileField.get_molecules
+      ~ProfileField.get_pressure
+      ~ProfileField.get_temperature
+      ~ProfileField.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: content
+   .. autoattribute:: fmt
+   .. autoattribute:: names
+   .. autoattribute:: nlayers
+   .. autoattribute:: str_nlayers
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_layer
+   .. automethod:: get_molecules
+   .. automethod:: get_pressure
+   .. automethod:: get_temperature
+   .. automethod:: read

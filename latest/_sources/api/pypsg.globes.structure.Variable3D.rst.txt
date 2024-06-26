@@ -1,0 +1,7 @@
+Variable3D
+==========
+
+.. currentmodule:: pypsg.globes.structure
+
+.. autoclass:: Variable3D
+   :show-inheritance:
