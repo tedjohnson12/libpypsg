@@ -47,7 +47,7 @@ html_theme = 'pydata_sphinx_theme'
 html_theme_options = {
     'navbar_start': ['navbar-logo', 'version-switcher'],
     'switcher': {
-        'json_url': 'https://vspec-collab.github.io/pypsg/versions.json',
+        'json_url': 'https://tedjohnson12.github.io/pypsg/versions.json',
         'version_match': doc_version
     }
 }
