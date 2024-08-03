@@ -18,10 +18,10 @@
 .. _sphx_glr_auto_examples_plot_simple.py:
 
 
-``PyPSG``
-=========
+``libpypsg``
+============
 
-A Python wrapper for the Planetary Spectrum Generator.
+A Python library to interact with the Planetary Spectrum Generator.
 
 The goal of this package is to make PSG more accessible to
 new users, but still be powerfull enough that expert users
@@ -37,12 +37,12 @@ using the ``PyConfig`` class.
 
     # sphinx_gallery_thumbnail_path = '_static/pypsg_basic.png'
 
-    import pypsg
+    import libpypsg
 
-    pypsg.docker.set_url_and_run()
+    libpypsg.docker.set_url_and_run()
 
-    cfg = pypsg.cfg.PyConfig(
-        target=pypsg.cfg.Target(object='Exoplanet',name='Proxima Cen b')
+    cfg = libpypsg.cfg.PyConfig(
+        target=libpypsg.cfg.Target(object='Exoplanet',name='Proxima Cen b')
         )
     print(cfg.content)
 
@@ -54,7 +54,7 @@ using the ``PyConfig`` class.
 
  .. code-block:: none
 
-    Saved settings to /home/runner/.pypsg/settings.json
+    Saved settings to /home/runner/.libpypsg/settings.json
     Reloading settings...
     b'<OBJECT-NAME>Proxima Cen b\n<OBJECT>Exoplanet'
 
@@ -70,7 +70,7 @@ Get the rad file
 
 .. code-block:: Python
 
-    psg = pypsg.APICall(
+    psg = libpypsg.APICall(
             cfg=cfg,
             output_type='rad',
         )
@@ -129,7 +129,7 @@ Look at the rad file
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.317 seconds)
+   **Total running time of the script:** (0 minutes 0.304 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simple.py:
@@ -145,6 +145,10 @@ Look at the rad file
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simple.py <plot_simple.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_simple.zip <plot_simple.zip>`
 
 
 .. only:: html

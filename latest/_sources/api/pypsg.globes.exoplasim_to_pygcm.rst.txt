@@ -1,6 +1,0 @@
-exoplasim_to_pygcm
-==================
-
-.. currentmodule:: pypsg.globes
-
-.. autofunction:: exoplasim_to_pygcm

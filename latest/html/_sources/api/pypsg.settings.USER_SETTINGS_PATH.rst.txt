@@ -1,6 +1,0 @@
-USER_SETTINGS_PATH
-==================
-
-.. currentmodule:: pypsg.settings
-
-.. autodata:: USER_SETTINGS_PATH

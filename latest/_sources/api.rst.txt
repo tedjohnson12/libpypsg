@@ -1,7 +1,7 @@
-The ``pypsg`` API
-=================
+The ``libpypsg`` API
+====================
 
-.. automodapi:: pypsg
+.. automodapi:: libpypsg
     :no-main-docstr:
 
 The main submodules are:

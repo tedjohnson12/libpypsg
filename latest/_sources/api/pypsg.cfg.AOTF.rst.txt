@@ -1,7 +1,0 @@
-AOTF
-====
-
-.. currentmodule:: pypsg.cfg
-
-.. autoclass:: AOTF
-   :show-inheritance:

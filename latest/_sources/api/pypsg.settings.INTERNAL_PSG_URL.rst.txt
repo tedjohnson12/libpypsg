@@ -1,6 +1,0 @@
-INTERNAL_PSG_URL
-================
-
-.. currentmodule:: pypsg.settings
-
-.. autodata:: INTERNAL_PSG_URL

@@ -33,8 +33,8 @@ and plot the layers.
     import matplotlib.pyplot as plt
     import numpy as np
 
-    from pypsg.cfg.config import PyConfig, BinConfig
-    from pypsg.cfg.base import Profile
+    from libpypsg.cfg.config import PyConfig, BinConfig
+    from libpypsg.cfg.base import Profile
 
     try:
         CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
@@ -150,6 +150,10 @@ Plot the layers
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_read_cfg.py <plot_read_cfg.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_read_cfg.zip <plot_read_cfg.zip>`
 
 
 .. only:: html

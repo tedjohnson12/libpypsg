@@ -21,14 +21,14 @@
 Work with an ExoCAM GCM
 =======================
 
-Learn how to use the ``pypsg.globes`` ExoCAM module. 
+Learn how to use the ``libpypsg.globes`` ExoCAM module. 
 
 
-To get started, install ``pypsg``:
+To get started, install ``libpypsg``:
 
 .. code-block:: bash
 
-    pip install pypsg
+    pip install libpypsg
 
 It would also be beneficial to have PSG installed with docker.
 
@@ -42,11 +42,11 @@ It would also be beneficial to have PSG installed with docker.
     from cartopy import crs as ccrs
     from astropy import units as u
     import matplotlib.pyplot as plt
-    from pypsg.globes.exocam import exocam_to_pygcm, download_exocam_test_data
-    from pypsg import PyConfig, APICall
-    from pypsg.cfg import models
-    from pypsg.docker import set_url_and_run
-    from pypsg.units import resolving_power
+    from libpypsg.globes.exocam import exocam_to_pygcm, download_exocam_test_data
+    from libpypsg import PyConfig, APICall
+    from libpypsg.cfg import models
+    from libpypsg.docker import set_url_and_run
+    from libpypsg.units import resolving_power
 
     TEST_PATH = download_exocam_test_data(rewrite=False) # Change this to the path of your dataset
 
@@ -61,7 +61,7 @@ It would also be beneficial to have PSG installed with docker.
 
  .. code-block:: none
 
-    Saved settings to /home/runner/.pypsg/settings.json
+    Saved settings to /home/runner/.libpypsg/settings.json
     Reloading settings...
 
 
@@ -119,9 +119,9 @@ Convert to PyGCM
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pypsg/globes/waccm/waccm.py:356: VariableAssumptionWarning: Emissivity not explicitly stated. Using 1.0.
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/globes/waccm/waccm.py:356: VariableAssumptionWarning: Emissivity not explicitly stated. Using 1.0.
       warnings.warn(msg, structure.VariableAssumptionWarning)
-    <class 'pypsg.globes.globes.PyGCM'>
+    <class 'libpypsg.globes.globes.PyGCM'>
 
 
 
@@ -160,7 +160,7 @@ Have some fun with the GCM
  .. code-block:: none
 
 
-    <matplotlib.colorbar.Colorbar object at 0x7fa48d18ded0>
+    <matplotlib.colorbar.Colorbar object at 0x7fc6a4445f10>
 
 
 
@@ -321,13 +321,13 @@ Run PSG
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pypsg/request.py:51: PUMASWarning: The aerosols require higher scattering requirements, of NMAX:1 and LMAX:80, for the selected aerosols having a max g of 0.94.
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/request.py:51: PUMASWarning: The aerosols require higher scattering requirements, of NMAX:1 and LMAX:80, for the selected aerosols having a max g of 0.94.
       warnings.warn(warning)
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pypsg/request.py:51: GeneratorWarning: Too many electrons per pixel (up to inf) detected in the 1.00-17.98 um spectral range. Reduce exposure time per frame to less than 0.000 seconds.
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/request.py:51: GeneratorWarning: Too many electrons per pixel (up to inf) detected in the 1.00-17.98 um spectral range. Reduce exposure time per frame to less than 0.000 seconds.
       warnings.warn(warning)
     /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:573: UnitsWarning: 'W/m2/um' contains multiple slashes, which is discouraged by the FITS standard
       warnings.warn(
-    <class 'pypsg.request.PSGResponse'>
+    <class 'libpypsg.request.PSGResponse'>
 
 
 
@@ -346,7 +346,7 @@ Plot the result
 
     ax.plot(result.rad.wl,(result.rad['Proxima-Cen-b']/result.rad['Total']).to_value(u.dimensionless_unscaled)*1e6)
     ax.set_xlabel(f'Wavelength ({result.rad.wl.unit})')
-    ax.set_ylabel(f'Flux (ppm)')
+    ax.set_ylabel('Flux (ppm)')
 
 
 
@@ -369,7 +369,7 @@ Plot the result
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.465 seconds)
+   **Total running time of the script:** (0 minutes 2.532 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_exocam.py:
@@ -385,6 +385,10 @@ Plot the result
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_exocam.py <plot_exocam.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_exocam.zip <plot_exocam.zip>`
 
 
 .. only:: html

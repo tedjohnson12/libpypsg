@@ -33,10 +33,10 @@ Get a rad file from PSG and plot it.
     import numpy as np
     import astropy.units as u
 
-    from pypsg.cfg.config import PyConfig
-    from pypsg import APICall
-    from pypsg import docker
-    from pypsg.cfg.base import Table
+    from libpypsg.cfg.config import PyConfig
+    from libpypsg import APICall
+    from libpypsg import docker
+    from libpypsg.cfg.base import Table
 
     try:
         CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'
@@ -54,7 +54,7 @@ Get a rad file from PSG and plot it.
 
  .. code-block:: none
 
-    Saved settings to /home/runner/.pypsg/settings.json
+    Saved settings to /home/runner/.libpypsg/settings.json
     Reloading settings...
 
 
@@ -155,9 +155,9 @@ Run PSG
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pypsg/request.py:51: PUMASWarning: Modeling multiple-scattering accurately for Rayleigh would require NMAX to be at least 1 and LMAX 2.
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/request.py:51: PUMASWarning: Modeling multiple-scattering accurately for Rayleigh would require NMAX to be at least 1 and LMAX 2.
       warnings.warn(warning)
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pypsg/request.py:51: GeneratorWarning: Too many electrons per pixel (up to 4.69e+08) detected in the 1.00-17.92 um spectral range. Reduce exposure time per frame to less than 0.107 seconds.
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/request.py:51: GeneratorWarning: Too many electrons per pixel (up to 4.69e+08) detected in the 1.00-17.92 um spectral range. Reduce exposure time per frame to less than 0.107 seconds.
       warnings.warn(warning)
     /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:573: UnitsWarning: 'W/m2/um' contains multiple slashes, which is discouraged by the FITS standard
       warnings.warn(
@@ -201,7 +201,7 @@ Read the response
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.956 seconds)
+   **Total running time of the script:** (0 minutes 1.990 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_rad.py:
@@ -217,6 +217,10 @@ Read the response
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_rad.py <plot_rad.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_rad.zip <plot_rad.zip>`
 
 
 .. only:: html

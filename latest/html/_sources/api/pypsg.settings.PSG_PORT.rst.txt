@@ -1,6 +1,0 @@
-PSG_PORT
-========
-
-.. currentmodule:: pypsg.settings
-
-.. autodata:: PSG_PORT

@@ -1,6 +1,0 @@
-waccm_to_pygcm
-==============
-
-.. currentmodule:: pypsg.globes
-
-.. autofunction:: waccm_to_pygcm

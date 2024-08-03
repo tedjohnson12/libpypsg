@@ -1,6 +1,0 @@
-psg_pressure_unit
-=================
-
-.. currentmodule:: pypsg.settings
-
-.. autodata:: psg_pressure_unit
