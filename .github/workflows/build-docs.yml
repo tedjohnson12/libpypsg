@@ -87,7 +87,8 @@ jobs:
           git fetch origin gh-pages
           git checkout gh-pages
           git pull origin gh-pages
-          rm -rf ${DEST_DIR}/*
+          rm -rf ${DEST_DIR}
+          mkdir -p ${DEST_DIR}
           cp -r docs/build/html/* ${DEST_DIR}/
           cp ${DEST_DIR}/versions.json versions.json
           cp ${DEST_DIR}/redirect.html index.html
