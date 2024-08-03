@@ -1,7 +1,7 @@
-``PyPSG``
-=========
+``libpypsg``
+============
 
-A Python wrapper for the Planetary Spectrum Generator.
+A Python library to interact with the Planetary Spectrum Generator.
 
 The goal of this package is to make PSG more accessible to
 new users, but still be powerful enough that expert users
@@ -14,10 +14,10 @@ using the ``PyConfig`` class.
 .. code-block:: python
 
 
-    import pypsg
+    import libpypsg
 
-    cfg = pypsg.cfg.PyConfig(
-        target=pypsg.cfg.Target(object='Exoplanet',name='Proxima Cen b')
+    cfg = libpypsg.cfg.PyConfig(
+        target=libpypsg.cfg.Target(object='Exoplanet',name='Proxima Cen b')
         )
     print(cfg.content)
 
@@ -29,7 +29,7 @@ We can then call PSG with our setup.
 
 .. code-block:: python
 
-    psg = pypsg.APICall(
+    psg = libpypsg.APICall(
             cfg=cfg,
             output_type='rad',
         )
