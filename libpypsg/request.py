@@ -4,19 +4,19 @@ PyPSG Requests
 
 Direct access to the PSG API
 """
+import logging
 import warnings
 from typing import Union, Dict
 import re
 import requests
-import logging
 
-from pypsg.cfg import PyConfig, BinConfig
-from pypsg import settings
-from pypsg import exceptions
-from pypsg.rad import PyRad
-from pypsg.lyr import PyLyr
-from pypsg.trn import PyTrn
-from pypsg import docker
+from .cfg import PyConfig, BinConfig
+from . import settings
+from . import exceptions
+from .rad import PyRad
+from .lyr import PyLyr
+from .trn import PyTrn
+from . import docker
 
 docker.set_url_and_run()
 

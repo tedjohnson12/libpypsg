@@ -1,7 +1,7 @@
 import pytest
 from astropy import units as u
 
-from pypsg import units
+from libpypsg import units
 
 def test_ppmv():
     abn = 100*units.ppm

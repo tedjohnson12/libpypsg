@@ -15,13 +15,13 @@ from astropy import units as u
 
 import netCDF4 as nc
 
-from pypsg.globes.exocam.exocam import validate_variables, get_time_index, TIME_UNIT,get_shape
-import pypsg.globes.exocam.exocam as rw
-from pypsg.globes.exocam import download_exocam_test_data
-from pypsg.globes import PyGCM, exocam_to_pygcm
-from pypsg.globes import structure
-from pypsg import PyConfig, APICall
-from pypsg.cfg import models
+from libpypsg.globes.exocam.exocam import validate_variables, get_time_index, TIME_UNIT,get_shape
+import libpypsg.globes.exocam.exocam as rw
+from libpypsg.globes.exocam import download_exocam_test_data
+from libpypsg.globes import PyGCM, exocam_to_pygcm
+from libpypsg.globes import structure
+from libpypsg import PyConfig, APICall
+from libpypsg.cfg import models
 
 
 chdir(Path(__file__).parent)

@@ -9,7 +9,7 @@ import numpy as np
 import astropy.units as u
 from astropy import table
 
-from pypsg import settings
+from .. import settings
 
 
 class PyTrn(table.QTable):

@@ -64,10 +64,10 @@ jobs:
         env:
           PSG_KEY: ${{ secrets.PSG_API_KEY }}
         run: |
-          python -c "import pypsg; pypsg.settings.save_settings(api_key='$PSG_KEY')"
-          python -c "import pypsg.settings as settings; settings.save_settings(url=settings.PSG_URL)"
-          python -c "from pypsg import settings; print('The current PSG URL is',settings.get_setting('url'))"
-          python -c "from pypsg.globes.exocam.exocam import download_test_data; download_test_data()"
+          python -c "import libpypsg; libpypsg.settings.save_settings(api_key='$PSG_KEY')"
+          python -c "import libpypsg.settings as settings; settings.save_settings(url=settings.PSG_URL)"
+          python -c "from libpypsg import settings; print('The current PSG URL is',settings.get_setting('url'))"
+          python -c "from libpypsg.globes.exocam.exocam import download_test_data; download_test_data()"
       - name: Build docs
         env:
           DOCNAME: ${{ steps.prep.outputs.DOCNAME }}

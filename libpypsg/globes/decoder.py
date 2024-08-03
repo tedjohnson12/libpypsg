@@ -396,8 +396,10 @@ class GCMdecoder:
         z = [np.zeros(shape=(Nlat, Nlon))]
         for i in range(Nlayers-1):
             dP = P[i+1, :, :] - P[i, :, :]
+            # pylint: disable-next=no-member
             rho = m[i, :, :]*(P[i, :, :] + 0.5*dP)/c.R/T[i, :, :]
             r = z[-1]*z_unit + R
+            # pylint: disable-next=no-member
             g = M*c.G/r**2
             dz = -dP/rho/g
             z.append((z[-1]*z_unit+dz).to(z_unit).value)
@@ -413,8 +415,10 @@ class GCMdecoder:
         partial_pressure = P*abn
         alt = self.get_alt(M, R)
         heights = np.diff(alt, axis=0)
-        density: u.Quantity = np.sum(
+        density = np.sum(
+            # pylint: disable-next=no-member
             partial_pressure[:-1]*heights/c.R/T[:-1], axis=0)
+        density: u.Quantity
         return density.to(u.mol/u.cm**2)
 
     def get_column_clouds(self, var: str, M: u.Quantity, R: u.Quantity,):
@@ -427,6 +431,8 @@ class GCMdecoder:
         molar_mass = self.get_mean_molec_mass()
         alt = self.get_alt(M, R)
         heights = np.diff(alt, axis=0)
+        # pylint: disable-next=no-member
         gas_mass_density = P[:-1]*heights/c.R/T[:-1]*molar_mass[:-1]  # g cm-2
-        mass_density = np.sum(mass_frac[:-1]*gas_mass_density, axis=0).cgs
+        mass_density = np.sum(mass_frac[:-1]*gas_mass_density, axis=0)
+        mass_density: u.Quantity
         return mass_density.to(u.kg/u.cm**2)

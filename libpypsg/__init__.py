@@ -1,8 +1,8 @@
 """
-PyPSG top-level module
+``libpypsg`` top-level module
 ======================
 """
-__version__ = '0.3.2'
+__version__ = '0.4.0'
 from .request import APICall, PSGResponse
 from . import cfg
 from .cfg import PyConfig

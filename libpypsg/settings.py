@@ -9,7 +9,7 @@ import warnings
 import json
 from astropy import units as u
 
-from pypsg import __version__
+from . import __version__
 
 REQUEST_TIMEOUT = 120
 
@@ -17,7 +17,7 @@ PSG_URL = 'https://psg.gsfc.nasa.gov/api.php'
 PSG_PORT = 3000
 INTERNAL_PSG_URL = f'http://localhost:{PSG_PORT}/api.php'
 
-USER_DATA_PATH = Path.home() / '.pypsg'
+USER_DATA_PATH = Path.home() / '.libpypsg'
 USER_SETTINGS_PATH = USER_DATA_PATH / 'settings.json'
 
 DEFAULT_SETTINGS = {
@@ -26,7 +26,7 @@ DEFAULT_SETTINGS = {
     'encoding': 'utf-8',
     'cfg_max_lines': 1500,
     'timeout': REQUEST_TIMEOUT,
-    'header': {'User-Agent': f'pypsg/{__version__}'},
+    'header': {'User-Agent': f'libpypsg/{__version__}'},
 }
 
 
@@ -86,7 +86,7 @@ class StaleSettingsWarning(RuntimeWarning):
 def get_setting(key):
     if settings_need_reload:
         msg = 'Your user settings have changed recently.\n'
-        msg += 'Please reload the settings using the `pypsg.settings.reload_settings()` function.'
+        msg += 'Please reload the settings using the `libpypsg.settings.reload_settings()` function.'
         warnings.warn(msg,StaleSettingsWarning) 
     if key in user_settings:
         return user_settings[key]

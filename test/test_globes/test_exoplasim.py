@@ -11,12 +11,12 @@ from netCDF4 import Dataset
 import pytest
 import numpy as np
 from astropy import units as u
-from pypsg.globes import PyGCM
-from pypsg.cfg import PyConfig, models
-from pypsg import APICall
+from libpypsg.globes import PyGCM
+from libpypsg.cfg import PyConfig, models
+from libpypsg import APICall
 
 
-from pypsg.globes.exoplasim.exoplasim import (
+from libpypsg.globes.exoplasim.exoplasim import (
     get_shape,
     TEST_PATH,
     get_psurf,
@@ -32,7 +32,7 @@ from pypsg.globes.exoplasim.exoplasim import (
     get_molecule_suite,
     to_pygcm
 )
-from pypsg.globes.exoplasim import download_exoplasim_test_data
+from libpypsg.globes.exoplasim import download_exoplasim_test_data
 
 @pytest.fixture
 def data()->Dataset:

@@ -29,7 +29,7 @@ jobs:
       - name: Test
         run: |
           pip install pytest
-          python -c "import pypsg; pypsg.settings.save_settings(api_key='$PSG_KEY')"
-          python -c "from pypsg.globes.waccm.waccm import download_test_data; download_test_data()"
-          python -c "from pypsg.globes.exoplasim.exoplasim import download_test_data; download_test_data()"
+          python -c "import libpypsg; libpypsg.settings.save_settings(api_key='$PSG_KEY')"
+          python -c "from libpypsg.globes.waccm.waccm import download_test_data; download_test_data()"
+          python -c "from libpypsg.globes.exoplasim.exoplasim import download_test_data; download_test_data()"
           pytest test --ignore=test\test_request.py

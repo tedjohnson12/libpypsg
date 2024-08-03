@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import astropy.units as u
 
-from pypsg.cfg.config import PyConfig
-from pypsg import APICall
-from pypsg import docker
-from pypsg.cfg.base import Table
+from libpypsg.cfg.config import PyConfig
+from libpypsg import APICall
+from libpypsg import docker
+from libpypsg.cfg.base import Table
 
 try:
     CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'

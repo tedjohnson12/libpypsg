@@ -2,14 +2,14 @@
 Work with an ExoCAM GCM
 =======================
 
-Learn how to use the ``pypsg.globes`` ExoCAM module. 
+Learn how to use the ``libpypsg.globes`` ExoCAM module. 
 
 
-To get started, install ``pypsg``:
+To get started, install ``libpypsg``:
 
 .. code-block:: bash
 
-    pip install pypsg
+    pip install libpypsg
 
 It would also be beneficial to have PSG installed with docker.
 """
@@ -19,11 +19,11 @@ from netCDF4 import Dataset
 from cartopy import crs as ccrs
 from astropy import units as u
 import matplotlib.pyplot as plt
-from pypsg.globes.exocam import exocam_to_pygcm, download_exocam_test_data
-from pypsg import PyConfig, APICall
-from pypsg.cfg import models
-from pypsg.docker import set_url_and_run
-from pypsg.units import resolving_power
+from libpypsg.globes.exocam import exocam_to_pygcm, download_exocam_test_data
+from libpypsg import PyConfig, APICall
+from libpypsg.cfg import models
+from libpypsg.docker import set_url_and_run
+from libpypsg.units import resolving_power
 
 TEST_PATH = download_exocam_test_data(rewrite=False) # Change this to the path of your dataset
 
@@ -181,5 +181,5 @@ fig, ax = plt.subplots(1,1)
 
 ax.plot(result.rad.wl,(result.rad['Proxima-Cen-b']/result.rad['Total']).to_value(u.dimensionless_unscaled)*1e6)
 ax.set_xlabel(f'Wavelength ({result.rad.wl.unit})')
-ax.set_ylabel(f'Flux (ppm)')
+ax.set_ylabel('Flux (ppm)')
 

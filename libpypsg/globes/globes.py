@@ -81,23 +81,23 @@ class PyGCM:
 
     Parameters
     ----------
-    pressure : pypsg.globes.structure.Pressure
+    pressure : libpypsg.globes.structure.Pressure
         The pressure variable.
-    temperature : pypsg.globes.structure.Temperature
+    temperature : libpypsg.globes.structure.Temperature
         The temperature variable.
-    wind_u : pypsg.globes.structure.Wind, optional
+    wind_u : libpypsg.globes.structure.Wind, optional
         The west-to-east wind variable.
-    wind_v : pypsg.globes.structure.Wind, optional
+    wind_v : libpypsg.globes.structure.Wind, optional
         The south-to-north wind variable.
-    tsurf : pypsg.globes.structure.SurfaceTemperature, optional
+    tsurf : libpypsg.globes.structure.SurfaceTemperature, optional
         The surface temperature variable.
-    psurf : pypsg.globes.structure.SurfacePressure, optional
+    psurf : libpypsg.globes.structure.SurfacePressure, optional
         The surface pressure variable.
-    albedo : pypsg.globes.structure.Albedo, optional
+    albedo : libpypsg.globes.structure.Albedo, optional
         The albedo variable.
-    emissivity : pypsg.globes.structure.Emissivity, optional
+    emissivity : libpypsg.globes.structure.Emissivity, optional
         The emissivity variable.
-    *args : pypsg.globes.structure.Molecule | pypsg.globes.structure.Aerosol | pypsg.globes.structure.AerosolSize | pypsg.globes.structure.Surface
+    *args : libpypsg.globes.structure.Molecule | libpypsg.globes.structure.Aerosol | libpypsg.globes.structure.AerosolSize | libpypsg.globes.structure.Surface
         Additional variables.
     """
     _key_order = [
@@ -439,8 +439,7 @@ class PyGCM:
             pressure_top = pressure.dat[i+1, :, :].to(u.bar)
             dP = pressure_top - pressure_bottom
             # pylint: disable-next=no-member
-            rho = mean_molecular_mass*u.Unit('g mol-1') * \
-                (pressure_bottom + 0.5*dP) / c.R / temperature.dat[i, :, :]
+            rho = mean_molecular_mass*u.Unit('g mol-1') * (pressure_bottom + 0.5*dP) / c.R / temperature.dat[i, :, :]
             distance_from_planet_center = radius + z[i, :, :]*z_unit
             # pylint: disable-next=no-member
             accel_due_to_gravity = c.G * mass / distance_from_planet_center**2
@@ -479,6 +478,7 @@ class PyGCM:
         heights = np.diff(altitude, axis=0)
         # pylint: disable-next=no-member
         surface_density: u.Quantity = partial_pressure[:-
+                                                       # pylint: disable-next=no-member
                                                        1] * heights / c.R / temperature[:-1]
         return surface_density.sum(axis=0).to(u.mol/u.cm**2)
 

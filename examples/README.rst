@@ -1,2 +1,2 @@
-``pypsg`` Examples
+``libpypsg`` Examples
 ==================

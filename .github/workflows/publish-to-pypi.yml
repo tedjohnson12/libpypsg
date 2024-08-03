@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/pypsg/
+      url: https://pypi.org/p/libpypsg/
     permissions:
       id-token: write
     steps:

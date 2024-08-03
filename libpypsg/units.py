@@ -1,5 +1,5 @@
 """
-A custom set of units to use in pypsg
+A custom set of units to use in libpypsg
 """
 
 from astropy import units as u
