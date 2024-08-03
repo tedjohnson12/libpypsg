@@ -6,15 +6,15 @@ This module contains the basic functionality for fields in PSG
 config objects.
 """
 from typing import Any, Tuple, List
+from abc import ABC, abstractmethod
 import warnings
 from copy import deepcopy
 from astropy import units as u
 from astropy import time
 from dateutil.parser import parse as parse_date
 import numpy as np
-from abc import ABC, abstractmethod
 
-from pypsg import units as u_psg
+from .. import units as u_psg
 
 ENCODING = 'UTF-8'
 

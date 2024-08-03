@@ -1,7 +1,7 @@
 import numpy as np
 
 
-from pypsg.globes.decoder import GCMdecoder
+from libpypsg.globes.decoder import GCMdecoder
 
 # Test data
 header = '10,10,10,180,-90,18,9,O2,H2O,CO2'

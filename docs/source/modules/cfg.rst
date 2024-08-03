@@ -1,4 +1,4 @@
-.. automodapi:: pypsg.cfg
+.. automodapi:: libpypsg.cfg
     :no-main-docstr:
 
 Fields

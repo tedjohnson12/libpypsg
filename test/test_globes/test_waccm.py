@@ -16,13 +16,13 @@ from astropy import units as u
 
 import netCDF4 as nc
 
-from pypsg import APICall, PyConfig
-from pypsg.globes.waccm.waccm import validate_variables, get_time_index, TIME_UNIT,get_shape
-import pypsg.globes.waccm.waccm as rw
-from pypsg.globes.waccm import download_waccm_test_data
-from pypsg.globes import PyGCM, waccm_to_pygcm
-from pypsg.globes import structure
-from pypsg.cfg import models
+from libpypsg import APICall, PyConfig
+from libpypsg.globes.waccm.waccm import validate_variables, get_time_index, TIME_UNIT,get_shape
+import libpypsg.globes.waccm.waccm as rw
+from libpypsg.globes.waccm import download_waccm_test_data
+from libpypsg.globes import PyGCM, waccm_to_pygcm
+from libpypsg.globes import structure
+from libpypsg.cfg import models
 
 
 chdir(Path(__file__).parent)

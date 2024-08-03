@@ -5,7 +5,7 @@ Test the `pypsg.docker` module.
 import time
 import pytest
 
-from pypsg import docker as psgdocker
+from libpypsg import docker as psgdocker
 
 
 @pytest.mark.local

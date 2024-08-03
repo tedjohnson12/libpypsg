@@ -7,13 +7,13 @@ import requests
 from astropy import units as u
 import time
 
-from pypsg.cfg import PyConfig, BinConfig, models
-from pypsg import settings
-from pypsg.globes import globes
-from pypsg.exceptions import GlobESError, PSGMultiError
-from pypsg.settings import INTERNAL_PSG_URL, PSG_URL
-from pypsg.docker import start_psg, stop_psg, is_psg_installed
-from pypsg import APICall, PSGResponse, PyRad, PyLyr, PyTrn
+from libpypsg.cfg import PyConfig, BinConfig, models
+from libpypsg import settings
+from libpypsg.globes import globes
+from libpypsg.exceptions import GlobESError, PSGMultiError
+from libpypsg.settings import INTERNAL_PSG_URL, PSG_URL
+from libpypsg.docker import start_psg, stop_psg, is_psg_installed
+from libpypsg import APICall, PSGResponse, PyRad, PyLyr, PyTrn
 
 TR1e_PATH = Path(__file__).parent / 'test_cfg' / 'data' / 'TR1e_mirecle.cfg'
 

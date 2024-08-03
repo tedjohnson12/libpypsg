@@ -9,8 +9,7 @@ from astropy import units as u
 from astropy.table import QTable
 from astropy.io import fits
 
-from pypsg.cfg.base import Profile
-from pypsg import settings
+from .. import settings
 
 class PyLyr:
     """

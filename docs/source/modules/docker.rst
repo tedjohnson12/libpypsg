@@ -1,2 +1,2 @@
-.. automodapi:: pypsg.docker
+.. automodapi:: libpypsg.docker
     :no-main-docstr:

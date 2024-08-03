@@ -1,5 +1,5 @@
 """
-Convert `exoplasim` outputs to the `pypsg` format.
+Convert `exoplasim` outputs to the `libpypsg` format.
 """
 
 import warnings

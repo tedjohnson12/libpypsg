@@ -8,12 +8,12 @@ import numpy as np
 from astropy import units as u
 from pathlib import Path
 
-from pypsg.cfg.config import BinConfig
-from pypsg.cfg.base import Table
-from pypsg.cfg.models import Target, Geometry
-from pypsg.cfg.models import NoAtmosphere, EquilibriumAtmosphere, ComaAtmosphere
+from libpypsg.cfg.config import BinConfig
+from libpypsg.cfg.base import Table
+from libpypsg.cfg.models import Target, Geometry
+from libpypsg.cfg.models import NoAtmosphere, EquilibriumAtmosphere, ComaAtmosphere
 
-from pypsg.cfg.models import (
+from libpypsg.cfg.models import (
     Surface,
     Generator,
     Telescope,

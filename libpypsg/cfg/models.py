@@ -1,17 +1,16 @@
 """
 A module to store PSG config models.
 """
-from typing import Union
 from astropy import units as u
 from astropy.units import cds
 from astropy.units import imperial
 
-from pypsg import units as u_psg
-from pypsg.cfg.base import Model
-from pypsg.cfg.base import CharField, IntegerField, DateField
-from pypsg.cfg.base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
-from pypsg.cfg.base import GeometryOffsetField, MoleculesField, AerosolsField
-from pypsg.cfg.base import ProfileField, BooleanField, UnitChoicesField
+from .. import units as u_psg
+from .base import Model
+from .base import CharField, IntegerField, DateField
+from .base import FloatField, QuantityField, CodedQuantityField, CharChoicesField
+from .base import GeometryOffsetField, MoleculesField, AerosolsField
+from .base import ProfileField, BooleanField, UnitChoicesField
 
 
 class Target(Model):

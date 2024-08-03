@@ -42,17 +42,6 @@ class Variable(ABC):
     dat : astropy.units.Quantity
         The data values of the variable as a `astropy.units.Quantity` object.
 
-    Methods
-    -------
-    flat() -> np.ndarray:
-        Returns a flattened version of the data values of the variable as a
-        NumPy array, with the physical unit converted to the specified `psg_unit`.
-        The array is of dtype 'float32' and the flattening order is 'C'. This is the
-        format in which PSG assumes GCM binaries are written.
-
-    shape() -> Tuple[int]:
-        Returns the shape of the data values of the variable as a tuple of integers.
-
     """
 
     def __init__(

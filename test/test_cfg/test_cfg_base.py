@@ -5,15 +5,15 @@ import pytest
 from astropy import units as u
 import numpy as np
 
-from pypsg import units as u_psg
+from libpypsg import units as u_psg
 
-from pypsg.cfg.base import Table
-from pypsg.cfg.base import Model, CharField, IntegerField
-from pypsg.cfg.base import FloatField, QuantityField
-from pypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
-from pypsg.cfg.base import CodedQuantityField
-from pypsg.cfg.base import Molecule, MoleculesField, Aerosol, AerosolsField
-from pypsg.cfg.base import Profile, ProfileField, BooleanField
+from libpypsg.cfg.base import Table
+from libpypsg.cfg.base import Model, CharField, IntegerField
+from libpypsg.cfg.base import FloatField, QuantityField
+from libpypsg.cfg.base import DateField, CharChoicesField, GeometryOffsetField
+from libpypsg.cfg.base import CodedQuantityField
+from libpypsg.cfg.base import Molecule, MoleculesField, Aerosol, AerosolsField
+from libpypsg.cfg.base import Profile, ProfileField, BooleanField
 
 
 def test_table():

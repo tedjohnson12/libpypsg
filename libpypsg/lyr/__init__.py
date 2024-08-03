@@ -5,4 +5,4 @@ Layers
 Dealing with .lyr files.
 """
 
-from pypsg.lyr.lyr import PyLyr
+from .lyr import PyLyr

@@ -4,8 +4,8 @@ Configuration for pytest.
 import pytest
 import time
 
-from pypsg.docker import set_url_and_run, stop_psg
-from pypsg import settings
+from libpypsg.docker import set_url_and_run, stop_psg
+from libpypsg import settings
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     """
