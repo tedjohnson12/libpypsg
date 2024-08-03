@@ -9,6 +9,11 @@ from pypsg.cfg.config import PyConfig, BinConfig, ConfigTooLongWarning
 from pypsg.cfg.models import (
     Target,
     Geometry,
+    Observatory,
+    Nadir,
+    Limb,
+    Occultation,
+    LookingUp,
     Atmosphere,
     NoAtmosphere,
     EquilibriumAtmosphere,
