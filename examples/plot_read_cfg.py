@@ -10,8 +10,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pypsg.cfg.config import PyConfig, BinConfig
-from pypsg.cfg.base import Profile
+from libpypsg.cfg.config import PyConfig, BinConfig
+from libpypsg.cfg.base import Profile
 
 try:
     CFG_PATH = Path(__file__).parent / 'psg_cfg.txt'

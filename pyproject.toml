@@ -4,16 +4,16 @@ requires = ["setuptools", "wheel"]  # PEP 508 specifications.
 
 [project]
 version = "0.3.2"
-name = "pypsg"
+name = "libpypsg"
 authors = [
     {name = "Ted Johnson", email = "ted.johnson@unlv.edu"},
 ]
 maintainers = [ { name = "Ted Johnson", email = "ted.johnson@unlv.edu" } ]
-description = "A Python package for accessing the Planetary System Generator."
+description = "A Python library for accessing the Planetary System Generator."
 readme = "docs/readme.rst"
 license = {file = "LICENSE"}
 keywords =  ["astronomy", "exoplanet", "planet", "spectroscopy", "PSG"]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
@@ -48,8 +48,8 @@ dev = [
     "sphinxcontrib-bibtex",
 ]
 [project.urls]
-Repository = "https://github.com/tedjohnson12/pypsg"
-Issues = "https://github.com/tedjohnson12/pypsg/issues"
+Repository = "https://github.com/tedjohnson12/libpypsg"
+Issues = "https://github.com/tedjohnson12/libpypsg/issues"
 
 [tool.pytest.ini_options]
 markers = [

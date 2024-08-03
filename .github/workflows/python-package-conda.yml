@@ -44,8 +44,8 @@ jobs:
       run: |
         conda install pytest
         pip install coveralls
-        python -c "import pypsg; pypsg.settings.save_settings(api_key='$PSG_KEY')"
-        python -c "from pypsg.globes.waccm.waccm import download_test_data; download_test_data()"
-        python -c "from pypsg.globes.exoplasim.exoplasim import download_test_data; download_test_data()"
-        coverage run --source=pypsg -m pytest test --slow
+        python -c "import libpypsg; libpypsg.settings.save_settings(api_key='$PSG_KEY')"
+        python -c "from libpypsg.globes.waccm.waccm import download_test_data; download_test_data()"
+        python -c "from libpypsg.globes.exoplasim.exoplasim import download_test_data; download_test_data()"
+        coverage run --source=libpypsg -m pytest test --slow
         coveralls

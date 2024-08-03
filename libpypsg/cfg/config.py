@@ -6,9 +6,9 @@ from pathlib import Path
 
 import warnings
 
-from pypsg.cfg import models
-from pypsg import settings
-from pypsg.globes import PyGCM
+from . import models
+from .. import settings
+from ..globes import PyGCM
 
 
 class ConfigTooLongWarning(UserWarning):

@@ -8,7 +8,7 @@
 
 import os
 
-project = 'pypsg'
+project = 'libpypsg'
 copyright = '2024, Ted Johnson, The PSG Team'
 author = 'Ted Johnson, The PSG Team'
 release = '0.3.2'
@@ -47,7 +47,7 @@ html_theme = 'pydata_sphinx_theme'
 html_theme_options = {
     'navbar_start': ['navbar-logo', 'version-switcher'],
     'switcher': {
-        'json_url': 'https://tedjohnson12.github.io/pypsg/versions.json',
+        'json_url': 'https://tedjohnson12.github.io/libpypsg/versions.json',
         'version_match': doc_version
     }
 }

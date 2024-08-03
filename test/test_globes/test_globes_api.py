@@ -5,9 +5,9 @@ import time
 import numpy as np
 import pytest
 from astropy import units as u
-from pypsg.globes import PyGCM, structure, GCMdecoder
-from pypsg import PyConfig, APICall
-from pypsg.cfg import models
+from libpypsg.globes import PyGCM, structure, GCMdecoder
+from libpypsg import PyConfig, APICall
+from libpypsg.cfg import models
 
 class TestPyGCM:
     def test_init(self):

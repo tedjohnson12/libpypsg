@@ -7,7 +7,7 @@ import numpy as np
 
 from astropy import units as u
 
-from pypsg import PyTrn
+from libpypsg import PyTrn
 
 
 @pytest.fixture

@@ -6,8 +6,8 @@ import pytest
 from astropy import units as u
 import logging
 
-from pypsg import PyConfig, APICall, PyRad, PyLyr, PyTrn
-from pypsg import request as psgrequest
+from libpypsg import PyConfig, APICall, PyRad, PyLyr, PyTrn
+from libpypsg import request as psgrequest
 
 
 @pytest.fixture
