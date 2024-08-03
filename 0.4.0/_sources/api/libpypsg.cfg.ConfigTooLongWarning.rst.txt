@@ -1,0 +1,6 @@
+ConfigTooLongWarning
+====================
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoexception:: ConfigTooLongWarning

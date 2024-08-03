@@ -1,0 +1,21 @@
+Surface
+=======
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: Surface
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Surface.albedo
+      ~Surface.emissivity
+      ~Surface.temperature
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: albedo
+   .. autoattribute:: emissivity
+   .. autoattribute:: temperature

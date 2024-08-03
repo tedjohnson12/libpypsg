@@ -1,0 +1,17 @@
+Emissivity
+==========
+
+.. currentmodule:: libpypsg.globes.structure
+
+.. autoclass:: Emissivity
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Emissivity.constant
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: constant

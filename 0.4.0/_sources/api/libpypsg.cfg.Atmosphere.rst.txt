@@ -1,0 +1,17 @@
+Atmosphere
+==========
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: Atmosphere
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Atmosphere.structure
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: structure

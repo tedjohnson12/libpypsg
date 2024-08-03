@@ -1,0 +1,17 @@
+Nadir
+=====
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: Nadir
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Nadir.zenith
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: zenith

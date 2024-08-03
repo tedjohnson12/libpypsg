@@ -1,0 +1,7 @@
+LookingUp
+=========
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: LookingUp
+   :show-inheritance:
