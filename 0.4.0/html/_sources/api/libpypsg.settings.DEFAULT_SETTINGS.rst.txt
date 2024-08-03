@@ -1,0 +1,6 @@
+DEFAULT_SETTINGS
+================
+
+.. currentmodule:: libpypsg.settings
+
+.. autodata:: DEFAULT_SETTINGS

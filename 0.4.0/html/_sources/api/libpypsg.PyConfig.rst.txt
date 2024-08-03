@@ -1,0 +1,35 @@
+PyConfig
+========
+
+.. currentmodule:: libpypsg
+
+.. autoclass:: PyConfig
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~PyConfig.content
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PyConfig.from_binaryconfig
+      ~PyConfig.from_bytes
+      ~PyConfig.from_dict
+      ~PyConfig.from_file
+      ~PyConfig.to_file
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: content
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: from_binaryconfig
+   .. automethod:: from_bytes
+   .. automethod:: from_dict
+   .. automethod:: from_file
+   .. automethod:: to_file

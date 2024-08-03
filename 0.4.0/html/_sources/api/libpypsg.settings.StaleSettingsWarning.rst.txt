@@ -1,0 +1,6 @@
+StaleSettingsWarning
+====================
+
+.. currentmodule:: libpypsg.settings
+
+.. autoexception:: StaleSettingsWarning

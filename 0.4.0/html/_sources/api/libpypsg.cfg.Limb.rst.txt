@@ -1,0 +1,17 @@
+Limb
+====
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: Limb
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Limb.limb_altitude
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: limb_altitude

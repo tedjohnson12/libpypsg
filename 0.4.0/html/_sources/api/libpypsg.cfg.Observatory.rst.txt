@@ -1,0 +1,7 @@
+Observatory
+===========
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: Observatory
+   :show-inheritance:

@@ -1,0 +1,6 @@
+get_setting
+===========
+
+.. currentmodule:: libpypsg.settings
+
+.. autofunction:: get_setting

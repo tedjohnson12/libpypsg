@@ -1,0 +1,25 @@
+Noise
+=====
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: Noise
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Noise.desc
+      ~Noise.exp_time
+      ~Noise.n_frames
+      ~Noise.n_pixels
+      ~Noise.noise_type
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: desc
+   .. autoattribute:: exp_time
+   .. autoattribute:: n_frames
+   .. autoattribute:: n_pixels
+   .. autoattribute:: noise_type

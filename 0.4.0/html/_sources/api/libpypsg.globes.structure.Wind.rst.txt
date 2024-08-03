@@ -1,0 +1,19 @@
+Wind
+====
+
+.. currentmodule:: libpypsg.globes.structure
+
+.. autoclass:: Wind
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Wind.constant
+      ~Wind.zero
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: constant
+   .. automethod:: zero
