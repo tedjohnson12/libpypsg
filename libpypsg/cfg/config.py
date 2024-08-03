@@ -27,14 +27,6 @@ class BinConfig:
     content : bytes
         The content of the configuration.
 
-    Attributes
-    ----------
-    enconding : str
-        The encoding of the config. Set to 'UTF-8'.
-    content : bytes
-        The content of the config.
-    has_binary : bool
-        True if there is a `<BINARY>` section in the config.
     """
     encoding = 'UTF-8'
 

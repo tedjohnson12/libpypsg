@@ -1,5 +1,5 @@
-The ``pypsg`` API
-=================
+The ``libpypsg`` API
+====================
 
 .. automodapi:: libpypsg
     :no-main-docstr:

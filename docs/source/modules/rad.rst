@@ -1,2 +1,2 @@
-.. automodapi:: pypsg.rad
+.. automodapi:: libpypsg.rad
     :no-main-docstr:

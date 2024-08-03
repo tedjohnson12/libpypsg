@@ -1,2 +1,2 @@
-.. automodapi:: pypsg.lyr
+.. automodapi:: libpypsg.lyr
     :no-main-docstr:

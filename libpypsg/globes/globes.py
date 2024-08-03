@@ -439,9 +439,7 @@ class PyGCM:
             pressure_top = pressure.dat[i+1, :, :].to(u.bar)
             dP = pressure_top - pressure_bottom
             # pylint: disable-next=no-member
-            rho = mean_molecular_mass*u.Unit('g mol-1') * \
-                # pylint: disable-next=no-member
-                (pressure_bottom + 0.5*dP) / c.R / temperature.dat[i, :, :]
+            rho = mean_molecular_mass*u.Unit('g mol-1') * (pressure_bottom + 0.5*dP) / c.R / temperature.dat[i, :, :]
             distance_from_planet_center = radius + z[i, :, :]*z_unit
             # pylint: disable-next=no-member
             accel_due_to_gravity = c.G * mass / distance_from_planet_center**2
