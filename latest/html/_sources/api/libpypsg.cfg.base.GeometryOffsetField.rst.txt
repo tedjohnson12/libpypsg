@@ -1,0 +1,33 @@
+GeometryOffsetField
+===================
+
+.. currentmodule:: libpypsg.cfg.base
+
+.. autoclass:: GeometryOffsetField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~GeometryOffsetField.content
+      ~GeometryOffsetField.fmt
+      ~GeometryOffsetField.name
+      ~GeometryOffsetField.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~GeometryOffsetField.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: content
+   .. autoattribute:: fmt
+   .. autoattribute:: name
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

@@ -1,0 +1,6 @@
+VariableAssumptionWarning
+=========================
+
+.. currentmodule:: libpypsg.globes.structure
+
+.. autoexception:: VariableAssumptionWarning

@@ -1,0 +1,6 @@
+exocam_to_pygcm
+===============
+
+.. currentmodule:: libpypsg.globes
+
+.. autofunction:: exocam_to_pygcm

@@ -1,0 +1,7 @@
+Variable2D
+==========
+
+.. currentmodule:: libpypsg.globes.structure
+
+.. autoclass:: Variable2D
+   :show-inheritance:

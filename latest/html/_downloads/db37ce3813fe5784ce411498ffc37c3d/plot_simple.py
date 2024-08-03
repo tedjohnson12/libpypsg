@@ -1,8 +1,8 @@
 """
-``PyPSG``
-=========
+``libpypsg``
+============
 
-A Python wrapper for the Planetary Spectrum Generator.
+A Python library to interact with the Planetary Spectrum Generator.
 
 The goal of this package is to make PSG more accessible to
 new users, but still be powerfull enough that expert users
@@ -14,19 +14,19 @@ using the ``PyConfig`` class.
 
 # sphinx_gallery_thumbnail_path = '_static/pypsg_basic.png'
 
-import pypsg
+import libpypsg
 
-pypsg.docker.set_url_and_run()
+libpypsg.docker.set_url_and_run()
 
-cfg = pypsg.cfg.PyConfig(
-    target=pypsg.cfg.Target(object='Exoplanet',name='Proxima Cen b')
+cfg = libpypsg.cfg.PyConfig(
+    target=libpypsg.cfg.Target(object='Exoplanet',name='Proxima Cen b')
     )
 print(cfg.content)
 
 #%%
 # Get the rad file
 # ----------------
-psg = pypsg.APICall(
+psg = libpypsg.APICall(
         cfg=cfg,
         output_type='rad',
     )

@@ -1,0 +1,7 @@
+NoAtmosphere
+============
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: NoAtmosphere
+   :show-inheritance:

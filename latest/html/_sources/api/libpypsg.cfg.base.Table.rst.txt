@@ -1,0 +1,19 @@
+Table
+=====
+
+.. currentmodule:: libpypsg.cfg.base
+
+.. autoclass:: Table
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Table.read
+      ~Table.to_string
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read
+   .. automethod:: to_string

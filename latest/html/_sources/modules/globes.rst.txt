@@ -1,6 +1,6 @@
-.. automodapi:: pypsg.globes
+.. automodapi:: libpypsg.globes
     :no-main-docstr:
 
-.. automodapi:: pypsg.globes.structure
+.. automodapi:: libpypsg.globes.structure
     :no-main-docstr:
     :skip: ABC, Quantity, Unit

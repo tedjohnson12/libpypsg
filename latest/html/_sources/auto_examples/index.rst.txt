@@ -1,6 +1,6 @@
 :orphan:
 
-``pypsg`` Examples
+``libpypsg`` Examples
 ==================
 
 
@@ -12,7 +12,7 @@
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A Python wrapper for the Planetary Spectrum Generator.">
+    <div class="sphx-glr-thumbcontainer" tooltip="A Python library to interact with the Planetary Spectrum Generator.">
 
 .. only:: html
 
@@ -23,7 +23,7 @@
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">PyPSG</div>
+      <div class="sphx-glr-thumbnail-title">libpypsg</div>
     </div>
 
 
@@ -63,7 +63,7 @@
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Learn how to use the pypsg.globes ExoCAM module. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="Learn how to use the libpypsg.globes ExoCAM module. ">
 
 .. only:: html
 
