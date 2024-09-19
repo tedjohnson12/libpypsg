@@ -440,7 +440,7 @@ Reloading settings...
 <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">gcm</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/globes/waccm/waccm.py:356: VariableAssumptionWarning: Emissivity not explicitly stated. Using 1.0.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/libpypsg/globes/waccm/waccm.py:356: VariableAssumptionWarning: Emissivity not explicitly stated. Using 1.0.
   warnings.warn(msg, structure.VariableAssumptionWarning)
 &lt;class &#39;libpypsg.globes.globes.PyGCM&#39;&gt;
 </pre></div>
@@ -459,7 +459,7 @@ Reloading settings...
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.colorbar.html#matplotlib.figure.Figure.colorbar" title="matplotlib.figure.Figure.colorbar" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span></a><span class="p">(</span><span class="n">im</span><span class="p">,</span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a><span class="o">=</span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;T (K)&#39;</span><span class="p">,</span><span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_exocam_001.png" srcset="../_images/sphx_glr_plot_exocam_001.png" alt="plot exocam" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar object at 0x7f09e0393210&gt;
+<img src="../_images/sphx_glr_plot_exocam_001.png" srcset="../_images/sphx_glr_plot_exocam_001.png" alt="plot exocam" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar object at 0x7fc2946d3f10&gt;
 </pre></div>
 </div>
 </section>
@@ -563,13 +563,11 @@ This is just a very comprehensive example.</p>
 <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/request.py:51: PUMASWarning: The aerosols require higher scattering requirements, of NMAX:1 and LMAX:36, for the selected aerosols having a max g of 0.83.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/libpypsg/request.py:51: PUMASWarning: The aerosols require higher scattering requirements, of NMAX:1 and LMAX:80, for the selected aerosols having a max g of 0.94.
   warnings.warn(warning)
-/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/request.py:51: PUMASWarning: Atmospheric temperature exceeded correlated-k range (40-2000 K) for &#39;N2 - HIT[22]&#39;, restricting excitation temperatures to this range.
+/opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/libpypsg/request.py:51: GeneratorWarning: Too many electrons per pixel (up to inf) detected in the 1.00-17.98 um spectral range. Reduce exposure time per frame to less than 0.000 seconds.
   warnings.warn(warning)
-/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/libpypsg/request.py:51: PUMASWarning: Atmospheric pressure exceeded correlated-k range (1.00e-06 to 1.00e+02 bar) for &#39;N2 - HIT[22]&#39;, restricting broadening pressures to this range.
-  warnings.warn(warning)
-/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:573: UnitsWarning: &#39;W/m2/um&#39; contains multiple slashes, which is discouraged by the FITS standard
+/opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:573: UnitsWarning: &#39;W/m2/um&#39; contains multiple slashes, which is discouraged by the FITS standard
   warnings.warn(
 &lt;class &#39;libpypsg.request.PSGResponse&#39;&gt;
 </pre></div>
@@ -584,13 +582,10 @@ This is just a very comprehensive example.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html#matplotlib.axes.Axes.set_ylabel" title="matplotlib.axes.Axes.set_ylabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span></a><span class="p">(</span><span class="s1">&#39;Flux (ppm)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_exocam_002.png" srcset="../_images/sphx_glr_plot_exocam_002.png" alt="plot exocam" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/astropy/units/quantity.py:671: RuntimeWarning: invalid value encountered in divide
-  result = super().__array_ufunc__(function, method, *arrays, **kwargs)
-
-Text(22.472222222222214, 0.5, &#39;Flux (ppm)&#39;)
+<img src="../_images/sphx_glr_plot_exocam_002.png" srcset="../_images/sphx_glr_plot_exocam_002.png" alt="plot exocam" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(47.097222222222214, 0.5, &#39;Flux (ppm)&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.724 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.751 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-exocam-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/db88c3711efa1eddd5e1d87a6429bd55/plot_exocam.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_exocam.ipynb</span></code></a></p>

@@ -84,7 +84,7 @@ Get the rad file
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:573: UnitsWarning: 'W/sr/m2/um' contains multiple slashes, which is discouraged by the FITS standard
+    /opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:573: UnitsWarning: 'W/sr/m2/um' contains multiple slashes, which is discouraged by the FITS standard
       warnings.warn(
 
 
@@ -129,7 +129,7 @@ Look at the rad file
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.341 seconds)
+   **Total running time of the script:** (0 minutes 0.606 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simple.py:
