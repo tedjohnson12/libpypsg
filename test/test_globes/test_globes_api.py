@@ -12,6 +12,9 @@ from libpypsg import PyConfig, APICall
 from libpypsg.cfg import models
 
 LOG_PATH = Path(__file__).parent / 'logs' / 'globes.log'
+if not LOG_PATH.parent.exists():
+    LOG_PATH.parent.mkdir()
+
 log = logging.getLogger('globes')
 fh = logging.FileHandler(LOG_PATH)
 fh.setLevel(logging.DEBUG)

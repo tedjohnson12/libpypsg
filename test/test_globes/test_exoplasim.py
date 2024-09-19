@@ -36,6 +36,8 @@ from libpypsg.globes.exoplasim.exoplasim import (
 from libpypsg.globes.exoplasim import download_exoplasim_test_data
 
 LOG_PATH = Path(__file__).parent / 'logs' / 'exoplasim.log'
+if not LOG_PATH.parent.exists():
+    LOG_PATH.parent.mkdir()
 
 log = logging.getLogger('exoplasim')
 log.setLevel(logging.DEBUG)

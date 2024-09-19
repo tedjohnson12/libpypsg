@@ -29,6 +29,9 @@ from libpypsg.cfg import models
 chdir(Path(__file__).parent)
 
 LOG_PATH = Path(__file__).parent / 'logs' / 'waccm.log'
+if not LOG_PATH.parent.exists():
+    LOG_PATH.parent.mkdir()
+
 log = logging.getLogger('waccm')
 fh = logging.FileHandler(LOG_PATH)
 fh.setLevel(logging.DEBUG)

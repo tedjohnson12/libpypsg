@@ -28,6 +28,8 @@ from libpypsg.cfg import models
 chdir(Path(__file__).parent)
 
 LOG_PATH = Path(__file__).parent / 'logs' / 'exocam.log'
+if not LOG_PATH.parent.exists():
+    LOG_PATH.parent.mkdir()
 
 log = logging.Logger('exocam')
 log.setLevel(logging.DEBUG)
