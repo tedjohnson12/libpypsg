@@ -9,6 +9,7 @@ You can download it by running the below code:
 """
 from os import chdir
 from pathlib import Path
+import logging
 import pytest
 import numpy as np
 from astropy import units as u
@@ -25,6 +26,14 @@ from libpypsg.cfg import models
 
 
 chdir(Path(__file__).parent)
+
+LOG_PATH = Path(__file__).parent / 'logs' / 'exocam.log'
+
+log = logging.Logger('exocam')
+log.setLevel(logging.DEBUG)
+fh = logging.FileHandler(LOG_PATH,mode='w')
+fh.setLevel(logging.DEBUG)
+log.addHandler(fh)
 
 @pytest.fixture()
 def data_path():
@@ -165,9 +174,15 @@ def test_call_psg(data_path,psg_url):
         obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
         gen = models.Generator(gcm_binning=200)
         cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj,generator=gen)
-        psg = APICall(cfg,'all','globes',url=psg_url)
+        psg = APICall(cfg,'all','globes',url=psg_url,logger=log)
         psg.reset()
-        response = psg()
+        try:
+            response = psg()
+            psg.reset()
+        except Exception as e:
+            with open(LOG_PATH, 'rt', encoding='UTF-8') as file:
+                raise Exception(file.read()) from e
+            
         assert not np.any(np.isnan(response.lyr.prof['H2O']))
         assert not np.any(np.isnan(response.lyr.prof['CO2']))
         assert np.all(response.lyr.prof['CO2']==response.lyr.prof['CO2'][0])

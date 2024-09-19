@@ -8,6 +8,7 @@ You can download it by running ``VSPEC.builtins.download_waccm_test_data()``, fo
     python -c "from pypsg.globes.waccm.waccm import download_test_data; download_test_data()"
 """
 from os import chdir
+import logging
 import time
 from pathlib import Path
 import pytest
@@ -26,6 +27,13 @@ from libpypsg.cfg import models
 
 
 chdir(Path(__file__).parent)
+
+LOG_PATH = Path(__file__).parent / 'logs' / 'waccm.log'
+log = logging.getLogger('waccm')
+fh = logging.FileHandler(LOG_PATH)
+fh.setLevel(logging.DEBUG)
+log.addHandler(fh)
+log.setLevel(logging.DEBUG)
 
 @pytest.fixture()
 def data_path():
@@ -166,7 +174,12 @@ def test_call_psg(data_path,psg_url):
         psg = APICall(cfg,'all','globes',url=psg_url)
         psg.reset()
         time.sleep(0.1)
-        response = psg()
+        try:
+            response = psg()
+            psg.reset()
+        except Exception as e:
+            with open(LOG_PATH, 'rt', encoding='UTF-8') as file:
+                raise Exception(file.read()) from e
         assert not np.any(np.isnan(response.lyr.prof['CO2']))
     
 

@@ -1,6 +1,8 @@
 """
 API tests for GlobES
 """
+import logging
+from pathlib import Path
 import time
 import numpy as np
 import pytest
@@ -8,6 +10,14 @@ from astropy import units as u
 from libpypsg.globes import PyGCM, structure, GCMdecoder
 from libpypsg import PyConfig, APICall
 from libpypsg.cfg import models
+
+LOG_PATH = Path(__file__).parent / 'logs' / 'globes.log'
+log = logging.getLogger('globes')
+fh = logging.FileHandler(LOG_PATH)
+fh.setLevel(logging.DEBUG)
+log.addHandler(fh)
+log.setLevel(logging.DEBUG)
+
 
 class TestPyGCM:
     def test_init(self):
@@ -109,7 +119,12 @@ class TestPyGCM:
         assert decoder['Winds'].shape == (2,nlayer, nlon, nlat)
         psg.reset()
         time.sleep(0.1)
-        response = psg()
+        try:
+            response = psg()
+            psg.reset()
+        except Exception as e:
+            with open(LOG_PATH, 'rt', encoding='UTF-8') as file:
+                raise Exception(file.read()) from e
         assert not np.any(np.isnan(response.lyr.prof['CO2']))
     
         

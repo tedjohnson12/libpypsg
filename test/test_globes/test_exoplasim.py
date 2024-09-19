@@ -6,7 +6,8 @@ If you are running this test locally, you will need to download the ExoPlasim te
 .. code-block:: bash
     python -c "from pypsg.globes.exoplasim.exoplasim import download_test_data; download_test_data()"
 """
-
+import logging
+from pathlib import Path
 from netCDF4 import Dataset
 import pytest
 import numpy as np
@@ -33,6 +34,14 @@ from libpypsg.globes.exoplasim.exoplasim import (
     to_pygcm
 )
 from libpypsg.globes.exoplasim import download_exoplasim_test_data
+
+LOG_PATH = Path(__file__).parent / 'logs' / 'exoplasim.log'
+
+log = logging.getLogger('exoplasim')
+log.setLevel(logging.DEBUG)
+fh = logging.FileHandler(LOG_PATH)
+fh.setLevel(logging.DEBUG)
+log.addHandler(fh)
 
 @pytest.fixture
 def data()->Dataset:
@@ -219,9 +228,14 @@ def test_call_psg(data,psg_url):
     geo = models.Observatory(observer_altitude = 1.3*u.pc,)
     obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
     cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj)
-    psg = APICall(cfg,'all','globes',url=psg_url)
+    psg = APICall(cfg,'all','globes',url=psg_url,logger=log)
     psg.reset()
-    response = psg()
+    try:
+        response = psg()
+        psg.reset()
+    except Exception as e:
+        with open(LOG_PATH, 'rt', encoding='UTF-8') as file:
+            raise Exception(file.read()) from e
     assert not np.any(np.isnan(response.lyr.prof['H2O']))
         
     
