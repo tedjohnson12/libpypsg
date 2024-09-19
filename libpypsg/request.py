@@ -250,8 +250,14 @@ class APICall:
             The type of output to ask for.
         app : str or None
             The app to use.
+        api_key : str or None
+            The API key to use.
         url : str
             The URL to send the request to.
+        header : dict
+            The HTTP header to use.
+        timeout : float, optional
+            The timeout, in seconds. Defaults to 30.
 
         Returns
         -------
