@@ -5,6 +5,7 @@ PyPSG settings
 This module allows users to configure PyPSG.
 """
 from pathlib import Path
+from contextlib import contextmanager
 import warnings
 import json
 from astropy import units as u
@@ -28,6 +29,8 @@ DEFAULT_SETTINGS = {
     'timeout': REQUEST_TIMEOUT,
     'header': {'User-Agent': f'libpypsg/{__version__}'},
 }
+
+TEMPORARY_SETTINGS = {}
 
 
 settings_need_reload = False
@@ -83,11 +86,27 @@ def reload_settings():
 class StaleSettingsWarning(RuntimeWarning):
     pass
 
+
+@contextmanager
+def temporary_settings(**kwargs):
+    for key in kwargs:
+        if key not in DEFAULT_SETTINGS.keys():
+            raise KeyError(f'Unknown setting {key}.')
+    global TEMPORARY_SETTINGS
+    TEMPORARY_SETTINGS = kwargs
+    try:
+        yield
+    finally:
+        TEMPORARY_SETTINGS = {}
+
+
 def get_setting(key):
     if settings_need_reload:
         msg = 'Your user settings have changed recently.\n'
         msg += 'Please reload the settings using the `libpypsg.settings.reload_settings()` function.'
         warnings.warn(msg,StaleSettingsWarning) 
+    if key in TEMPORARY_SETTINGS:
+        return TEMPORARY_SETTINGS[key]
     if key in user_settings:
         return user_settings[key]
     else:
