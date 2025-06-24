@@ -74,8 +74,8 @@ class PyLyr:
         metadata['aero_sizes'] = find(r'Aerosol sizes: (.*)')
         metadata['aero_size_units'] = find(r'Aerosol size units: (.*)')
         
-        other_data['tab1_names'] = re.findall(r'#[ ]*(Alt\[km\].*)',text)[0]
-        other_data['tab2_names'] = re.findall(r'#[ ]*(Alt\[km\].*)',text)[0]
+        other_data['tab1_names'] = re.findall(r'#[ ]*([Layer ]*Alt\[km\].*)',text)[0]
+        other_data['tab2_names'] = re.findall(r'#[ ]*(Low\[km\].*)',text)[0]
         
 
         possible_table_lines =re.compile(r"(#[ ]+[\de\-\+\.\s]+)\n").findall(text,re.MULTILINE)

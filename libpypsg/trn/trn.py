@@ -46,6 +46,7 @@ class PyTrn(table.QTable):
         metadata = cls._get_metadata('\n'.join(header))
         
         names = metadata[cls._NAMES].split(' ')
+        names  = [_n for _n in names if len(_n)>0]
         wl_unit:u.Unit = metadata[cls.SPEC_UNIT]
         trn_unit = u.dimensionless_unscaled
         

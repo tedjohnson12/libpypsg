@@ -333,6 +333,8 @@ class APICall:
             self.logger.debug(format_content(reply.content, 'Received from PSG'))
         try:
             reply.raise_for_status()
+            if reply.text == '':
+                raise exceptions.PSGConnectionError('Empty reply from PSG')
         except requests.HTTPError as err:
             raise exceptions.PSGConnectionError(reply.content) from err
         too_many_calls = 'Your other API call is still running, please let it finish, wait 10 minutes, or consider installing the PSG Docker version'
