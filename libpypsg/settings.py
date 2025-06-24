@@ -35,6 +35,16 @@ TEMPORARY_SETTINGS = {}
 
 settings_need_reload = False
 def save_settings(**kwargs):
+    """
+    Save new user settings to file.
+    
+    This file is usually located at `~/.libpypsg/settings.json`.
+    
+    Parameters
+    ----------
+    kwargs : dict
+        The settings to save.
+    """
     if not USER_DATA_PATH.exists():
         USER_DATA_PATH.mkdir()
     if not USER_SETTINGS_PATH.exists():
@@ -52,14 +62,20 @@ def save_settings(**kwargs):
             raise KeyError(f'Unknown setting {key}.')
     with USER_SETTINGS_PATH.open('w') as file:
         json.dump(previous_settings, file, indent=4)
-    print(f'Saved settings to {USER_SETTINGS_PATH}')
     # pylint: disable-next=global-statement
     global settings_need_reload
     settings_need_reload = True
-    print('Reloading settings...')
     reload_settings()
 
 def load_settings():
+    """
+    Get user settings from file or use defaults.
+    
+    Returns
+    -------
+    settings : dict
+        The user settings.
+    """
     try:
         with USER_SETTINGS_PATH.open('r') as file:
             try:
@@ -71,24 +87,44 @@ def load_settings():
     for key, value in DEFAULT_SETTINGS.items():
         if key not in settings:
             settings[key] = value
-    # pylint: disable-next=global-statement
-    global settings_need_reload
-    settings_need_reload = False
     return settings
 
 user_settings = load_settings()
 
 def reload_settings():
+    """
+    Refreshes the settings stored in memory.
+    """
     # pylint: disable-next=global-statement
     global user_settings
     user_settings = load_settings()
+    # pylint: disable-next=global-statement
+    global settings_need_reload
+    settings_need_reload = False
 
 class StaleSettingsWarning(RuntimeWarning):
+    """
+    Warning raised when the user settings have changed but have not been reloaded.
+    """
     pass
 
 
 @contextmanager
 def temporary_settings(**kwargs):
+    """
+    Create a temporary settings context.
+    
+    Parameters
+    ----------
+    kwargs : dict
+        The settings to set.
+    
+    Examples
+    --------
+    >>> with temporary_settings(url='https://psg.gsfc.nasa.gov/api.php'):
+    ...     print(get_setting('url'))
+    https://psg.gsfc.nasa.gov/api.php
+    """
     for key in kwargs:
         if key not in DEFAULT_SETTINGS.keys():
             raise KeyError(f'Unknown setting {key}.')
@@ -101,6 +137,26 @@ def temporary_settings(**kwargs):
 
 
 def get_setting(key):
+    """
+    Get a setting.
+    
+    This function checks for context first, then the saved settings, and finally the defaults.
+    
+    Parameters
+    ----------
+    key : str
+        The setting to get.
+    
+    Returns
+    -------
+    value : any
+        The value of the setting.
+    
+    Raises
+    ------
+    KeyError
+        If the setting is not found.
+    """
     if settings_need_reload:
         msg = 'Your user settings have changed recently.\n'
         msg += 'Please reload the settings using the `libpypsg.settings.reload_settings()` function.'
