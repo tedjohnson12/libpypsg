@@ -189,7 +189,8 @@ def test_apicall(keep_psg_settings):
                                 )
                             except Exception as e:
                                 msg = f'Failed for\npsg_running={psg_running}\ncfg={cfg}\noutput_type={output_type}\napp={app}\nurl={url}\nurl_setting={url_setting}\nn_tested={n_tested}'
-                                raise Exception(msg) from e
+                                e.add_note(msg)
+                                raise
                             
 
 class TestPyConfig:
