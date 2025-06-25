@@ -279,7 +279,7 @@ class PyConfig:
                 lines.append(c)
         if self.gcm is not None:
             lines.append(self.gcm.content)
-        return b'\n'.join(lines)
+        return b'\n'.join(lines) + b'\n'
 
     def to_file(self, path: Path | str):
         """
