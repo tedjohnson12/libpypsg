@@ -37,7 +37,7 @@ def get_gcm_binary(config: str or Path or bytes):
     else:
         fdat = config
     header, dat = fdat.split(start)
-    dat = dat.replace(end, b'')
+    dat = dat.split(end)[0]
     dat = np.frombuffer(dat, dtype='float32')
     for line in str(header).split(r'\n'):
         if key in line:

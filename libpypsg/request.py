@@ -333,7 +333,7 @@ class APICall:
             self.logger.debug(format_content(reply.content, 'Received from PSG'))
         try:
             reply.raise_for_status()
-            if reply.text == '':
+            if (reply.text == '') and (self.type not in ['upd', 'set']):
                 raise exceptions.PSGConnectionError('Empty reply from PSG')
         except requests.HTTPError as err:
             raise exceptions.PSGConnectionError(reply.content) from err

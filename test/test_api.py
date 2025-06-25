@@ -409,7 +409,7 @@ class TestPyConfig:
         """
         
         cfg = PyConfig(target=models.Target(name='Earth'))
-        assert cfg.content == b'<OBJECT-NAME>Earth'
+        assert cfg.content == b'<OBJECT-NAME>Earth\n'
         
     def test_tofile(self, temp_file:Path):
         """
@@ -418,7 +418,7 @@ class TestPyConfig:
         
         cfg = PyConfig(target=models.Target(name='Earth'))
         cfg.to_file(temp_file)
-        assert temp_file.read_text() == '<OBJECT-NAME>Earth'
+        assert temp_file.read_text() == '<OBJECT-NAME>Earth\n'
         
         
         
