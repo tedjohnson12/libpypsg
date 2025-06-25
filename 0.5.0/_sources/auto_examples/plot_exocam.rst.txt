@@ -153,7 +153,7 @@ Have some fun with the GCM
  .. code-block:: none
 
 
-    <matplotlib.colorbar.Colorbar object at 0x7f8bd03ba5d0>
+    <matplotlib.colorbar.Colorbar object at 0x7f83484d1210>
 
 
 
@@ -360,7 +360,7 @@ Plot the result
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 37.400 seconds)
+   **Total running time of the script:** (0 minutes 1.746 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_exocam.py:
