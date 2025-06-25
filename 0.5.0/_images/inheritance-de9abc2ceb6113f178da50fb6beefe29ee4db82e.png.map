@@ -1,0 +1,34 @@
+<map id="inheritance773c0f1b09" name="inheritance773c0f1b09">
+<area shape="rect" id="node1" href="https://docs.python.org/3/library/abc.html#abc.ABC" target="_top" title="Helper class that provides a standard way to create an ABC using" alt="" coords="54,671,126,696"/>
+<area shape="rect" id="node5" title="A base class for data models." alt="" coords="223,671,295,696"/>
+<area shape="rect" id="node2" href="../api/libpypsg.cfg.AOTF.html#libpypsg.cfg.AOTF" target="_top" title="Acousto&#45;Optical&#45;Tunable&#45;Filter (AOTF)" alt="" coords="568,5,640,31"/>
+<area shape="rect" id="node3" href="../api/libpypsg.cfg.Telescope.html#libpypsg.cfg.Telescope" target="_top" title="Base class for telescopes." alt="" coords="350,129,437,155"/>
+<area shape="rect" id="node13" href="../api/libpypsg.cfg.Coronagraph.html#libpypsg.cfg.Coronagraph" target="_top" title="A coronagraph." alt="" coords="551,55,657,80"/>
+<area shape="rect" id="node18" href="../api/libpypsg.cfg.Interferometer.html#libpypsg.cfg.Interferometer" target="_top" title="An interferometry array." alt="" coords="545,104,663,129"/>
+<area shape="rect" id="node19" href="../api/libpypsg.cfg.LIDAR.html#libpypsg.cfg.LIDAR" target="_top" title="A laser source is injected into the FOV." alt="" coords="568,153,640,179"/>
+<area shape="rect" id="node30" href="../api/libpypsg.cfg.SingleTelescope.html#libpypsg.cfg.SingleTelescope" target="_top" title="A simple telescope with a single apperture." alt="" coords="541,203,667,228"/>
+<area shape="rect" id="node4" href="../api/libpypsg.cfg.Atmosphere.html#libpypsg.cfg.Atmosphere" target="_top" title="Base Atmosphere model" alt="" coords="343,325,444,351"/>
+<area shape="rect" id="node9" href="../api/libpypsg.cfg.ComaAtmosphere.html#libpypsg.cfg.ComaAtmosphere" target="_top" title="An atmosphere that is the result of outgassing." alt="" coords="535,252,673,277"/>
+<area shape="rect" id="node15" href="../api/libpypsg.cfg.EquilibriumAtmosphere.html#libpypsg.cfg.EquilibriumAtmosphere" target="_top" title="An atmosphere that is in hydrostatic equilibrium." alt="" coords="517,301,691,327"/>
+<area shape="rect" id="node23" href="../api/libpypsg.cfg.NoAtmosphere.html#libpypsg.cfg.NoAtmosphere" target="_top" title="No Atmosphere" alt="" coords="545,351,663,376"/>
+<area shape="rect" id="node8" href="../api/libpypsg.cfg.Noise.html#libpypsg.cfg.Noise" target="_top" title="Base class for noise models." alt="" coords="357,572,429,597"/>
+<area shape="rect" id="node16" href="../api/libpypsg.cfg.Generator.html#libpypsg.cfg.Generator" target="_top" title="Combines the source and instrument models into spectra." alt="" coords="350,671,437,696"/>
+<area shape="rect" id="node17" href="../api/libpypsg.cfg.Geometry.html#libpypsg.cfg.Geometry" target="_top" title="PSG parameter model for fields starting with `GEOMETRY`." alt="" coords="350,769,437,795"/>
+<area shape="rect" id="node31" href="../api/libpypsg.cfg.Surface.html#libpypsg.cfg.Surface" target="_top" title="The surface model." alt="" coords="357,819,429,844"/>
+<area shape="rect" id="node32" href="../api/libpypsg.cfg.Target.html#libpypsg.cfg.Target" target="_top" title="PSG parameter model for keywords begining with `OBJECT`." alt="" coords="357,868,429,893"/>
+<area shape="rect" id="node6" href="../api/libpypsg.cfg.BinConfig.html#libpypsg.cfg.BinConfig" target="_top" title="PSG configuration structure." alt="" coords="48,621,132,647"/>
+<area shape="rect" id="node7" href="../api/libpypsg.cfg.CCD.html#libpypsg.cfg.CCD" target="_top" title="Charge image sensor (e.g., CCD, CMOS, EMCCD, ICCD / MCP)" alt="" coords="568,400,640,425"/>
+<area shape="rect" id="node11" href="../api/libpypsg.cfg.ConstantNoise.html#libpypsg.cfg.ConstantNoise" target="_top" title="Constant noise model." alt="" coords="545,449,663,475"/>
+<area shape="rect" id="node12" href="../api/libpypsg.cfg.ConstantNoiseWithBackground.html#libpypsg.cfg.ConstantNoiseWithBackground" target="_top" title="No additional description in handbook." alt="" coords="492,499,716,524"/>
+<area shape="rect" id="node14" href="../api/libpypsg.cfg.Detectability.html#libpypsg.cfg.Detectability" target="_top" title="Detectivity" alt="" coords="551,548,657,573"/>
+<area shape="rect" id="node24" href="../api/libpypsg.cfg.Noiseless.html#libpypsg.cfg.Noiseless" target="_top" title="No noise. This is not the same as a `null` value." alt="" coords="561,597,647,623"/>
+<area shape="rect" id="node27" href="../api/libpypsg.cfg.PowerEquivalentNoise.html#libpypsg.cfg.PowerEquivalentNoise" target="_top" title="Noise Equivalent Power" alt="" coords="520,647,688,672"/>
+<area shape="rect" id="node29" href="../api/libpypsg.cfg.RecieverTemperatureNoise.html#libpypsg.cfg.RecieverTemperatureNoise" target="_top" title="Receiver temperature (radio)." alt="" coords="505,696,703,721"/>
+<area shape="rect" id="node10" href="../api/libpypsg.cfg.ConfigTooLongWarning.html#libpypsg.cfg.ConfigTooLongWarning" target="_top" title="The PSG configuration is too long," alt="" coords="5,572,175,597"/>
+<area shape="rect" id="node20" href="../api/libpypsg.cfg.Limb.html#libpypsg.cfg.Limb" target="_top" title="Limb Geometry" alt="" coords="568,745,640,771"/>
+<area shape="rect" id="node21" href="../api/libpypsg.cfg.LookingUp.html#libpypsg.cfg.LookingUp" target="_top" title="Looking Up Geometry" alt="" coords="559,795,649,820"/>
+<area shape="rect" id="node22" href="../api/libpypsg.cfg.Nadir.html#libpypsg.cfg.Nadir" target="_top" title="Nadir Geometry" alt="" coords="568,844,640,869"/>
+<area shape="rect" id="node25" href="../api/libpypsg.cfg.Observatory.html#libpypsg.cfg.Observatory" target="_top" title="Observatory Geometry" alt="" coords="553,893,655,919"/>
+<area shape="rect" id="node26" href="../api/libpypsg.cfg.Occultation.html#libpypsg.cfg.Occultation" target="_top" title="Occultation Geometry" alt="" coords="556,943,652,968"/>
+<area shape="rect" id="node28" href="../api/libpypsg.cfg.PyConfig.html#libpypsg.cfg.PyConfig" target="_top" title="A configuration in the form of a python object." alt="" coords="51,523,129,548"/>
+</map>

@@ -1,0 +1,6 @@
+settings_need_reload
+====================
+
+.. currentmodule:: libpypsg.settings
+
+.. autodata:: settings_need_reload

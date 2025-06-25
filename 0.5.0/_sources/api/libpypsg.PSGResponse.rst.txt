@@ -1,0 +1,19 @@
+PSGResponse
+===========
+
+.. currentmodule:: libpypsg
+
+.. autoclass:: PSGResponse
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PSGResponse.from_bytes
+      ~PSGResponse.null
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: from_bytes
+   .. automethod:: null

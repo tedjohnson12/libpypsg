@@ -1,0 +1,27 @@
+BooleanField
+============
+
+.. currentmodule:: libpypsg.cfg.base
+
+.. autoclass:: BooleanField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~BooleanField.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~BooleanField.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

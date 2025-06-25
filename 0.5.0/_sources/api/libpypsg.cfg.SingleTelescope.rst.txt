@@ -1,0 +1,7 @@
+SingleTelescope
+===============
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: SingleTelescope
+   :show-inheritance:

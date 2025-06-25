@@ -1,0 +1,6 @@
+load_settings
+=============
+
+.. currentmodule:: libpypsg.settings
+
+.. autofunction:: load_settings

@@ -1,0 +1,6 @@
+stop_psg
+========
+
+.. currentmodule:: libpypsg.docker
+
+.. autofunction:: stop_psg

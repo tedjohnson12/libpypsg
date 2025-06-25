@@ -1,0 +1,17 @@
+CharChoicesField
+================
+
+.. currentmodule:: libpypsg.cfg.base
+
+.. autoclass:: CharChoicesField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~CharChoicesField.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: value

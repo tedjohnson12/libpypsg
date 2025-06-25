@@ -1,0 +1,7 @@
+SurfaceTemperature
+==================
+
+.. currentmodule:: libpypsg.globes.structure
+
+.. autoclass:: SurfaceTemperature
+   :show-inheritance:

@@ -1,0 +1,17 @@
+Occultation
+===========
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: Occultation
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Occultation.occultation_altitude
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: occultation_altitude

@@ -1,0 +1,43 @@
+AerosolsField
+=============
+
+.. currentmodule:: libpypsg.cfg.base
+
+.. autoclass:: AerosolsField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~AerosolsField.abun
+      ~AerosolsField.aeros
+      ~AerosolsField.content
+      ~AerosolsField.naero
+      ~AerosolsField.size
+      ~AerosolsField.size_unit
+      ~AerosolsField.type
+      ~AerosolsField.unit
+      ~AerosolsField.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~AerosolsField.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: abun
+   .. autoattribute:: aeros
+   .. autoattribute:: content
+   .. autoattribute:: naero
+   .. autoattribute:: size
+   .. autoattribute:: size_unit
+   .. autoattribute:: type
+   .. autoattribute:: unit
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

@@ -1,0 +1,6 @@
+atmosphere_type_dict
+====================
+
+.. currentmodule:: libpypsg.settings
+
+.. autodata:: atmosphere_type_dict

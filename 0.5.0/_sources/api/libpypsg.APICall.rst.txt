@@ -1,0 +1,33 @@
+APICall
+=======
+
+.. currentmodule:: libpypsg
+
+.. autoclass:: APICall
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~APICall.is_single_file
+      ~APICall.type
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~APICall.__call__
+      ~APICall.call
+      ~APICall.reset
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: is_single_file
+   .. autoattribute:: type
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: __call__
+   .. automethod:: call
+   .. automethod:: reset

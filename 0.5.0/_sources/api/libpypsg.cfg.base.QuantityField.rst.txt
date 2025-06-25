@@ -1,0 +1,29 @@
+QuantityField
+=============
+
+.. currentmodule:: libpypsg.cfg.base
+
+.. autoclass:: QuantityField
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~QuantityField.is_table
+      ~QuantityField.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~QuantityField.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: is_table
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

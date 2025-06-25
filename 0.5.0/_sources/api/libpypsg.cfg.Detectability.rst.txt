@@ -1,0 +1,19 @@
+Detectability
+=============
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: Detectability
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Detectability.pixel_size
+      ~Detectability.sensitivity
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: pixel_size
+   .. autoattribute:: sensitivity

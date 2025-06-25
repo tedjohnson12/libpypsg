@@ -1,0 +1,6 @@
+TEMPORARY_SETTINGS
+==================
+
+.. currentmodule:: libpypsg.settings
+
+.. autodata:: TEMPORARY_SETTINGS

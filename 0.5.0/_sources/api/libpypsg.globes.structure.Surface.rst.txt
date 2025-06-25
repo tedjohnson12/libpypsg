@@ -1,0 +1,17 @@
+Surface
+=======
+
+.. currentmodule:: libpypsg.globes.structure
+
+.. autoclass:: Surface
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Surface.constant
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: constant

@@ -1,0 +1,6 @@
+reload_settings
+===============
+
+.. currentmodule:: libpypsg
+
+.. autofunction:: reload_settings

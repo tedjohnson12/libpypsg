@@ -1,0 +1,6 @@
+PSGNotInstalledError
+====================
+
+.. currentmodule:: libpypsg.docker
+
+.. autoexception:: PSGNotInstalledError

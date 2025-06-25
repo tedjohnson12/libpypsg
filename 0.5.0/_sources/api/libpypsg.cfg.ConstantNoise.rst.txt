@@ -1,0 +1,17 @@
+ConstantNoise
+=============
+
+.. currentmodule:: libpypsg.cfg
+
+.. autoclass:: ConstantNoise
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ConstantNoise.sigma
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: sigma

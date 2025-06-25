@@ -1,0 +1,35 @@
+Field
+=====
+
+.. currentmodule:: libpypsg.cfg.base
+
+.. autoclass:: Field
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Field.asbytes
+      ~Field.content
+      ~Field.is_null
+      ~Field.name
+      ~Field.value
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Field.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: asbytes
+   .. autoattribute:: content
+   .. autoattribute:: is_null
+   .. autoattribute:: name
+   .. autoattribute:: value
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

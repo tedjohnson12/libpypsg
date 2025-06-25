@@ -1,0 +1,6 @@
+temporary_settings
+==================
+
+.. currentmodule:: libpypsg
+
+.. autofunction:: temporary_settings

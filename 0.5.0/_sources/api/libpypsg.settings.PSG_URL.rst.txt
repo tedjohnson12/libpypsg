@@ -1,0 +1,6 @@
+PSG_URL
+=======
+
+.. currentmodule:: libpypsg.settings
+
+.. autodata:: PSG_URL
