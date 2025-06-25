@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from subprocess import Popen, PIPE
 import tomllib
+import json
 import pytest
 from libpypsg import __version__
 
@@ -42,6 +43,10 @@ def test_version():
     except Exception as e:
         if isinstance(e, AssertionError):
             raise
+    
+    with open(DOCS_SOURCE_PATH / 'versions.json', 'rt', encoding='UTF-8') as f:
+        versions = json.load(f)
+    assert {'version': version, 'url': f'https://tedjohnson12.github.io/libpypsg/{version}/index.html'} in versions, f'Version {version} is not in `versions.json`'
     
     
 if __name__ == '__main__':
