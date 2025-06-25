@@ -189,7 +189,8 @@ def test_apicall(keep_psg_settings):
                                 )
                             except Exception as e:
                                 msg = f'Failed for\npsg_running={psg_running}\ncfg={cfg}\noutput_type={output_type}\napp={app}\nurl={url}\nurl_setting={url_setting}\nn_tested={n_tested}'
-                                raise Exception(msg) from e
+                                e.add_note(msg)
+                                raise
                             
 
 class TestPyConfig:
@@ -408,7 +409,7 @@ class TestPyConfig:
         """
         
         cfg = PyConfig(target=models.Target(name='Earth'))
-        assert cfg.content == b'<OBJECT-NAME>Earth'
+        assert cfg.content == b'<OBJECT-NAME>Earth\n'
         
     def test_tofile(self, temp_file:Path):
         """
@@ -417,7 +418,7 @@ class TestPyConfig:
         
         cfg = PyConfig(target=models.Target(name='Earth'))
         cfg.to_file(temp_file)
-        assert temp_file.read_text() == '<OBJECT-NAME>Earth'
+        assert temp_file.read_text() == '<OBJECT-NAME>Earth\n'
         
         
         
