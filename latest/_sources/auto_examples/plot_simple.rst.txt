@@ -54,9 +54,7 @@ using the ``PyConfig`` class.
 
  .. code-block:: none
 
-    Saved settings to /home/runner/.libpypsg/settings.json
-    Reloading settings...
-    b'<OBJECT-NAME>Proxima Cen b\n<OBJECT>Exoplanet'
+    b'<OBJECT-NAME>Proxima Cen b\n<OBJECT>Exoplanet\n'
 
 
 
@@ -84,7 +82,7 @@ Get the rad file
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:573: UnitsWarning: 'W/sr/m2/um' contains multiple slashes, which is discouraged by the FITS standard
+    /opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:507: UnitsWarning: 'W/sr/m2/um' contains multiple slashes, which is discouraged by the FITS standard
       warnings.warn(
 
 
@@ -112,16 +110,16 @@ Look at the rad file
     Wave/freq     Total          Object       Reflected       Thermal    
         um    W / (sr um m2) W / (sr um m2) W / (sr um m2) W / (sr um m2)
     --------- -------------- -------------- -------------- --------------
-          1.0      231.99203        231.992        231.992    1.76851e-13
-          1.1      184.89523        184.895        184.895    8.59289e-12
-          1.2      148.08486        148.085        148.085     2.1043e-10
-          1.3      119.38777        119.388        119.388    3.05108e-09
-          1.4      96.962337        96.9623        96.9623    2.93731e-08
-          1.5      79.349429        79.3494        79.3494    2.04157e-07
-          1.6      65.427132        65.4271        65.4271    1.09062e-06
-          1.7      54.343872        54.3439        54.3439    4.69654e-06
-          1.8       45.45587        45.4559        45.4559    1.69172e-05
-          1.9      38.276023         38.276         38.276    5.24737e-05
+          1.0       232.4973        232.497        232.497    1.76797e-13
+          1.1      185.29793        185.298        185.298    8.59024e-12
+          1.2      148.40739        148.407        148.407    2.10365e-10
+          1.3      119.64779        119.648        119.648    3.05014e-09
+          1.4      97.173518        97.1735        97.1735     2.9364e-08
+          1.5       79.52225        79.5222        79.5222    2.04094e-07
+          1.6      65.569631        65.5696        65.5696    1.09028e-06
+          1.7      54.462232        54.4622        54.4622     4.6951e-06
+          1.8      45.554871        45.5549        45.5549     1.6912e-05
+          1.9      38.359387        38.3594        38.3593    5.24575e-05
 
 
 
@@ -129,7 +127,7 @@ Look at the rad file
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.435 seconds)
+   **Total running time of the script:** (0 minutes 0.215 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simple.py:

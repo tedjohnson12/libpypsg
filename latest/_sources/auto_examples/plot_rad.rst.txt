@@ -50,13 +50,6 @@ Get a rad file from PSG and plot it.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Saved settings to /home/runner/.libpypsg/settings.json
-    Reloading settings...
-
 
 
 
@@ -155,11 +148,9 @@ Run PSG
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/libpypsg/request.py:51: PUMASWarning: Modeling multiple-scattering accurately for Rayleigh would require NMAX to be at least 1 and LMAX 2.
+    /opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/site-packages/libpypsg/request.py:51: GeneratorWarning: Too many electrons per pixel (up to 4.69e+08) detected in the 1.00-17.92 um spectral range. Reduce exposure time per frame to less than 0.107 seconds.
       warnings.warn(warning)
-    /opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/libpypsg/request.py:51: GeneratorWarning: Too many electrons per pixel (up to 4.69e+08) detected in the 1.00-17.92 um spectral range. Reduce exposure time per frame to less than 0.107 seconds.
-      warnings.warn(warning)
-    /opt/hostedtoolcache/Python/3.11.10/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:573: UnitsWarning: 'W/m2/um' contains multiple slashes, which is discouraged by the FITS standard
+    /opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:507: UnitsWarning: 'W/m2/um' contains multiple slashes, which is discouraged by the FITS standard
       warnings.warn(
 
 
@@ -201,7 +192,7 @@ Read the response
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.870 seconds)
+   **Total running time of the script:** (0 minutes 1.169 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_rad.py:
