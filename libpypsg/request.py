@@ -4,11 +4,13 @@ PyPSG Requests
 
 Direct access to the PSG API
 """
-import logging
 import warnings
-from typing import Union, Dict
+from typing import Union, Dict, List
 import re
 import requests
+from loguru import logger
+from time import time
+from sys import getsizeof
 
 from .cfg import PyConfig, BinConfig
 from . import settings
@@ -16,9 +18,8 @@ from . import exceptions
 from .rad import PyRad
 from .lyr import PyLyr
 from .trn import PyTrn
-from . import docker
 
-docker.set_url_and_run()
+TOO_MANY_CALLS = 'Your other API call is still running, please let it finish, wait 10 minutes, or consider installing the PSG Docker version'
 
 typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
     b'cfg': PyConfig,
@@ -27,6 +28,17 @@ typedict: Dict[bytes, Union[PyConfig, PyRad, PyLyr]] = {
     b'noi': PyRad,
     b'trn': PyTrn
 }
+
+def readable_size(b: bytes) -> str:
+    s = getsizeof(b)
+    if s < 1024:
+        return f'{s} B'
+    elif s < 1024**2:
+        return f'{s/1024:.2f} KB'
+    elif s < 1024**3:
+        return f'{s/1024**2:.2f} MB'
+    else:
+        return f'{s/1024**3:.2f} GB'
 
 def parse_exceptions(content:bytes):
     
@@ -44,10 +56,11 @@ def parse_exceptions(content:bytes):
     }
     
     matchs = re.findall(r'WARNING \| ([\w]+) \| (.*)', content)
-    psg_warnings = [
+    psg_warnings: List[Warning] = [
         warning_dict.get(match[0], exceptions.UnknownPSGWarning)(match[1]) for match in matchs
     ]
     for warning in psg_warnings:
+        logger.warning(warning)
         warnings.warn(warning)
     
     
@@ -57,6 +70,8 @@ def parse_exceptions(content:bytes):
     errors = [
         exception_dict.get(match[0], exceptions.UnknownPSGError)(match[1]) for match in matchs
     ]
+    for error in errors:
+        logger.error(error)
     if len(errors) == 1:
         raise errors[0]
     raise exceptions.PSGMultiError(errors)
@@ -154,7 +169,7 @@ class APICall:
         output_type: str = None,
         app: str = None,
         url: str = None,
-        logger: logging.Logger = None
+        log_flag: str = None
     ):
         self.cfg = cfg
         self._type = output_type
@@ -162,7 +177,7 @@ class APICall:
         self.url = url
         if self.url is None:
             self.url = settings.get_setting('url')
-        self.logger = logger
+        self.log_flag = log_flag
         self._validate()
 
     def _validate(self):
@@ -271,12 +286,17 @@ class APICall:
             data['app'] = app
         if api_key is not None:
             data['key'] = api_key
+        logger.debug(f'Sending {readable_size(data["file"])} of data to {url}')
+        start = time()
         reply: requests.Response = requests.post(
             url=url,
             data=data,
             timeout=timeout,
             headers=header
         )
+        logger.debug(f'Received {readable_size(reply.content)} in {time() - start:.2f} seconds')
+        logger.debug(f'Status code: {reply.status_code}')
+        
         return reply
     
     def reset(self):
@@ -320,7 +340,7 @@ class APICall:
             header=settings.get_setting('header'),
             timeout=settings.get_setting('timeout')
         )
-        if self.logger is not None:
+        if self.log_flag is not None:
             def format_content(content,title):
                 if b'<BINARY>' in content:
                     content = content.split(b'<BINARY>')[0] + b'<BINARY>...</BINARY>'  + content.split(b'</BINARY>')[1]
@@ -329,16 +349,18 @@ class APICall:
                     + str(content, encoding=settings.get_setting('encoding')) \
                         + '\n' + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
                 return s
-            self.logger.debug(format_content(self.cfg.content,f'Sent to {self.url} (app: {self.app}) with mode `{self.type}`'))
-            self.logger.debug(format_content(reply.content, 'Received from PSG'))
+            logger.bind(**{self.log_flag:True}).trace(format_content(self.cfg.content,f'Sent to {self.url} (app: {self.app}) with mode `{self.type}`'))
+            logger.bind(**{self.log_flag:True}).trace(format_content(reply.content, 'Received from PSG'))
         try:
             reply.raise_for_status()
             if (reply.text == '') and (self.type not in ['upd', 'set']):
+                logger.critical(f'Empty reply with requested type: {self.type}')
                 raise exceptions.PSGConnectionError('Empty reply from PSG')
         except requests.HTTPError as err:
+            logger.error(err)
             raise exceptions.PSGConnectionError(reply.content) from err
-        too_many_calls = 'Your other API call is still running, please let it finish, wait 10 minutes, or consider installing the PSG Docker version'
-        if too_many_calls in reply.text:
+        if TOO_MANY_CALLS in reply.text:
+            logger.critical('Too many calls to PSG. Please wait for 1 minute.')
             raise exceptions.PSGConnectionError(reply.text)
         parse_exceptions(reply.content)
         if self._type in ['upd', 'set']:

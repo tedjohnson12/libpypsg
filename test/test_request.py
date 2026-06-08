@@ -4,7 +4,6 @@ Test pypsg.request module.
 from pathlib import Path
 import pytest
 from astropy import units as u
-import logging
 
 from libpypsg import PyConfig, APICall, PyRad, PyLyr, PyTrn
 from libpypsg import request as psgrequest
@@ -26,14 +25,6 @@ def advanced_cfg():
     return PyConfig.from_file(Path(__file__).parent / 'data' / 'advanced.cfg')
 # pylint: disable=redefined-outer-name
 
-@pytest.fixture
-def logger():
-    """
-    A logger for PSG
-    """
-    return logging.Logger('psglog',level=logging.INFO)
-
-
 def test_api_init(default_cfg):
     """
     Test api intialization.
@@ -45,32 +36,32 @@ def test_api_init(default_cfg):
     assert api.cfg.target.object.value == 'Exoplanet'
 
 
-def test_api_call_rad(default_cfg,psg_url,logger):
+def test_api_call_rad(default_cfg,psg_url):
     """
     Test api call.
     """
-    api = APICall(default_cfg, 'rad',url=psg_url,logger=logger)
+    api = APICall(default_cfg, 'rad',url=psg_url)
     response = api()
     assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.rad, PyRad)
     assert isinstance(response.rad.wl, u.Quantity)
 
-def test_api_call_trn(advanced_cfg, psg_url,logger):
+def test_api_call_trn(advanced_cfg, psg_url):
     """
     Test api call to return trn.
     """
-    api = APICall(advanced_cfg, 'trn',url=psg_url,logger=logger)
+    api = APICall(advanced_cfg, 'trn',url=psg_url)
     response = api()
     assert isinstance(response, psgrequest.PSGResponse)
     assert response.rad is None
     assert isinstance(response.trn, PyTrn)
 
 
-def test_api_call_all(default_cfg, psg_url,logger):
+def test_api_call_all(default_cfg, psg_url):
     """
     Test api call.
     """
-    api = APICall(default_cfg, 'all',url=psg_url,logger=logger)
+    api = APICall(default_cfg, 'all',url=psg_url)
     response = api()
     assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.cfg, PyConfig)
@@ -85,11 +76,11 @@ def test_api_call_multiple(default_cfg):
         _ = APICall(default_cfg, ('rad', 'cfg'))
 
 
-def test_api_call_advanced(advanced_cfg, psg_url,logger):
+def test_api_call_advanced(advanced_cfg, psg_url):
     """
     Test api call.
     """
-    api = APICall(advanced_cfg, 'all',url=psg_url,logger=logger)
+    api = APICall(advanced_cfg, 'all',url=psg_url)
     response = api()
     assert isinstance(response, psgrequest.PSGResponse)
     assert isinstance(response.rad, PyRad)

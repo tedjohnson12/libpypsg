@@ -3,6 +3,7 @@ Python representation of rad files.
 """
 
 from pathlib import Path
+import warnings
 import re
 import numpy as np
 
@@ -76,9 +77,14 @@ class PyRad(table.QTable):
         metadata[PyRad.SPEC_UNIT] = u.Unit(
             re.findall(r'Spectral unit:.+\[(.+)\]\n',header)[0]
         )
-        metadata[PyRad.RAD_UNIT] = u.Unit(
-            re.findall(r'Radiance unit:.+\[(.+)\]\n',header)[0]
-        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=u.UnitsWarning)
+            u.add_enabled_aliases({
+                'photons': u.ph
+            })
+            metadata[PyRad.RAD_UNIT] = u.Unit(
+                re.findall(r'Radiance unit:.+\[(.+)\]\n',header)[0]
+            )
         metadata[PyRad._NAMES] = re.findall(
             r'# (Wave\/freq.+)',
             header

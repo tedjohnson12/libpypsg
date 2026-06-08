@@ -9,10 +9,10 @@ You can download it by running the below code:
 """
 from os import chdir
 from pathlib import Path
-import logging
 import pytest
 import numpy as np
 from astropy import units as u
+from loguru import logger
 
 import netCDF4 as nc
 
@@ -31,11 +31,7 @@ LOG_PATH = Path(__file__).parent / 'logs' / 'exocam.log'
 if not LOG_PATH.parent.exists():
     LOG_PATH.parent.mkdir()
 
-log = logging.Logger('exocam')
-log.setLevel(logging.DEBUG)
-fh = logging.FileHandler(LOG_PATH,mode='w')
-fh.setLevel(logging.DEBUG)
-log.addHandler(fh)
+logger.add(LOG_PATH, level='TRACE', filter=lambda record: 'exocam' in record['extra'])
 
 @pytest.fixture()
 def data_path():
@@ -176,7 +172,7 @@ def test_call_psg(data_path,psg_url):
         obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
         gen = models.Generator(gcm_binning=200)
         cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj,generator=gen)
-        psg = APICall(cfg,'all','globes',url=psg_url,logger=log)
+        psg = APICall(cfg,'all','globes',url=psg_url,log_flag='exocam')
         psg.reset()
         try:
             response = psg()

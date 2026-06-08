@@ -6,12 +6,13 @@ If you are running this test locally, you will need to download the ExoPlasim te
 .. code-block:: bash
     python -c "from pypsg.globes.exoplasim.exoplasim import download_test_data; download_test_data()"
 """
-import logging
 from pathlib import Path
 from netCDF4 import Dataset
 import pytest
 import numpy as np
 from astropy import units as u
+from loguru import logger
+
 from libpypsg.globes import PyGCM
 from libpypsg.cfg import PyConfig, models
 from libpypsg import APICall
@@ -39,11 +40,7 @@ LOG_PATH = Path(__file__).parent / 'logs' / 'exoplasim.log'
 if not LOG_PATH.parent.exists():
     LOG_PATH.parent.mkdir()
 
-log = logging.getLogger('exoplasim')
-log.setLevel(logging.DEBUG)
-fh = logging.FileHandler(LOG_PATH)
-fh.setLevel(logging.DEBUG)
-log.addHandler(fh)
+logger.add(LOG_PATH, level='TRACE', filter = lambda record: 'exoplasim' in record['extra'])
 
 @pytest.fixture
 def data()->Dataset:
@@ -230,7 +227,7 @@ def test_call_psg(data,psg_url):
     geo = models.Observatory(observer_altitude = 1.3*u.pc,)
     obj = models.Target(name = 'Exoplanet', object='Exoplanet',diameter=1*u.R_earth,season=30*u.deg)
     cfg = PyConfig(gcm=gcm,telescope=tele,geometry=geo,target=obj)
-    psg = APICall(cfg,'all','globes',url=psg_url,logger=log)
+    psg = APICall(cfg,'all','globes',url=psg_url,log_flag='exoplasim')
     psg.reset()
     try:
         response = psg()

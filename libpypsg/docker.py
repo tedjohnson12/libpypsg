@@ -5,6 +5,7 @@ import json
 import subprocess
 import platform
 import shutil
+from loguru import logger
 
 from . import settings
 
@@ -24,6 +25,7 @@ def _get_containers_json() -> dict:
     raw_output = subprocess.check_output(
         ['docker', 'ps', '-a', '--format', 'json'],
         shell=shell).strip().decode('utf-8')
+    logger.debug(raw_output)
     ls_output = raw_output.split('\n')
     json_output = '[\n' + ',\n'.join(ls_output) + ']'
     containers_info = json.loads(json_output)
@@ -68,8 +70,10 @@ def is_psg_installed() -> bool:
                 named_psg = 'psg' == name
             if image == 'psg' and named_psg:
                 return True
+        logger.debug('No container named `psg` found.')
         return False
     except json.JSONDecodeError:
+        logger.debug('Could not parse json output from `docker ps -a --format json`. Is docker installed?')
         return False
 
 
@@ -131,10 +135,13 @@ def start_psg(strict=True):
             msg = 'PSG is not installed. '
             url = 'https://psg.gsfc.nasa.gov/helpapi.php#installation'
             msg += f'Visit {url} for installation instructions.'
+            logger.critical(msg)
             raise PSGNotInstalledError(msg)
         else:
+            logger.warning('PSG is not installed. Skipping start command...')
             return None
     if not is_psg_running():
+        logger.info('Starting psg container...')
         subprocess.call(['docker', 'start', 'psg'])
 
 
@@ -152,10 +159,13 @@ def stop_psg(strict=True):
             msg = 'PSG is not installed. '
             url = 'https://psg.gsfc.nasa.gov/helpapi.php#installation'
             msg += f'Visit {url} for installation instructions.'
+            logger.critical(msg)
             raise PSGNotInstalledError(msg)
         else:
+            logger.warning('PSG is not installed. Skipping stop command...')
             return None
     if is_psg_running():
+        logger.info('Stopping psg container...')
         subprocess.call(['docker', 'stop', 'psg'])
 
 
@@ -172,6 +182,7 @@ def set_psg_url(internal=True):
         url = settings.INTERNAL_PSG_URL
     else:
         url = settings.PSG_URL
+    logger.info(f'Setting psg URL to {url}')
     settings.save_settings(url=url)
 
 
@@ -190,4 +201,5 @@ def set_url_and_run():
         start_psg(strict=True)
     else:
         url = settings.PSG_URL
+    logger.info(f'Setting psg URL to {url}')
     settings.save_settings(url=url)
