@@ -12,6 +12,7 @@ import numpy as np
 from ...settings import psg_aerosol_size_unit, USER_DATA_PATH
 from .. import structure
 from ..globes import PyGCM
+from ..structure import Molecule
 from ..exocam.exocam import _generic_getter
 
 
@@ -358,6 +359,7 @@ def to_pygcm(
     data:Dataset,
     itime:int,
     molecules:list,
+    const_molecules:dict[str,float],
     aerosols:list,
     background=None,
     lon_start:float=-180.,
@@ -376,6 +378,8 @@ def to_pygcm(
         The time index.
     molecules : list
         The variable names of the molecules.
+    const_molecules : dict[str,float]
+        Names and abundances of constant-abndance molecules to add.
     aerosols : list
         The variable names of the aerosols.
     background : str, optional
@@ -390,6 +394,9 @@ def to_pygcm(
         The mean molecular mass of the atmosphere. Defaults to None.
     """
     molecules:tuple = tuple() if molecules is None else get_molecule_suite(data,itime,molecules,background,mean_molecular_mass)
+    shape = data.variables['flpr'].shape[1:]
+    additional_molecules:tuple = tuple() if const_molecules is None else tuple(Molecule.constant(name,abn,shape) for name, abn in const_molecules.items())
+    molecules += additional_molecules
     
     _aerosols:tuple = tuple() if aerosols is None else tuple(get_aerosol(data,itime,name) for name in aerosols)
     aerosol_sizes:tuple = tuple() if aerosols is None else tuple(get_aerosol_size(data,itime,name) for name in aerosols)
