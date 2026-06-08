@@ -148,10 +148,8 @@ Run PSG
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/site-packages/libpypsg/request.py:51: GeneratorWarning: Too many electrons per pixel (up to 4.69e+08) detected in the 1.00-17.92 um spectral range. Reduce exposure time per frame to less than 0.107 seconds.
+    /opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/libpypsg/request.py:64: GeneratorWarning: Too many electrons per pixel (up to 4.69e+08) detected in the 1.00-17.92 um spectral range. Reduce exposure time per frame to less than 0.107 seconds.
       warnings.warn(warning)
-    /opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/site-packages/astropy/units/format/generic.py:507: UnitsWarning: 'W/m2/um' contains multiple slashes, which is discouraged by the FITS standard
-      warnings.warn(
 
 
 
@@ -192,7 +190,7 @@ Read the response
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.238 seconds)
+   **Total running time of the script:** (0 minutes 1.697 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_rad.py:
