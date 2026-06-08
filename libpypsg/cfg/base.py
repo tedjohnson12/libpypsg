@@ -424,7 +424,7 @@ class UnitChoicesField(Field):
     def value(self, value_to_set):
         if value_to_set is None:
             pass
-        elif not isinstance(value_to_set, (u.Unit,u.CompositeUnit)):
+        elif not isinstance(value_to_set, (u.Unit,u.CompositeUnit,u.IrreducibleUnit)):
             raise TypeError(f"Value must be a unit. Instead got {type(value_to_set)}")
         elif value_to_set not in self._options:
             msg = f'Value must be one of {",".join([unit.to_string() for unit in self._options])}.'
@@ -1139,9 +1139,9 @@ class Molecule:
         PSG also allows the `m-3`, `molec`, `s-1`, and `tau` unit types.
         These should be implemented eventually.
     """
-    _allowed_units = (u.pct, u_psg.ppm, u_psg.ppb, u_psg.ppt,
+    _allowed_units = (u.pct,u.pct, u_psg.ppm, u_psg.ppb, u_psg.ppt,
                       u.Unit('m-2'), u.dimensionless_unscaled)
-    _unit_codes = ('%', 'ppmv', 'ppbv', 'pptv', 'm2', 'scl')
+    _unit_codes = ('%','pct', 'ppmv', 'ppbv', 'pptv', 'm2', 'scl')
     _fmt = '.2e'
 
     def __init__(
